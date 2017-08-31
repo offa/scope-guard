@@ -1,5 +1,10 @@
 # Scope Guard
 
+[![Build Status](https://travis-ci.org/offa/scope-guard.svg?branch=master)](https://travis-ci.org/offa/scope-guard)
+[![GitHub release](https://img.shields.io/github/release/offa/scope-guard.svg)](https://github.com/offa/scope-guard/releases)
+[![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
+![C++](https://img.shields.io/badge/c++-14-green.svg)
+
 
 ## License
 
