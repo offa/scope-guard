@@ -2,6 +2,7 @@
 #include "scope_guard.h"
 #include <catch.hpp>
 
+using namespace guards;
 
 TEST_CASE("deleter called on destruction", "[ScopeGuard]")
 {
