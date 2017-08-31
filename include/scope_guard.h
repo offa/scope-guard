@@ -3,7 +3,7 @@
 
 #include <utility>
 
-namespace guards
+namespace sg
 {
 
     template<class Deleter>
