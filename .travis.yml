@@ -1,0 +1,62 @@
+language: generic
+
+dist: trusty
+sudo: required
+
+matrix:
+    include:
+    - env: CXX=g++-7 CC=gcc-7
+      addons:
+        apt:
+          packages:
+            - g++-7
+          sources: &sources
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+            - llvm-toolchain-precise-3.9
+            - llvm-toolchain-precise-3.8
+            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
+              key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
+    - env: CXX=g++-6 CC=gcc-6
+      addons:
+        apt:
+          packages:
+            - g++-6
+          sources: *sources
+    - env: CXX=g++-5 CC=gcc-5
+      addons:
+        apt:
+          packages:
+            - g++-5
+          sources: *sources
+    - env: CXX=clang++-4.0 CC=clang-4.0
+      addons:
+        apt:
+          packages:
+            - clang-4.0
+            - libc++-dev
+          sources: *sources
+    - env: CXX=clang++-3.9 CC=clang-3.9
+      addons:
+        apt:
+          packages:
+            - clang-3.9
+            - libc++-dev
+          sources: *sources
+    - env: CXX=clang++-3.8 CC=clang-3.8
+      addons:
+        apt:
+          packages:
+            - clang-3.8
+            - libc++-dev
+          sources: *sources
+
+script:
+    - if [[ "$CXX" == clang* ]]; then export CXXFLAGS="-stdlib=libc++"; fi
+    - mkdir build && cd build
+    - cmake ..
+    - make
+    - make unittest
+
+
+
