@@ -37,3 +37,7 @@ if( UNITTEST )
     add_subdirectory("test")
 endif()
 
+
+include(Install)
+
+
