@@ -1,6 +1,11 @@
 
+add_library(Catch INTERFACE)
+target_include_directories(Catch INTERFACE "catch")
+
+
 add_library(testmain TestMain.cpp)
-target_include_directories(testmain SYSTEM PUBLIC "catch/")
+target_link_libraries(testmain Catch)
+
 
 function(add_test_suite name)
     add_executable(${name} ${name}.cpp)
@@ -8,8 +13,8 @@ function(add_test_suite name)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
-add_test_suite(ScopeGuardTest)
 
+add_test_suite(ScopeGuardTest)
 
 
 
