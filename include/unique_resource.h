@@ -36,13 +36,23 @@ namespace sr
         }
 
         unique_resource_t(const unique_resource_t&) = delete;
-        unique_resource_t(unique_resource_t&&) = default;
+
+        unique_resource_t(unique_resource_t&& other) noexcept : m_resource(std::move(other.m_resource)),
+                                                            m_deleter(std::move(other.m_deleter)),
+                                                            m_execute_on_destruction(other.m_execute_on_destruction)
+        {
+            other.release();
+        }
 
         ~unique_resource_t()
         {
             if( m_execute_on_destruction == true )
             {
-                m_deleter();
+                try
+                {
+                    m_deleter();
+                }
+                catch( ... ) { /* Empty */ }
             }
         }
 

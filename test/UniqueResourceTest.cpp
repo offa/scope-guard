@@ -49,7 +49,6 @@ TEST_CASE("deleter is not called if released", "[UniqueResource]")
     REQUIRE(calls == 0);
 }
 
-
 TEST_CASE("release returns reference to resource", "[UniqueResource]")
 {
     constexpr Handle handle{3};
@@ -60,4 +59,56 @@ TEST_CASE("release returns reference to resource", "[UniqueResource]")
     REQUIRE(handle == result);
 }
 
+TEST_CASE("move releases moved-from object", "[UniqueResource]")
+{
+    std::size_t calls{0};
+    constexpr Handle handle{3};
+
+    {
+        auto movedFrom = sr::unique_resource(handle, [&calls] { ++calls; });
+        auto guard = std::move(movedFrom);
+        static_cast<void>(guard);
+    }
+
+    REQUIRE(calls == 1);
+}
+
+TEST_CASE("move transfers state", "[UniqueResource]")
+{
+    std::size_t calls{0};
+    constexpr Handle handle{3};
+
+    {
+        auto movedFrom = sr::unique_resource(handle, [&calls] { ++calls; });
+        auto guard = std::move(movedFrom);
+        static_cast<void>(guard);
+    }
+
+    REQUIRE(calls == 1);
+}
+
+TEST_CASE("move transfers state if released", "[UniqueResource]")
+{
+    std::size_t calls{0};
+    constexpr Handle handle{3};
+
+    {
+        auto movedFrom = sr::unique_resource(handle, [&calls] { ++calls; });
+        movedFrom.release();
+        auto guard = std::move(movedFrom);
+        static_cast<void>(guard);
+    }
+
+    REQUIRE(calls == 0);
+}
+
+TEST_CASE("no exception propagation from deleter", "[UniqueResource]")
+{
+    constexpr Handle handle{3};
+
+    REQUIRE_NOTHROW([] {
+        auto guard = sr::unique_resource(handle, [] { throw "Don't propagate this!"; });
+        static_cast<void>(guard);
+        }());
+}
 
