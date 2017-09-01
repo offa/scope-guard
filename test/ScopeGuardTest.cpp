@@ -33,7 +33,7 @@ TEST_CASE("move releases moved-from object", "[ScopeGuard]")
     {
         auto movedFrom = sr::scope_guard([&calls] { ++calls; });
         auto guard = std::move(movedFrom);
-
+        static_cast<void>(guard);
     }
 
     REQUIRE(calls == 1);
@@ -46,6 +46,7 @@ TEST_CASE("move transfers state", "[ScopeGuard]")
     {
         auto movedFrom = sr::scope_guard([&executed] { executed = true; });
         auto guard = std::move(movedFrom);
+        static_cast<void>(guard);
     }
 
     REQUIRE(executed == true);
@@ -59,6 +60,7 @@ TEST_CASE("move transfers state if released", "[ScopeGuard]")
         auto movedFrom = sr::scope_guard([&executed] { executed = true; });
         movedFrom.release();
         auto guard = std::move(movedFrom);
+        static_cast<void>(guard);
     }
 
     REQUIRE(executed == false);
