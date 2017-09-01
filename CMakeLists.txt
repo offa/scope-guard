@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(scoped-ressource VERSION 0.0.1)
+project(ScopeGuard VERSION 0.0.1)
 message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 
 option(UNITTEST "Build Unit Tests" ON)
