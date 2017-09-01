@@ -24,6 +24,14 @@
 
 namespace sr
 {
+
+    enum class invoke_it
+    {
+        once,
+        again
+    };
+
+
     template<class Ressource, class Deleter>
     class unique_resource_t
     {
