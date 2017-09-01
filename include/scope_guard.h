@@ -16,7 +16,12 @@ namespace sg
         {
         }
 
-        scope_guard_t(scope_guard_t&&)= default;
+        scope_guard_t(scope_guard_t&& other) : m_deleter(std::move(other.m_deleter)),
+                                            m_execute_on_destruction(other.m_execute_on_destruction)
+        {
+            other.release();
+        }
+
         scope_guard_t(const scope_guard_t&) = delete;
 
         ~scope_guard_t()
