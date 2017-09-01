@@ -58,12 +58,25 @@ namespace sr
             {
                 try
                 {
-                    m_deleter();
+                    m_deleter(m_resource);
                 }
                 catch( ... ) { /* Empty */ }
             }
         }
 
+
+        void invoke(const invoke_it strategy = invoke_it::once) noexcept
+        {
+            if( m_execute_on_destruction == true )
+            {
+                try
+                {
+                    m_deleter(m_resource);
+                }
+                catch( ... ) { /* Empty */ }
+            }
+            m_execute_on_destruction = ( strategy == invoke_it::again );
+        }
 
         const Ressource& release() noexcept
         {
@@ -74,7 +87,7 @@ namespace sr
 
         unique_resource_t& operator=(unique_resource_t&& other) noexcept
         {
-            m_deleter();
+            m_deleter(m_resource);
             m_resource = std::move(other.m_resource);
             m_deleter = std::move(other.m_deleter);
             m_execute_on_destruction = other.m_execute_on_destruction;
