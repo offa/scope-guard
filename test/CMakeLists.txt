@@ -9,7 +9,7 @@ target_link_libraries(TestMain Catch)
 
 function(add_test_suite name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(${name} TestMain)
+    target_link_libraries(${name} TestMain ScopeGuard)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
