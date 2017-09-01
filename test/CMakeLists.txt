@@ -15,10 +15,11 @@ endfunction()
 
 
 add_test_suite(ScopeGuardTest)
-
+add_test_suite(UniqueResourceTest)
 
 
 add_custom_target(unittest ScopeGuardTest
+                    COMMAND UniqueResourceTest
                     COMMENT "Running unittests\n\n"
                     VERBATIM
                     )
