@@ -16,8 +16,8 @@ namespace sg
         {
         }
 
-        scope_guard_t(scope_guard_t&& other) : m_deleter(std::move(other.m_deleter)),
-                                            m_execute_on_destruction(other.m_execute_on_destruction)
+        scope_guard_t(scope_guard_t&& other) noexcept : m_deleter(std::move(other.m_deleter)),
+                                                    m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
         }
