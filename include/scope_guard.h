@@ -82,7 +82,7 @@ namespace sr
     template<class Deleter>
     scope_guard_t<Deleter> scope_guard(Deleter&& deleter) noexcept
     {
-        return scope_guard_t<Deleter>(std::move(deleter));
+        return scope_guard_t<Deleter>{std::move(deleter)};
     }
 
 }
