@@ -52,7 +52,7 @@ namespace sr
         }
 
 
-        void release()
+        void release() noexcept
         {
             m_execute_on_destruction = false;
         }
