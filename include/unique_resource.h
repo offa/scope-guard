@@ -62,7 +62,7 @@ namespace sr
         {
             if( m_execute_on_destruction == true )
             {
-                callDeleterSafe();
+                call_deleter_safe();
             }
 
             m_execute_on_destruction = ( strategy == invoke_it::again );
@@ -92,7 +92,7 @@ namespace sr
 
     private:
 
-        void callDeleterSafe() noexcept
+        void call_deleter_safe() noexcept
         {
             try
             {
