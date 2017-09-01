@@ -52,11 +52,5 @@ matrix:
           sources: *sources
 
 script:
-    - if [[ "$CXX" == clang* ]]; then export CXXFLAGS="-stdlib=libc++"; fi
-    - mkdir build && cd build
-    - cmake ..
-    - make
-    - make unittest
-
-
+    - script/ci_build.sh
 
