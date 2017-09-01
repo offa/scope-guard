@@ -29,7 +29,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 
 add_library(ScopeGuard INTERFACE)
-target_include_directories(ScopeGuard INTERFACE "include")
+target_include_directories(ScopeGuard INTERFACE
+                       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                       $<INSTALL_INTERFACE:include>)
 
 
 if( UNITTEST )

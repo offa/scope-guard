@@ -1,10 +1,4 @@
 
-include(GNUInstallDirs)
-
-install(TARGETS ScopeGuard
-                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-                )
-
+install(TARGETS ScopeGuard EXPORT ScopeGuard-config DESTINATION include)
+install(EXPORT ScopeGuard-config DESTINATION share/scopeguard/cmake)
 
