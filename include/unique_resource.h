@@ -29,7 +29,10 @@ namespace sr
     {
     public:
 
-        explicit unique_resource_t(Ressource&& res, Deleter&& deleter, bool shouldrun = true) noexcept : m_deleter(std::move(deleter))
+        explicit unique_resource_t(Ressource&& res, Deleter&& deleter, bool shouldrun = true) noexcept : m_resource(std::move(res)),
+                                                                                                    m_deleter(std::move(deleter)),
+                                                                                                    m_execute_on_destruction(true)
+
         {
             static_cast<void>(res);
             static_cast<void>(shouldrun);
@@ -38,13 +41,25 @@ namespace sr
 
         ~unique_resource_t()
         {
-            m_deleter();
+            if( m_execute_on_destruction == true )
+            {
+                m_deleter();
+            }
+        }
+
+
+        const Ressource& release() noexcept
+        {
+            m_execute_on_destruction = false;
+            return m_resource;
         }
 
 
     private:
 
+        Ressource m_resource;
         Deleter m_deleter;
+        bool m_execute_on_destruction;
     };
 
 

@@ -36,3 +36,28 @@ TEST_CASE("deleter called on destruction", "[UniqueResource]")
     REQUIRE(calls == 1);
 }
 
+TEST_CASE("deleter is not called if released", "[UniqueResource]")
+{
+    std::size_t calls{0};
+    constexpr Handle handle{3};
+
+    {
+        auto guard = sr::unique_resource(handle, [&calls] { ++calls; });
+        guard.release();
+    }
+
+    REQUIRE(calls == 0);
+}
+
+
+TEST_CASE("release returns reference to resource", "[UniqueResource]")
+{
+    constexpr Handle handle{3};
+
+    auto guard = sr::unique_resource(handle, [] { });
+    const auto result = guard.release();
+
+    REQUIRE(handle == result);
+}
+
+
