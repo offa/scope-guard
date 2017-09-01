@@ -28,7 +28,7 @@ namespace sr
         {
             if( m_execute_on_destruction == true )
             {
-                m_deleter();
+                callDeleterSafe();
             }
         }
 
@@ -44,6 +44,16 @@ namespace sr
 
 
     private:
+
+        void callDeleterSafe() noexcept
+        {
+            try
+            {
+                m_deleter();
+            }
+            catch( ... ) { /* Empty */ }
+        }
+
 
         Deleter m_deleter;
         bool m_execute_on_destruction;

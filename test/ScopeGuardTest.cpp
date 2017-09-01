@@ -64,3 +64,10 @@ TEST_CASE("move transfers state if released", "[ScopeGuard]")
     REQUIRE(executed == false);
 }
 
+TEST_CASE("no exception propagation from deleter", "[ScopeGuard]")
+{
+    REQUIRE_NOTHROW([] {
+        auto guard = sr::scope_guard([] { throw "Don't propagate this!"; });
+        static_cast<void>(guard);
+        }());
+}
