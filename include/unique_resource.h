@@ -32,10 +32,11 @@ namespace sr
         explicit unique_resource_t(Ressource&& res, Deleter&& deleter, bool shouldrun = true) noexcept : m_resource(std::move(res)),
                                                                                                     m_deleter(std::move(deleter)),
                                                                                                     m_execute_on_destruction(shouldrun)
-
         {
         }
 
+        unique_resource_t(const unique_resource_t&) = delete;
+        unique_resource_t(unique_resource_t&&) = default;
 
         ~unique_resource_t()
         {
@@ -51,6 +52,10 @@ namespace sr
             m_execute_on_destruction = false;
             return m_resource;
         }
+
+
+        unique_resource_t& operator=(unique_resource_t&&) = default;
+        unique_resource_t& operator=(const unique_resource_t&) = delete;
 
 
     private:
