@@ -54,14 +54,7 @@ namespace sr
 
         ~unique_resource_t()
         {
-            if( m_execute_on_destruction == true )
-            {
-                try
-                {
-                    m_deleter(m_resource);
-                }
-                catch( ... ) { /* Empty */ }
-            }
+            invoke(invoke_it::once);
         }
 
 
@@ -87,7 +80,7 @@ namespace sr
 
         unique_resource_t& operator=(unique_resource_t&& other) noexcept
         {
-            m_deleter(m_resource);
+            invoke(invoke_it::once);
             m_resource = std::move(other.m_resource);
             m_deleter = std::move(other.m_deleter);
             m_execute_on_destruction = other.m_execute_on_destruction;
