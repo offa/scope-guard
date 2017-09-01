@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-14-green.svg)
 
-Implementation of `scope_guard` and `unique_resource` as proposed in [N3949 - Scoped Resource][1].
+Implementation of `scope_guard` and `unique_resource` as proposed in [**N3949**][1].
 
 
 ## Documentation
