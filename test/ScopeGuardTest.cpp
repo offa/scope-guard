@@ -4,26 +4,26 @@
 
 TEST_CASE("deleter called on destruction", "[ScopeGuard]")
 {
-    bool executed = false;
+    std::size_t calls{0};
 
     {
-        auto guard = sr::scope_guard([&executed] { executed = true; });
+        auto guard = sr::scope_guard([&calls] { ++calls; });
         static_cast<void>(guard);
     }
 
-    REQUIRE(executed == true);
+    REQUIRE(calls == 1);
 }
 
 TEST_CASE("deleter is not called if released", "[ScopeGuard]")
 {
-    bool executed = false;
+    std::size_t calls{0};
 
     {
-        auto guard = sr::scope_guard([&executed] { executed = true; });
+        auto guard = sr::scope_guard([&calls] { ++calls; });
         guard.release();
     }
 
-    REQUIRE(executed == false);
+    REQUIRE(calls == 0);
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeGuard]")
@@ -41,29 +41,29 @@ TEST_CASE("move releases moved-from object", "[ScopeGuard]")
 
 TEST_CASE("move transfers state", "[ScopeGuard]")
 {
-    bool executed = false;
+    std::size_t calls{0};
 
     {
-        auto movedFrom = sr::scope_guard([&executed] { executed = true; });
+        auto movedFrom = sr::scope_guard([&calls] { ++calls; });
         auto guard = std::move(movedFrom);
         static_cast<void>(guard);
     }
 
-    REQUIRE(executed == true);
+    REQUIRE(calls == 1);
 }
 
 TEST_CASE("move transfers state if released", "[ScopeGuard]")
 {
-    bool executed = false;
+    std::size_t calls{0};
 
     {
-        auto movedFrom = sr::scope_guard([&executed] { executed = true; });
+        auto movedFrom = sr::scope_guard([&calls] { ++calls; });
         movedFrom.release();
         auto guard = std::move(movedFrom);
         static_cast<void>(guard);
     }
 
-    REQUIRE(executed == false);
+    REQUIRE(calls == 0);
 }
 
 TEST_CASE("no exception propagation from deleter", "[ScopeGuard]")
