@@ -21,10 +21,12 @@
 #include "unique_resource.h"
 #include <catch.hpp>
 
+using Handle = int;
+
 TEST_CASE("deleter called on destruction", "[UniqueResource]")
 {
     std::size_t calls{0};
-    constexpr int handle{3};
+    constexpr Handle handle{3};
 
     {
         auto guard = sr::unique_resource(handle, [&calls] { ++calls; });
