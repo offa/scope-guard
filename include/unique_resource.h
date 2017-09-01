@@ -62,12 +62,9 @@ namespace sr
         {
             if( m_execute_on_destruction == true )
             {
-                try
-                {
-                    m_deleter(m_resource);
-                }
-                catch( ... ) { /* Empty */ }
+                callDeleterSafe();
             }
+
             m_execute_on_destruction = ( strategy == invoke_it::again );
         }
 
@@ -89,10 +86,20 @@ namespace sr
             return *this;
         }
 
+
         unique_resource_t& operator=(const unique_resource_t&) = delete;
 
 
     private:
+
+        void callDeleterSafe() noexcept
+        {
+            try
+            {
+                m_deleter(m_resource);
+            }
+            catch( ... ) { /* Empty */ }
+        }
 
         Ressource m_resource;
         Deleter m_deleter;
