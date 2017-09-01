@@ -5,6 +5,12 @@
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-14-green.svg)
 
+Implementation of `scope_guard` and `unique_resource` as proposed in [N3949 - Scoped Resource][1].
+
+
+## Documentation
+
+- [*N3949 - Scoped Resource - Generic RAII Wrapper for the Standard Library*][1] (P. Sommerlad, A. L. Sandoval)
 
 ## License
 
@@ -24,3 +30,4 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+[1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3949.pdf
