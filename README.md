@@ -10,7 +10,7 @@ Implementation of `scope_guard` and `unique_resource` as proposed in [**N3949**]
 
 ## Compatibility
 
-This implemenation conforms to [N3949][1], except:
+This implementation conforms to [N3949][1], except:
 
 1. **Namespace:** Another namespace is used instead of `std`.
 1. **Filenames:** The filenames contain a `.h` extension.
