@@ -31,11 +31,9 @@ namespace sr
 
         explicit unique_resource_t(Ressource&& res, Deleter&& deleter, bool shouldrun = true) noexcept : m_resource(std::move(res)),
                                                                                                     m_deleter(std::move(deleter)),
-                                                                                                    m_execute_on_destruction(true)
+                                                                                                    m_execute_on_destruction(shouldrun)
 
         {
-            static_cast<void>(res);
-            static_cast<void>(shouldrun);
         }
 
 
