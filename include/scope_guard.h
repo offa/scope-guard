@@ -11,7 +11,8 @@ namespace sg
     {
     public:
 
-        explicit scope_guard_t(Deleter&& deleter) noexcept : m_deleter(std::move(deleter))
+        explicit scope_guard_t(Deleter&& deleter) noexcept : m_deleter(std::move(deleter)),
+                                                        m_execute_on_destruction(true)
         {
         }
 
@@ -20,7 +21,16 @@ namespace sg
 
         ~scope_guard_t()
         {
-            m_deleter();
+            if( m_execute_on_destruction == true )
+            {
+                m_deleter();
+            }
+        }
+
+
+        void release()
+        {
+            m_execute_on_destruction = false;
         }
 
 
@@ -31,6 +41,7 @@ namespace sg
     private:
 
         Deleter m_deleter;
+        bool m_execute_on_destruction;
     };
 
 
