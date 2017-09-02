@@ -305,3 +305,4 @@ TEST_CASE("deleter access", "[UniqueResource]")
     guard.get_deleter()(6);
     REQUIRE(value == 6);
 }
+

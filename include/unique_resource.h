@@ -112,6 +112,10 @@ namespace sr
             return m_deleter;
         }
 
+        Deleter& get_deleter() noexcept
+        {
+            return m_deleter;
+        }
 
         unique_resource_t& operator=(unique_resource_t&& other) noexcept
         {
