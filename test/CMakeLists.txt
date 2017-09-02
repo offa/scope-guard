@@ -2,9 +2,12 @@
 add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE "catch")
 
+add_library(Trompeloeil INTERFACE)
+target_include_directories(Trompeloeil INTERFACE "trompeloeil")
+
 
 add_library(TestMain TestMain.cpp)
-target_link_libraries(TestMain Catch)
+target_link_libraries(TestMain Catch Trompeloeil)
 
 
 function(add_test_suite name)

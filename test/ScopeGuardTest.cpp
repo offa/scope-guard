@@ -20,17 +20,33 @@
 
 #include "scope_guard.h"
 #include <catch.hpp>
+#include <trompeloeil.hpp>
+
+using namespace trompeloeil;
+
+struct CallMock
+{
+    MAKE_MOCK0(deleter, void());
+};
+
+namespace
+{
+    CallMock m;
+
+    void deleter()
+    {
+        m.deleter();
+    }
+}
+
 
 TEST_CASE("deleter called on destruction", "[ScopeGuard]")
 {
-    std::size_t calls{0};
-
     {
-        auto guard = sr::scope_guard([&calls] { ++calls; });
+        REQUIRE_CALL(m, deleter());
+        auto guard = sr::scope_guard(deleter);
         static_cast<void>(guard);
     }
-
-    REQUIRE(calls == 1);
 }
 
 TEST_CASE("deleter is not called if released", "[ScopeGuard]")
