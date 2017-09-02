@@ -20,17 +20,9 @@
 
 #include "scope_guard.h"
 #include <catch.hpp>
-#include <trompeloeil.hpp>
+#include "Mocks.h"
 
 using namespace trompeloeil;
-
-namespace mock
-{
-    struct CallMock
-    {
-        MAKE_MOCK0(deleter, void());
-    };
-}
 
 namespace
 {
@@ -39,11 +31,6 @@ namespace
     void deleter()
     {
         m.deleter();
-    }
-
-    void deleterThrow()
-    {
-        throw std::exception{};
     }
 }
 
@@ -98,7 +85,7 @@ TEST_CASE("move transfers state if released", "[ScopeGuard]")
 TEST_CASE("no exception propagation from deleter", "[ScopeGuard]")
 {
     REQUIRE_NOTHROW([] {
-        auto guard = sr::scope_guard(deleterThrow);
+        auto guard = sr::scope_guard([] { throw std::exception{}; });
         static_cast<void>(guard);
         }());
 }
