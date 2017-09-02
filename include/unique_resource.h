@@ -21,6 +21,7 @@
 #pragma once
 
 #include <utility>
+#include <type_traits>
 
 namespace sr
 {
@@ -90,6 +91,21 @@ namespace sr
             return m_resource;
         }
 
+        template<class R = std::decay_t<Ressource>,
+            std::enable_if_t<std::is_pointer<R>::value &&
+                ( std::is_class<std::remove_pointer_t<R>>::value
+                    || std::is_union<std::remove_pointer_t<R>>::value ), int> = 0>
+        R operator->() const noexcept
+        {
+            return m_resource;
+        }
+
+        template<class R = std::decay_t<Ressource>,
+            std::enable_if_t<std::is_pointer<R>::value, int> = 0>
+        std::add_lvalue_reference_t<std::remove_pointer_t<Ressource>> operator*() const noexcept
+        {
+            return *get();
+        }
 
         const Deleter& get_deleter() const noexcept
         {

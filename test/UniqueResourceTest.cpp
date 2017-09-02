@@ -23,6 +23,7 @@
 #include <catch.hpp>
 
 using Handle = int;
+using PtrHandle = std::add_pointer_t<Handle>;
 
 TEST_CASE("deleter called on destruction", "[UniqueResource]")
 {
@@ -249,14 +250,28 @@ TEST_CASE("get accesses ressource", "[UniqueResource]")
     REQUIRE(guard.get() == 3);
 }
 
-TEST_CASE("conversion operator accesses ressource", "[UniqueResource]")
+TEST_CASE("conversion operator", "[UniqueResource]")
 {
     auto guard = sr::unique_resource(Handle{3}, [](auto) { });
     const auto& ref = guard;
     REQUIRE(ref == 3);
 }
 
-// TODO: conditional access functions
+TEST_CASE("pointer access operator" "[UniqueResource]")
+{
+    const auto p = std::make_pair(3, 4);
+    auto guard = sr::unique_resource(&p, [](auto) { });
+    const auto x = guard.operator->();
+    REQUIRE(x->first == 3);
+}
+
+TEST_CASE("dereference operator", "[UniqueResource]")
+{
+    Handle h{4};
+    auto guard = sr::unique_resource(PtrHandle{&h}, [](auto) { });
+    const auto x = guard.operator*();
+    REQUIRE(x == 4);
+}
 
 TEST_CASE("deleter access", "[UniqueResource]")
 {
@@ -265,5 +280,4 @@ TEST_CASE("deleter access", "[UniqueResource]")
     REQUIRE(value == 0);
     guard.get_deleter()(6);
     REQUIRE(value == 6);
-
 }
