@@ -5,12 +5,19 @@ message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 option(UNITTEST "Build Unit Tests" ON)
+option(COVERAGE "Enable Coverage" OFF)
+message(STATUS "Coverage : ${COVERAGE}")
 
 
 if( CMAKE_BUILD_TYPE )
     message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
 else()
     message(STATUS "Build Type : None")
+endif()
+
+
+if( COVERAGE )
+    include(Coverage)
 endif()
 
 
@@ -38,7 +45,6 @@ if( UNITTEST )
     enable_testing()
     add_subdirectory("test")
 endif()
-
 
 include(Install)
 
