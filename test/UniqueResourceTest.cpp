@@ -243,9 +243,16 @@ TEST_CASE("reset sets ressource", "[UniqueResource]")
     REQUIRE(guard.get() == 7);
 }
 
-TEST_CASE("get returns ressource", "[UniqueResource]")
+TEST_CASE("get accesses ressource", "[UniqueResource]")
 {
     auto guard = sr::unique_resource(Handle{3}, [](auto) { });
     REQUIRE(guard.get() == 3);
+}
+
+TEST_CASE("conversion operator accesses ressource", "[UniqueResource]")
+{
+    auto guard = sr::unique_resource(Handle{3}, [](auto) { });
+    const auto& ref = guard;
+    REQUIRE(ref == 3);
 }
 

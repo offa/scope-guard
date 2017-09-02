@@ -85,6 +85,11 @@ namespace sr
             return m_resource;
         }
 
+        operator const Ressource&() const noexcept
+        {
+            return m_resource;
+        }
+
 
         unique_resource_t& operator=(unique_resource_t&& other) noexcept
         {
