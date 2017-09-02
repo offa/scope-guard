@@ -69,7 +69,7 @@ namespace sr
             m_execute_on_destruction = ( strategy == invoke_it::again );
         }
 
-        const Ressource& release() noexcept
+        Ressource release() noexcept
         {
             m_execute_on_destruction = false;
             return m_resource;
