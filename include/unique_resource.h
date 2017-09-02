@@ -74,6 +74,17 @@ namespace sr
             return m_resource;
         }
 
+        void reset(Ressource&& res) noexcept
+        {
+            invoke(invoke_it::again);
+            m_resource = std::move(res);
+        }
+
+        const Ressource& get() const noexcept
+        {
+            return m_resource;
+        }
+
 
         unique_resource_t& operator=(unique_resource_t&& other) noexcept
         {

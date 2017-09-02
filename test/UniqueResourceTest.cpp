@@ -211,3 +211,41 @@ TEST_CASE("invoke does not propagate exception", "[UniqueResource]")
     REQUIRE_NOTHROW(guard.invoke());
 }
 
+TEST_CASE("reset releases old ressource", "[UniqueResource]")
+{
+    std::size_t calls{0};
+
+    {
+        auto d = [&calls](auto v)
+        {
+            if( calls == 0 )
+            {
+                REQUIRE(v == 3);
+            }
+            else
+            {
+                REQUIRE(v == 7);
+            }
+            ++calls;
+        };
+
+        auto guard = sr::unique_resource(Handle{3}, d);
+        guard.reset(Handle{7});
+    }
+
+    REQUIRE(calls == 2);
+}
+
+TEST_CASE("reset sets ressource", "[UniqueResource]")
+{
+    auto guard = sr::unique_resource(Handle{3}, [](auto) { });
+    guard.reset(Handle{7});
+    REQUIRE(guard.get() == 7);
+}
+
+TEST_CASE("get returns ressource", "[UniqueResource]")
+{
+    auto guard = sr::unique_resource(Handle{3}, [](auto) { });
+    REQUIRE(guard.get() == 3);
+}
+
