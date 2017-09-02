@@ -118,7 +118,7 @@ namespace sr
         {
             try
             {
-                m_deleter(m_resource);
+                get_deleter()(m_resource);
             }
             catch( ... ) { /* Empty */ }
         }
