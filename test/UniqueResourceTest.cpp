@@ -256,3 +256,14 @@ TEST_CASE("conversion operator accesses ressource", "[UniqueResource]")
     REQUIRE(ref == 3);
 }
 
+// TODO: conditional access functions
+
+TEST_CASE("deleter access", "[UniqueResource]")
+{
+    std::size_t value{0};
+    auto guard = sr::unique_resource(Handle{3}, [&value](auto v) { value = v; });
+    REQUIRE(value == 0);
+    guard.get_deleter()(6);
+    REQUIRE(value == 6);
+
+}

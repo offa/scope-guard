@@ -91,6 +91,12 @@ namespace sr
         }
 
 
+        const Deleter& get_deleter() const noexcept
+        {
+            return m_deleter;
+        }
+
+
         unique_resource_t& operator=(unique_resource_t&& other) noexcept
         {
             invoke(invoke_it::once);
