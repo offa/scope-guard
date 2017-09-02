@@ -24,87 +24,81 @@
 
 using namespace trompeloeil;
 
-struct CallMock
+namespace mock
 {
-    MAKE_MOCK0(deleter, void());
-};
+    struct CallMock
+    {
+        MAKE_MOCK0(deleter, void());
+    };
+}
 
 namespace
 {
-    CallMock m;
+    mock::CallMock m;
 
     void deleter()
     {
         m.deleter();
+    }
+
+    void deleterThrow()
+    {
+        throw std::exception{};
     }
 }
 
 
 TEST_CASE("deleter called on destruction", "[ScopeGuard]")
 {
-    {
-        REQUIRE_CALL(m, deleter());
-        auto guard = sr::scope_guard(deleter);
-        static_cast<void>(guard);
-    }
+    REQUIRE_CALL(m, deleter());
+    auto guard = sr::scope_guard(deleter);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("deleter is not called if released", "[ScopeGuard]")
 {
-    std::size_t calls{0};
+   REQUIRE_CALL(m, deleter()).TIMES(0);
+   auto guard = sr::scope_guard(deleter);
+   guard.release();
+}
 
-    {
-        auto guard = sr::scope_guard([&calls] { ++calls; });
-        guard.release();
-    }
-
-    REQUIRE(calls == 0);
+TEST_CASE("deleter lambda called on destruction", "[ScopeGuard]")
+{
+    mock::CallMock cm;
+    REQUIRE_CALL(cm, deleter());
+    auto guard = sr::scope_guard([&cm] { cm.deleter(); });
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeGuard]")
 {
-    std::size_t calls{0};
-
-    {
-        auto movedFrom = sr::scope_guard([&calls] { ++calls; });
-        auto guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 1);
+    REQUIRE_CALL(m, deleter());
+    auto movedFrom = sr::scope_guard(deleter);
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move transfers state", "[ScopeGuard]")
 {
-    std::size_t calls{0};
-
-    {
-        auto movedFrom = sr::scope_guard([&calls] { ++calls; });
-        auto guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 1);
+    REQUIRE_CALL(m, deleter());
+    auto movedFrom = sr::scope_guard(deleter);
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move transfers state if released", "[ScopeGuard]")
 {
-    std::size_t calls{0};
-
-    {
-        auto movedFrom = sr::scope_guard([&calls] { ++calls; });
-        movedFrom.release();
-        auto guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 0);
+    REQUIRE_CALL(m, deleter()).TIMES(0);
+    auto movedFrom = sr::scope_guard(deleter);
+    movedFrom.release();
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("no exception propagation from deleter", "[ScopeGuard]")
 {
     REQUIRE_NOTHROW([] {
-        auto guard = sr::scope_guard([] { throw "Don't propagate this!"; });
+        auto guard = sr::scope_guard(deleterThrow);
         static_cast<void>(guard);
         }());
 }
