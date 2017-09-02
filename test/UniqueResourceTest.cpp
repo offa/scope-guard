@@ -49,6 +49,30 @@ TEST_CASE("deleter is not called if released", "[UniqueResource]")
     REQUIRE(calls == 0);
 }
 
+TEST_CASE("deleter not called if checked valid", "[UniqueResource]")
+{
+    std::size_t calls{0};
+
+    {
+        auto guard = sr::unique_resource_checked(Handle{3}, Handle{6}, [&calls](auto) { ++calls; });
+        static_cast<void>(guard);
+    }
+
+    REQUIRE(calls == 1);
+}
+
+TEST_CASE("deleter not called if checked invalid", "[UniqueResource]")
+{
+    std::size_t calls{0};
+
+    {
+        auto guard = sr::unique_resource_checked(Handle{3}, Handle{3}, [&calls](auto) { ++calls; });
+        static_cast<void>(guard);
+    }
+
+    REQUIRE(calls == 0);
+}
+
 TEST_CASE("release returns reference to resource", "[UniqueResource]")
 {
     auto guard = sr::unique_resource(Handle{3}, [](auto) { });

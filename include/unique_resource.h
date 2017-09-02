@@ -152,6 +152,12 @@ namespace sr
         return unique_resource_t<Ressource, Deleter>{std::move(res), std::move(d), true};
     }
 
+    template<class Ressource, class Deleter>
+    unique_resource_t<Ressource, Deleter> unique_resource_checked(Ressource res, Ressource invalid, Deleter d) noexcept
+    {
+        return unique_resource_t<Ressource, Deleter>{std::move(res), std::move(d), (res != invalid)};
+    }
+
 }
 
 
