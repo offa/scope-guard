@@ -21,56 +21,60 @@
 #include "unique_resource.h"
 #include <functional>
 #include <catch.hpp>
+#include <trompeloeil.hpp>
+
+using namespace trompeloeil;
 
 using Handle = int;
 using PtrHandle = std::add_pointer_t<Handle>;
 
+namespace mock
+{
+    struct CallMock
+    {
+        MAKE_MOCK1(deleter, void(Handle));
+    };
+}
+
+
+namespace
+{
+    mock::CallMock m;
+
+    void deleter(Handle h)
+    {
+        m.deleter(h);
+    }
+}
+
+
 TEST_CASE("deleter called on destruction", "[UniqueResource]")
 {
-    std::size_t calls{0};
+    REQUIRE_CALL(m, deleter(3));
 
-    {
-        auto guard = sr::unique_resource(Handle{3}, [&calls](auto) { ++calls; });
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 1);
+    auto guard = sr::unique_resource(Handle{3}, deleter);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("deleter is not called if released", "[UniqueResource]")
 {
-    std::size_t calls{0};
-
-    {
-        auto guard = sr::unique_resource(Handle{3}, [&calls](auto) { ++calls; });
-        guard.release();
-    }
-
-    REQUIRE(calls == 0);
+    REQUIRE_CALL(m, deleter(3)).TIMES(0);
+    auto guard = sr::unique_resource(Handle{3}, deleter);
+    guard.release();
 }
 
-TEST_CASE("deleter not called if checked valid", "[UniqueResource]")
+TEST_CASE("deleter called if checked valid", "[UniqueResource]")
 {
-    std::size_t calls{0};
-
-    {
-        auto guard = sr::unique_resource_checked(Handle{3}, Handle{6}, [&calls](auto) { ++calls; });
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 1);
+    REQUIRE_CALL(m, deleter(3));
+    auto guard = sr::unique_resource_checked(Handle{3}, Handle{6}, deleter);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("deleter not called if checked invalid", "[UniqueResource]")
 {
-    std::size_t calls{0};
-
-    {
-        auto guard = sr::unique_resource_checked(Handle{3}, Handle{3}, [&calls](auto) { ++calls; });
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 0);
+    REQUIRE_CALL(m, deleter(3)).TIMES(0);
+    auto guard = sr::unique_resource_checked(Handle{3}, Handle{3}, deleter);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("release returns reference to resource", "[UniqueResource]")
@@ -83,88 +87,61 @@ TEST_CASE("release returns reference to resource", "[UniqueResource]")
 
 TEST_CASE("move releases moved-from object", "[UniqueResource]")
 {
-    std::size_t calls{0};
-
-    {
-        auto movedFrom = sr::unique_resource(Handle{3}, [&calls](auto) { ++calls; });
-        auto guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 1);
+    REQUIRE_CALL(m, deleter(3));
+    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move transfers state", "[UniqueResource]")
 {
-    std::size_t calls{0};
-
-    {
-        auto movedFrom = sr::unique_resource(Handle{3}, [&calls](auto) { ++calls; });
-        auto guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 1);
+    REQUIRE_CALL(m, deleter(3));
+    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move transfers state if released", "[UniqueResource]")
 {
-    std::size_t calls{0};
+    REQUIRE_CALL(m, deleter(ANY(Handle))).TIMES(0); // TODO: Use ANY(T)
 
-    {
-        auto movedFrom = sr::unique_resource(Handle{3}, [&calls](auto) { ++calls; });
-        movedFrom.release();
-        auto guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 0);
+    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
+    movedFrom.release();
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move assignment releases moved-from object", "[UniqueResource]")
 {
-    std::size_t calls{0};
-    std::function<void(Handle)> del = [&calls](auto) { ++calls; };
+    REQUIRE_CALL(m, deleter(5));
+    REQUIRE_CALL(m, deleter(3));
 
-    {
-        auto movedFrom = sr::unique_resource(Handle{3}, del);
-        auto guard = sr::unique_resource(Handle{3}, del);
-        guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 2);
+    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
+    auto guard = sr::unique_resource(Handle{5}, deleter);
+    guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move assignment transfers state", "[UniqueResource]")
 {
-    std::size_t calls{0};
-    std::function<void(Handle)> del = [&calls](auto) { ++calls; };
+    REQUIRE_CALL(m, deleter(5));
+    REQUIRE_CALL(m, deleter(3));
 
-    {
-        auto movedFrom = sr::unique_resource(Handle{3}, del);
-        auto guard = sr::unique_resource(Handle{3}, del);
-        guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 2);
+    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
+    auto guard = sr::unique_resource(Handle{5}, deleter);
+    guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move assignment transfers state if released", "[UniqueResource]")
 {
-    std::size_t calls{0};
-    std::function<void(Handle)> del = [&calls](auto) { ++calls; };
+    REQUIRE_CALL(m, deleter(5));
 
-    {
-        auto movedFrom = sr::unique_resource(Handle{3}, del);
-        movedFrom.release();
-        auto guard = sr::unique_resource(Handle{3}, del);
-        guard = std::move(movedFrom);
-        static_cast<void>(guard);
-    }
-
-    REQUIRE(calls == 1);
+    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
+    movedFrom.release();
+    auto guard = sr::unique_resource(Handle{5}, deleter);
+    guard = std::move(movedFrom);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("no exception propagation from deleter", "[UniqueResource]")
@@ -177,57 +154,37 @@ TEST_CASE("no exception propagation from deleter", "[UniqueResource]")
 
 TEST_CASE("invoke executes deleter on resource", "[UniqueResource]")
 {
-    std::size_t calls{0};
+    REQUIRE_CALL(m, deleter(3));
 
-    {
-        auto guard = sr::unique_resource(Handle{3}, [&calls](auto h)
-                        {
-                            REQUIRE(h == 3);
-                            ++calls;
-                        });
-        guard.invoke();
-    }
-
-    REQUIRE(calls == 1);
+    auto guard = sr::unique_resource(Handle{3}, deleter);
+    guard.invoke();
 }
 
 TEST_CASE("invoke executes only multiple times if again strategy", "[UniqueResource]")
 {
-    std::size_t calls{0};
+    REQUIRE_CALL(m, deleter(3)).TIMES(3);
 
-    {
-        auto guard = sr::unique_resource(Handle{3}, [&calls](auto h) { if( h == 3 ) { ++calls;} });
-        guard.invoke(sr::invoke_it::again);
-        guard.invoke(sr::invoke_it::again);
-    }
-
-    REQUIRE(calls == 3);
+    auto guard = sr::unique_resource(Handle{3}, deleter);
+    guard.invoke(sr::invoke_it::again);
+    guard.invoke(sr::invoke_it::again);
 }
 
 TEST_CASE("invoke does nothing if released", "[UniqueResource]")
 {
-    std::size_t calls{0};
+    REQUIRE_CALL(m, deleter(ANY(Handle))).TIMES(0);
 
-    {
-        auto guard = sr::unique_resource(Handle{3}, [&calls](auto) { ++calls; });
-        guard.release();
-        guard.invoke(sr::invoke_it::once);
-    }
-
-    REQUIRE(calls == 0);
+    auto guard = sr::unique_resource(Handle{3}, deleter);
+    guard.release();
+    guard.invoke(sr::invoke_it::once);
 }
 
 TEST_CASE("invoke executes after release if again strategy", "[UniqueResource]")
 {
-    std::size_t calls{0};
+    REQUIRE_CALL(m, deleter(3));
 
-    {
-        auto guard = sr::unique_resource(Handle{3}, [&calls](auto) { ++calls; });
-        guard.release();
-        guard.invoke(sr::invoke_it::again);
-    }
-
-    REQUIRE(calls == 1);
+    auto guard = sr::unique_resource(Handle{3}, deleter);
+    guard.release();
+    guard.invoke(sr::invoke_it::again);
 }
 
 TEST_CASE("invoke does not propagate exception", "[UniqueResource]")
@@ -238,27 +195,11 @@ TEST_CASE("invoke does not propagate exception", "[UniqueResource]")
 
 TEST_CASE("reset releases old ressource", "[UniqueResource]")
 {
-    std::size_t calls{0};
+    REQUIRE_CALL(m, deleter(3));
+    REQUIRE_CALL(m, deleter(7));
 
-    {
-        auto d = [&calls](auto v)
-        {
-            if( calls == 0 )
-            {
-                REQUIRE(v == 3);
-            }
-            else
-            {
-                REQUIRE(v == 7);
-            }
-            ++calls;
-        };
-
-        auto guard = sr::unique_resource(Handle{3}, d);
-        guard.reset(Handle{7});
-    }
-
-    REQUIRE(calls == 2);
+    auto guard = sr::unique_resource(Handle{3}, deleter);
+    guard.reset(Handle{7});
 }
 
 TEST_CASE("reset sets ressource", "[UniqueResource]")
