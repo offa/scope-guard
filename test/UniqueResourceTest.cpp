@@ -25,21 +25,18 @@
 
 using namespace trompeloeil;
 
-using Handle = int;
-using PtrHandle = std::add_pointer_t<Handle>;
-
-namespace mock
+namespace
 {
+    using Handle = int;
+    using PtrHandle = std::add_pointer_t<Handle>;
+
+
     struct CallMock
     {
         MAKE_MOCK1(deleter, void(Handle));
     };
-}
 
-
-namespace
-{
-    mock::CallMock m;
+    CallMock m;
 
     void deleter(Handle h)
     {
