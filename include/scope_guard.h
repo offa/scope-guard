@@ -48,7 +48,6 @@ namespace sr
         explicit scope_guard_t(D&& deleter) : m_deleter(deleter),
                                                         m_execute_on_destruction(true)
         {
-            // TODO: Handle copying correctly (#41)
         }
 
 
