@@ -34,7 +34,7 @@ namespace
 
     struct ThrowOnCopyMock
     {
-        ThrowOnCopyMock() = default;
+        ThrowOnCopyMock() {  }
 
         ThrowOnCopyMock(const ThrowOnCopyMock&)
         {
