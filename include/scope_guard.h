@@ -21,6 +21,7 @@
 #pragma once
 
 #include <utility>
+#include <type_traits>
 
 namespace sr
 {
@@ -30,10 +31,27 @@ namespace sr
     {
     public:
 
-        explicit scope_guard_t(Deleter&& deleter) noexcept : m_deleter(std::move(deleter)),
+
+        template<class D,
+            std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
+            std::enable_if_t<(!std::is_lvalue_reference<D>::value)
+                                && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
+            >
+        explicit scope_guard_t(D&& deleter) noexcept : m_deleter(std::move(deleter)),
                                                         m_execute_on_destruction(true)
         {
         }
+
+        template<class D,
+            std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
+            std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
+            >
+        explicit scope_guard_t(D&& deleter) noexcept : m_deleter(deleter),
+                                                        m_execute_on_destruction(true)
+        {
+            // TODO: Handle copying correctly (#41)
+        }
+
 
         scope_guard_t(const scope_guard_t&) = delete;
 

@@ -47,19 +47,19 @@ TEST_CASE("deleter called on destruction", "[ScopeGuard]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter is not called if released", "[ScopeGuard]")
-{
-   REQUIRE_CALL(m, deleter()).TIMES(0);
-   auto guard = sr::scope_guard(deleter);
-   guard.release();
-}
-
 TEST_CASE("deleter lambda called on destruction", "[ScopeGuard]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
     auto guard = sr::scope_guard([&cm] { cm.deleter(); });
     static_cast<void>(guard);
+}
+
+TEST_CASE("deleter is not called if released", "[ScopeGuard]")
+{
+   REQUIRE_CALL(m, deleter()).TIMES(0);
+   auto guard = sr::scope_guard(deleter);
+   guard.release();
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeGuard]")
