@@ -31,13 +31,12 @@ namespace sr
     {
     public:
 
-
         template<class D,
             std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
             std::enable_if_t<(!std::is_lvalue_reference<D>::value)
                                 && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
             >
-        explicit scope_guard_t(D&& deleter) noexcept : m_deleter(std::move(deleter)),
+        explicit scope_guard_t(D&& deleter) : m_deleter(std::move(deleter)),
                                                         m_execute_on_destruction(true)
         {
         }
@@ -46,7 +45,7 @@ namespace sr
             std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
             >
-        explicit scope_guard_t(D&& deleter) noexcept : m_deleter(deleter),
+        explicit scope_guard_t(D&& deleter) : m_deleter(deleter),
                                                         m_execute_on_destruction(true)
         {
             // TODO: Handle copying correctly (#41)
