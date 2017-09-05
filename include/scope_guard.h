@@ -37,7 +37,7 @@ namespace sr
                                 && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
             >
         explicit scope_guard_t(D&& deleter) : m_deleter(std::move(deleter)),
-                                                        m_execute_on_destruction(true)
+                                            m_execute_on_destruction(true)
         {
         }
 
@@ -46,7 +46,7 @@ namespace sr
             std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
             >
         explicit scope_guard_t(D&& deleter) : m_deleter(deleter),
-                                                        m_execute_on_destruction(true)
+                                            m_execute_on_destruction(true)
         {
         }
 
