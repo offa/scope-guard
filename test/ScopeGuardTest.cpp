@@ -31,7 +31,31 @@ namespace
         MAKE_MOCK0(deleter, void());
     };
 
+
+    struct ThrowOnCopyMock
+    {
+        ThrowOnCopyMock() = default;
+
+        ThrowOnCopyMock(const ThrowOnCopyMock&)
+        {
+            throw std::exception{};
+        }
+
+        MAKE_CONST_MOCK0(deleter, void());
+
+        void operator()() const
+        {
+            this->deleter();
+        }
+
+        ThrowOnCopyMock& operator=(const ThrowOnCopyMock&)
+        {
+            throw std::exception{};
+        }
+    };
+
     CallMock m;
+
 
     void deleter()
     {
@@ -53,6 +77,16 @@ TEST_CASE("deleter lambda called on destruction", "[ScopeGuard]")
     REQUIRE_CALL(cm, deleter());
     auto guard = sr::scope_guard([&cm] { cm.deleter(); });
     static_cast<void>(guard);
+}
+
+TEST_CASE("deleter called and rethrow on copy exception", "[ScopeGuard]")
+{
+    REQUIRE_THROWS([] {
+        const ThrowOnCopyMock noMove;
+        REQUIRE_CALL(noMove, deleter());
+
+        sr::scope_guard_t<decltype(noMove)> guard{noMove};
+        }());
 }
 
 TEST_CASE("deleter is not called if released", "[ScopeGuard]")

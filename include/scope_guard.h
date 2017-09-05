@@ -45,9 +45,14 @@ namespace sr
             std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
             >
-        explicit scope_guard_t(D&& deleter) : m_deleter(deleter),
+        explicit scope_guard_t(D&& deleter) try : m_deleter(deleter),
                                             m_execute_on_destruction(true)
         {
+        }
+        catch( ... )
+        {
+            deleter();
+            throw;
         }
 
 
@@ -96,9 +101,9 @@ namespace sr
 
 
     template<class Deleter>
-    scope_guard_t<Deleter> scope_guard(Deleter&& deleter) noexcept
+    scope_guard_t<std::decay_t<Deleter>> scope_guard(Deleter&& deleter) noexcept
     {
-        return scope_guard_t<Deleter>{std::move(deleter)};
+        return scope_guard_t<std::decay_t<Deleter>>{std::forward<Deleter>(deleter)};
     }
 
 }
