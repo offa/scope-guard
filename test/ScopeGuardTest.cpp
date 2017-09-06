@@ -64,14 +64,14 @@ namespace
 }
 
 
-TEST_CASE("deleter called on destruction", "[ScopeGuard]")
+TEST_CASE("deleter called on destruction", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
     auto guard = sr::make_scope_exit(deleter);
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter lambda called on destruction", "[ScopeGuard]")
+TEST_CASE("deleter lambda called on destruction", "[ScopeExit]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
@@ -79,7 +79,7 @@ TEST_CASE("deleter lambda called on destruction", "[ScopeGuard]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter called and rethrow on copy exception", "[ScopeGuard]")
+TEST_CASE("deleter called and rethrow on copy exception", "[ScopeExit]")
 {
     REQUIRE_THROWS([] {
         const ThrowOnCopyMock noMove;
@@ -89,14 +89,14 @@ TEST_CASE("deleter called and rethrow on copy exception", "[ScopeGuard]")
         }());
 }
 
-TEST_CASE("deleter is not called if released", "[ScopeGuard]")
+TEST_CASE("deleter is not called if released", "[ScopeExit]")
 {
    REQUIRE_CALL(m, deleter()).TIMES(0);
    auto guard = sr::make_scope_exit(deleter);
    guard.release();
 }
 
-TEST_CASE("move releases moved-from object", "[ScopeGuard]")
+TEST_CASE("move releases moved-from object", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
     auto movedFrom = sr::make_scope_exit(deleter);
@@ -104,7 +104,7 @@ TEST_CASE("move releases moved-from object", "[ScopeGuard]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("move transfers state", "[ScopeGuard]")
+TEST_CASE("move transfers state", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
     auto movedFrom = sr::make_scope_exit(deleter);
@@ -112,7 +112,7 @@ TEST_CASE("move transfers state", "[ScopeGuard]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("move transfers state if released", "[ScopeGuard]")
+TEST_CASE("move transfers state if released", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter()).TIMES(0);
     auto movedFrom = sr::make_scope_exit(deleter);
@@ -121,7 +121,7 @@ TEST_CASE("move transfers state if released", "[ScopeGuard]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("no exception propagation from deleter", "[ScopeGuard]")
+TEST_CASE("no exception propagation from deleter", "[ScopeExit]")
 {
     REQUIRE_NOTHROW([] {
         auto guard = sr::make_scope_exit([] { throw std::exception{}; });
