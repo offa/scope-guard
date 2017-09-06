@@ -17,11 +17,11 @@ function(add_test_suite name)
 endfunction()
 
 
-add_test_suite(ScopeGuardTest)
+add_test_suite(ScopeExitTest)
 add_test_suite(UniqueResourceTest)
 
 
-add_custom_target(unittest ScopeGuardTest
+add_custom_target(unittest ScopeExitTest
                     COMMAND UniqueResourceTest
                     COMMENT "Running unittests\n\n"
                     VERBATIM

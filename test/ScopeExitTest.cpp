@@ -18,7 +18,7 @@
  * along with Scope Guard.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scope_guard.h"
+#include "scope_exit.h"
 #include <catch.hpp>
 #include <trompeloeil.hpp>
 
