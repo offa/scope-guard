@@ -85,7 +85,7 @@ TEST_CASE("deleter called and rethrow on copy exception", "[ScopeExit]")
         const ThrowOnCopyMock noMove;
         REQUIRE_CALL(noMove, deleter());
 
-        sr::scope_guard_t<decltype(noMove)> guard{noMove};
+        sr::scope_exit<decltype(noMove)> guard{noMove};
         }());
 }
 

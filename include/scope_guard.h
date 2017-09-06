@@ -27,7 +27,7 @@ namespace sr
 {
 
     template<class Deleter>
-    class scope_guard_t
+    class scope_exit
     {
     public:
 
@@ -36,7 +36,7 @@ namespace sr
             std::enable_if_t<(!std::is_lvalue_reference<D>::value)
                                 && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
             >
-        explicit scope_guard_t(D&& deleter) : m_deleter(std::move(deleter)),
+        explicit scope_exit(D&& deleter) : m_deleter(std::move(deleter)),
                                             m_execute_on_destruction(true)
         {
         }
@@ -45,7 +45,7 @@ namespace sr
             std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
             >
-        explicit scope_guard_t(D&& deleter) try : m_deleter(deleter),
+        explicit scope_exit(D&& deleter) try : m_deleter(deleter),
                                             m_execute_on_destruction(true)
         {
         }
@@ -56,15 +56,15 @@ namespace sr
         }
 
 
-        scope_guard_t(const scope_guard_t&) = delete;
+        scope_exit(const scope_exit&) = delete;
 
-        scope_guard_t(scope_guard_t&& other) : m_deleter(std::move(other.m_deleter)),
+        scope_exit(scope_exit&& other) : m_deleter(std::move(other.m_deleter)),
                                             m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
         }
 
-        ~scope_guard_t()
+        ~scope_exit()
         {
             if( m_execute_on_destruction == true )
             {
@@ -79,8 +79,8 @@ namespace sr
         }
 
 
-        scope_guard_t& operator=(const scope_guard_t&) = delete;
-        scope_guard_t& operator=(scope_guard_t&&) = delete;
+        scope_exit& operator=(const scope_exit&) = delete;
+        scope_exit& operator=(scope_exit&&) = delete;
 
 
     private:
@@ -101,9 +101,9 @@ namespace sr
 
 
     template<class Deleter>
-    scope_guard_t<std::decay_t<Deleter>> make_scope_exit(Deleter&& deleter) noexcept
+    scope_exit<std::decay_t<Deleter>> make_scope_exit(Deleter&& deleter) noexcept
     {
-        return scope_guard_t<std::decay_t<Deleter>>{std::forward<Deleter>(deleter)};
+        return scope_exit<std::decay_t<Deleter>>{std::forward<Deleter>(deleter)};
     }
 
 }
