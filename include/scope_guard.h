@@ -101,7 +101,7 @@ namespace sr
 
 
     template<class Deleter>
-    scope_guard_t<std::decay_t<Deleter>> scope_guard(Deleter&& deleter) noexcept
+    scope_guard_t<std::decay_t<Deleter>> make_scope_exit(Deleter&& deleter) noexcept
     {
         return scope_guard_t<std::decay_t<Deleter>>{std::forward<Deleter>(deleter)};
     }

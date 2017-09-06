@@ -67,7 +67,7 @@ namespace
 TEST_CASE("deleter called on destruction", "[ScopeGuard]")
 {
     REQUIRE_CALL(m, deleter());
-    auto guard = sr::scope_guard(deleter);
+    auto guard = sr::make_scope_exit(deleter);
     static_cast<void>(guard);
 }
 
@@ -75,7 +75,7 @@ TEST_CASE("deleter lambda called on destruction", "[ScopeGuard]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
-    auto guard = sr::scope_guard([&cm] { cm.deleter(); });
+    auto guard = sr::make_scope_exit([&cm] { cm.deleter(); });
     static_cast<void>(guard);
 }
 
@@ -92,14 +92,14 @@ TEST_CASE("deleter called and rethrow on copy exception", "[ScopeGuard]")
 TEST_CASE("deleter is not called if released", "[ScopeGuard]")
 {
    REQUIRE_CALL(m, deleter()).TIMES(0);
-   auto guard = sr::scope_guard(deleter);
+   auto guard = sr::make_scope_exit(deleter);
    guard.release();
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeGuard]")
 {
     REQUIRE_CALL(m, deleter());
-    auto movedFrom = sr::scope_guard(deleter);
+    auto movedFrom = sr::make_scope_exit(deleter);
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
 }
@@ -107,7 +107,7 @@ TEST_CASE("move releases moved-from object", "[ScopeGuard]")
 TEST_CASE("move transfers state", "[ScopeGuard]")
 {
     REQUIRE_CALL(m, deleter());
-    auto movedFrom = sr::scope_guard(deleter);
+    auto movedFrom = sr::make_scope_exit(deleter);
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
 }
@@ -115,7 +115,7 @@ TEST_CASE("move transfers state", "[ScopeGuard]")
 TEST_CASE("move transfers state if released", "[ScopeGuard]")
 {
     REQUIRE_CALL(m, deleter()).TIMES(0);
-    auto movedFrom = sr::scope_guard(deleter);
+    auto movedFrom = sr::make_scope_exit(deleter);
     movedFrom.release();
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
@@ -124,7 +124,7 @@ TEST_CASE("move transfers state if released", "[ScopeGuard]")
 TEST_CASE("no exception propagation from deleter", "[ScopeGuard]")
 {
     REQUIRE_NOTHROW([] {
-        auto guard = sr::scope_guard([] { throw std::exception{}; });
+        auto guard = sr::make_scope_exit([] { throw std::exception{}; });
         static_cast<void>(guard);
         }());
 }
