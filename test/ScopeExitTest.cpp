@@ -61,8 +61,6 @@ namespace
         NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)  { }
         NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock) { }
 
-        MAKE_CONST_MOCK0(deleter, void());
-
         void operator()() const
         {
             m_mock->deleter();
