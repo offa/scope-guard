@@ -54,6 +54,35 @@ namespace
         }
     };
 
+
+    struct NotNothrowMoveMock
+    {
+        NotNothrowMoveMock(CallMock* m) : m_mock(m) { }
+        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)  { }
+        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock) { }
+
+        MAKE_CONST_MOCK0(deleter, void());
+
+        void operator()() const
+        {
+            m_mock->deleter();
+        }
+
+        NotNothrowMoveMock& operator=(const NotNothrowMoveMock&)
+        {
+            throw "Not implemented";
+        }
+
+        NotNothrowMoveMock& operator=(NotNothrowMoveMock&&)
+        {
+            throw "Not implemented";
+        }
+
+        CallMock* m_mock;
+
+    };
+
+
     CallMock m;
 
 
@@ -102,6 +131,15 @@ TEST_CASE("move releases moved-from object", "[ScopeExit]")
     auto movedFrom = sr::make_scope_exit(deleter);
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
+}
+
+TEST_CASE("move with copy init releases moved-from object", "[ScopeExit]")
+{
+    CallMock mock;
+    const NotNothrowMoveMock notNothrow{&mock};
+    REQUIRE_CALL(mock, deleter());
+    sr::scope_exit<decltype(notNothrow)> movedFrom{notNothrow};
+    auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state", "[ScopeExit]")

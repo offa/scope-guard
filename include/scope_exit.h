@@ -55,11 +55,22 @@ namespace sr
             throw;
         }
 
-
         scope_exit(const scope_exit&) = delete;
 
+        template<class T = Deleter,
+            std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
+            >
         scope_exit(scope_exit&& other) : m_deleter(std::move(other.m_deleter)),
-                                            m_execute_on_destruction(other.m_execute_on_destruction)
+                                        m_execute_on_destruction(other.m_execute_on_destruction)
+        {
+            other.release();
+        }
+
+        template<class T = Deleter,
+            std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
+            >
+        scope_exit(scope_exit&& other) : m_deleter(other.m_deleter),
+                                        m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
         }
