@@ -157,10 +157,3 @@ TEST_CASE("move transfers state if released", "[ScopeExit]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("no exception propagation from deleter", "[ScopeExit]")
-{
-    REQUIRE_NOTHROW([] {
-        auto guard = sr::make_scope_exit([] { throw std::exception{}; });
-        static_cast<void>(guard);
-        }());
-}

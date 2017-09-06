@@ -75,11 +75,11 @@ namespace sr
             other.release();
         }
 
-        ~scope_exit()
+        ~scope_exit() noexcept(true)
         {
             if( m_execute_on_destruction == true )
             {
-                call_deleter_safe();
+                m_deleter();
             }
         }
 
@@ -95,16 +95,6 @@ namespace sr
 
 
     private:
-
-        void call_deleter_safe() noexcept
-        {
-            try
-            {
-                m_deleter();
-            }
-            catch( ... ) { /* Empty */ }
-        }
-
 
         Deleter m_deleter;
         bool m_execute_on_destruction;
