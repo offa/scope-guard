@@ -109,7 +109,7 @@ namespace sr
 
 
     template<class Deleter>
-    scope_success<std::decay_t<Deleter>> make_scope_success(Deleter&& deleter) noexcept
+    scope_success<std::decay_t<Deleter>> make_scope_success(Deleter&& deleter)
     {
         return scope_success<std::decay_t<Deleter>>{std::forward<Deleter>(deleter)};
     }
