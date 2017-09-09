@@ -38,7 +38,8 @@ namespace sr
                                 && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
             >
         explicit scope_success(D&& deleter) : m_deleter(std::move(deleter)),
-                                            m_execute_on_destruction(true)
+                                            m_execute_on_destruction(true),
+                                            m_uncaught_on_creation(uncaught_exceptions())
         {
         }
 
@@ -47,7 +48,8 @@ namespace sr
             std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
             >
         explicit scope_success(D&& deleter) try : m_deleter(deleter),
-                                            m_execute_on_destruction(true)
+                                            m_execute_on_destruction(true),
+                                            m_uncaught_on_creation(uncaught_exceptions())
         {
         }
         catch( ... )
@@ -71,7 +73,8 @@ namespace sr
             std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
             >
         scope_success(scope_success&& other) : m_deleter(other.m_deleter),
-                                        m_execute_on_destruction(other.m_execute_on_destruction)
+                                        m_execute_on_destruction(other.m_execute_on_destruction),
+                                        m_uncaught_on_creation(other.m_uncaught_on_creation)
         {
             other.release();
         }
