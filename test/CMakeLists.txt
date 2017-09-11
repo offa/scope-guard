@@ -19,11 +19,13 @@ endfunction()
 
 add_test_suite(ScopeExitTest)
 add_test_suite(ScopeSuccessTest)
+add_test_suite(ScopeFailTest)
 add_test_suite(UniqueResourceTest)
 
 
 add_custom_target(unittest ScopeExitTest
                     COMMAND ScopeSuccessTest
+                    COMMAND ScopeFailTest
                     COMMAND UniqueResourceTest
                     COMMENT "Running unittests\n\n"
                     VERBATIM
