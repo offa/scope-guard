@@ -106,7 +106,7 @@ TEST_CASE("deleter lambda called on destruction", "[ScopeSuccess]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter called and rethrow on copy exception", "[ScopeSuccess]")
+TEST_CASE("deleter not called and rethrow on copy exception", "[ScopeSuccess]")
 {
     REQUIRE_THROWS([] {
         const ThrowOnCopyMock noMove;
