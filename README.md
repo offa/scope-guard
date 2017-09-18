@@ -20,6 +20,9 @@ The filenames contain a `.h` extension.
 
 These deviations are necessary through standard requirements.
 
+###### std::uncaught_exceptions()
+The function `std::uncaught_exceptions()` is not available in C++14 and is therefore replaced with `std::uncaught_exception()`. This has some limitations, but is the only solution until C++17 is used.
+
 
 ## Documentation
 
