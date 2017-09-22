@@ -26,141 +26,96 @@
 namespace sr
 {
 
-    enum class invoke_it
-    {
-        once,
-        again
-    };
+    template<class T, class TT>
+    using is_ntmocp_constructible = std::conditional_t<std::is_reference<TT>::value || !std::is_nothrow_move_constructible<TT>::value,
+                                                    typename std::is_constructible<T, TT const &>::type,
+                                                    typename std::is_constructible<T, TT>::type>;
+
+    template<class T, class TT>
+    constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
 
 
-    template<class Ressource, class Deleter>
-    class unique_resource_t
+    template<class R, class D>
+    class unique_resource
     {
     public:
 
-        explicit unique_resource_t(Ressource&& res, Deleter&& deleter, bool shouldrun = true) noexcept : m_resource(std::move(res)),
-                                                                                                    m_deleter(std::move(deleter)),
-                                                                                                    m_execute_on_destruction(shouldrun)
+        template<class RR, class DD,
+                std::enable_if_t<(!std::is_lvalue_reference<RR>::value)
+                                    && std::is_nothrow_constructible<R, RR>::value, int> = 0,
+                std::enable_if_t<(!std::is_lvalue_reference<DD>::value)
+                                    && std::is_nothrow_constructible<D, DD>::value, int> = 0,
+
+                std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
+                                && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
+                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
+                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
+                >
+        explicit unique_resource(RR&& r, DD& d) : m_resource(std::move(r)), m_deleter(std::move(d))
         {
         }
 
-        unique_resource_t(const unique_resource_t&) = delete;
+        template<class RR, class DD,
+                std::enable_if_t<std::is_lvalue_reference<RR>::value || std::is_lvalue_reference<DD>::value, int> = 0,
 
-        unique_resource_t(unique_resource_t&& other) noexcept : m_resource(std::move(other.m_resource)),
-                                                            m_deleter(std::move(other.m_deleter)),
-                                                            m_execute_on_destruction(other.m_execute_on_destruction)
+                std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
+                                && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
+                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
+                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
+                >
+        explicit unique_resource(RR&& r, DD& d) try : m_resource(r), m_deleter(d)
         {
-            other.release();
+        }
+        catch( ... )
+        {
+            d(r);
+            throw;
         }
 
-        ~unique_resource_t()
+        template<class TR = R, class TD = D,
+                std::enable_if_t<(std::is_nothrow_move_constructible<TR>::value
+                                && std::is_nothrow_move_constructible<TD>::value), int> = 0
+                >
+        unique_resource(unique_resource&& other) : m_resource(std::forward<R>(other.m_resource)),
+                                                m_deleter(std::forward<D>(other.m_deleter)),
+                                                m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
         {
-            invoke(invoke_it::once);
         }
 
-
-        void invoke(const invoke_it strategy = invoke_it::once) noexcept
+        template<class TR = R, class TD = D,
+                std::enable_if_t<(!std::is_nothrow_move_constructible<TR>::value
+                                || !std::is_nothrow_move_constructible<TD>::value), int> = 0
+                >
+        unique_resource(unique_resource&& other) : m_resource(other.m_resource),
+                                                m_deleter(other.m_deleter),
+                                                m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
         {
-            if( m_execute_on_destruction == true )
-            {
-                call_deleter_safe();
-            }
-
-            m_execute_on_destruction = ( strategy == invoke_it::again );
         }
 
-        Ressource release() noexcept
+        unique_resource(const unique_resource&) = delete;
+
+
+
+        unique_resource& operator=(unique_resource&& other)
         {
-            m_execute_on_destruction = false;
-            return m_resource;
         }
-
-        void reset(Ressource&& res) noexcept
-        {
-            invoke(invoke_it::again);
-            m_resource = std::move(res);
-        }
-
-        const Ressource& get() const noexcept
-        {
-            return m_resource;
-        }
-
-        operator const Ressource&() const noexcept
-        {
-            return m_resource;
-        }
-
-        template<class R = Ressource,
-            std::enable_if_t<std::is_pointer<R>::value &&
-                ( std::is_class<std::remove_pointer_t<R>>::value
-                    || std::is_union<std::remove_pointer_t<R>>::value ), int> = 0>
-        R operator->() const noexcept
-        {
-            return m_resource;
-        }
-
-        template<class R = Ressource,
-            std::enable_if_t<std::is_pointer<R>::value, int> = 0>
-        std::add_lvalue_reference_t<std::remove_pointer_t<Ressource>> operator*() const noexcept
-        {
-            return *get();
-        }
-
-        const Deleter& get_deleter() const noexcept
-        {
-            return m_deleter;
-        }
-
-        Deleter& get_deleter() noexcept
-        {
-            return m_deleter;
-        }
-
-        unique_resource_t& operator=(unique_resource_t&& other) noexcept
-        {
-            invoke(invoke_it::once);
-            m_resource = std::move(other.m_resource);
-            m_deleter = std::move(other.m_deleter);
-            m_execute_on_destruction = other.m_execute_on_destruction;
-            other.release();
-
-            return *this;
-        }
-
-
-        unique_resource_t& operator=(const unique_resource_t&) = delete;
+        unique_resource& operator=(const unique_resource&) = delete;
 
 
     private:
 
-        void call_deleter_safe() noexcept
-        {
-            try
-            {
-                get_deleter()(m_resource);
-            }
-            catch( ... ) { /* Empty */ }
-        }
-
-        Ressource m_resource;
-        Deleter m_deleter;
+        R m_resource;
+        D m_deleter;
         bool m_execute_on_destruction;
     };
 
 
-
-    template<class Ressource, class Deleter>
-    unique_resource_t<Ressource, Deleter> unique_resource(Ressource&& res, Deleter d) noexcept
+    template<class Resource, class Deleter>
+    unique_resource<std::decay_t<Resource>, std::decay_t<Deleter>> make_unique_resource(Resource&& r, Deleter&& d)
     {
-        return unique_resource_t<Ressource, Deleter>{std::move(res), std::move(d), true};
+        return unique_resource<std::decay_t<Resource>, std::decay_t<Deleter>>{std::forward<Resource>(r), std::forward<Deleter>(d)};
     }
 
-    template<class Ressource, class Deleter>
-    unique_resource_t<Ressource, Deleter> unique_resource_checked(Ressource res, Ressource invalid, Deleter d) noexcept
-    {
-        return unique_resource_t<Ressource, Deleter>{std::move(res), std::move(d), (res != invalid)};
-    }
 
 }
 

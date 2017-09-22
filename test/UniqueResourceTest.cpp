@@ -19,9 +19,10 @@
  */
 
 #include "unique_resource.h"
-#include <functional>
 #include <catch.hpp>
 #include <trompeloeil.hpp>
+
+#include <type_traits>
 
 using namespace trompeloeil;
 
@@ -42,205 +43,88 @@ namespace
     {
         m.deleter(h);
     }
+
+
+    struct ThrowOnCopyMock
+    {
+        ThrowOnCopyMock() {  }
+
+        ThrowOnCopyMock(const ThrowOnCopyMock&)
+        {
+            throw std::exception{};
+        }
+
+        MAKE_CONST_MOCK1(deleter, void(ThrowOnCopyMock));
+
+        ThrowOnCopyMock& operator=(const ThrowOnCopyMock&)
+        {
+            throw std::exception{};
+        }
+    };
+
+    struct NotNothrowMoveMock
+    {
+        NotNothrowMoveMock(CallMock* mo) : m_mock(mo) { }
+        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)  { }
+        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock) { }
+
+        void operator()(Handle h) const
+        {
+            m_mock->deleter(h);
+        }
+
+        NotNothrowMoveMock& operator=(const NotNothrowMoveMock&)
+        {
+            throw "Not implemented";
+        }
+
+        NotNothrowMoveMock& operator=(NotNothrowMoveMock&&)
+        {
+            throw "Not implemented";
+        }
+
+        CallMock* m_mock;
+
+    };
+
+
 }
 
-
-TEST_CASE("deleter called on destruction", "[UniqueResource]")
+TEST_CASE("construction with move", "[UniqueResource]")
 {
-    REQUIRE_CALL(m, deleter(3));
-
-    auto guard = sr::unique_resource(Handle{3}, deleter);
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter is not called if released", "[UniqueResource]")
+TEST_CASE("construction with copy calls deleter and rethrows on failed copy", "[UniqueResource]")
 {
-    REQUIRE_CALL(m, deleter(3)).TIMES(0);
-    auto guard = sr::unique_resource(Handle{3}, deleter);
-    guard.release();
-}
+    REQUIRE_THROWS([] {
+        const ThrowOnCopyMock noMove;
+        const auto d = [](const auto&) { m.deleter(3); };
+        REQUIRE_CALL(m, deleter(3));
 
-TEST_CASE("deleter called if checked valid", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(3));
-    auto guard = sr::unique_resource_checked(Handle{3}, Handle{6}, deleter);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("deleter not called if checked invalid", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(3)).TIMES(0);
-    auto guard = sr::unique_resource_checked(Handle{3}, Handle{3}, deleter);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("release returns reference to resource", "[UniqueResource]")
-{
-    auto guard = sr::unique_resource(Handle{3}, [](auto) { });
-    const auto result = guard.release();
-
-    REQUIRE(3 == result);
-}
-
-TEST_CASE("move releases moved-from object", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(3));
-    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("move transfers state", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(3));
-    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("move transfers state if released", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(ANY(Handle))).TIMES(0); // TODO: Use ANY(T)
-
-    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
-    movedFrom.release();
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("move assignment releases moved-from object", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(5));
-    REQUIRE_CALL(m, deleter(3));
-
-    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
-    auto guard = sr::unique_resource(Handle{5}, deleter);
-    guard = std::move(movedFrom);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("move assignment transfers state", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(5));
-    REQUIRE_CALL(m, deleter(3));
-
-    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
-    auto guard = sr::unique_resource(Handle{5}, deleter);
-    guard = std::move(movedFrom);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("move assignment transfers state if released", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(5));
-
-    auto movedFrom = sr::unique_resource(Handle{3}, deleter);
-    movedFrom.release();
-    auto guard = sr::unique_resource(Handle{5}, deleter);
-    guard = std::move(movedFrom);
-    static_cast<void>(guard);
-}
-
-TEST_CASE("no exception propagation from deleter", "[UniqueResource]")
-{
-    REQUIRE_NOTHROW([] {
-        auto guard = sr::unique_resource(Handle{3}, [](auto) { throw "Don't propagate this!"; });
+        sr::unique_resource<decltype(noMove), decltype(d)> guard{noMove, d};
         static_cast<void>(guard);
-        }());
+    }());
 }
 
-TEST_CASE("invoke executes deleter on resource", "[UniqueResource]")
+TEST_CASE("move-construction with move", "[UniqueResource]")
 {
-    REQUIRE_CALL(m, deleter(3));
-
-    auto guard = sr::unique_resource(Handle{3}, deleter);
-    guard.invoke();
+    auto movedFrom = sr::make_unique_resource(Handle{3}, deleter);
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
+    // TODO: Check value of guard
 }
 
-TEST_CASE("invoke executes only multiple times if again strategy", "[UniqueResource]")
+TEST_CASE("move-construction with copy", "[UniqueResource]")
 {
-    REQUIRE_CALL(m, deleter(3)).TIMES(3);
-
-    auto guard = sr::unique_resource(Handle{3}, deleter);
-    guard.invoke(sr::invoke_it::again);
-    guard.invoke(sr::invoke_it::again);
+    CallMock mock;
+    const NotNothrowMoveMock notNothrow{&mock};
+    Handle h{3};
+    sr::unique_resource<Handle, decltype(notNothrow)> movedFrom{h, notNothrow};
+    auto guard = std::move(movedFrom);
+    static_cast<void>(guard);
+    // TODO: Check value of guard
 }
 
-TEST_CASE("invoke does nothing if released", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(ANY(Handle))).TIMES(0);
-
-    auto guard = sr::unique_resource(Handle{3}, deleter);
-    guard.release();
-    guard.invoke(sr::invoke_it::once);
-}
-
-TEST_CASE("invoke executes after release if again strategy", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(3));
-
-    auto guard = sr::unique_resource(Handle{3}, deleter);
-    guard.release();
-    guard.invoke(sr::invoke_it::again);
-}
-
-TEST_CASE("invoke does not propagate exception", "[UniqueResource]")
-{
-    auto guard = sr::unique_resource(Handle{3}, [](auto) { throw "Don't propagate this!"; });
-    REQUIRE_NOTHROW(guard.invoke());
-}
-
-TEST_CASE("reset releases old ressource", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(3));
-    REQUIRE_CALL(m, deleter(7));
-
-    auto guard = sr::unique_resource(Handle{3}, deleter);
-    guard.reset(Handle{7});
-}
-
-TEST_CASE("reset sets ressource", "[UniqueResource]")
-{
-    auto guard = sr::unique_resource(Handle{3}, [](auto) { });
-    guard.reset(Handle{7});
-    REQUIRE(guard.get() == 7);
-}
-
-TEST_CASE("get accesses ressource", "[UniqueResource]")
-{
-    auto guard = sr::unique_resource(Handle{3}, [](auto) { });
-    REQUIRE(guard.get() == 3);
-}
-
-TEST_CASE("conversion operator", "[UniqueResource]")
-{
-    auto guard = sr::unique_resource(Handle{3}, [](auto) { });
-    const auto& ref = guard;
-    REQUIRE(ref == 3);
-}
-
-TEST_CASE("pointer access operator" "[UniqueResource]")
-{
-    const auto p = std::make_pair(3, 4);
-    auto guard = sr::unique_resource(&p, [](auto) { });
-    const auto x = guard.operator->();
-    REQUIRE(x->first == 3);
-}
-
-TEST_CASE("dereference operator", "[UniqueResource]")
-{
-    Handle h{4};
-    auto guard = sr::unique_resource(PtrHandle{&h}, [](auto) { });
-    const auto x = guard.operator*();
-    REQUIRE(x == 4);
-}
-
-TEST_CASE("deleter access", "[UniqueResource]")
-{
-    std::size_t value{0};
-    auto guard = sr::unique_resource(Handle{3}, [&value](auto v) { value = v; });
-    REQUIRE(value == 0);
-    guard.get_deleter()(6);
-    REQUIRE(value == 6);
-}
-
+// TODO: Implement move assignment
