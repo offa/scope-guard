@@ -96,9 +96,7 @@ namespace sr
 
 
 
-        unique_resource& operator=(unique_resource&& other)
-        {
-        }
+        unique_resource& operator=(unique_resource&& other);
         unique_resource& operator=(const unique_resource&) = delete;
 
 
