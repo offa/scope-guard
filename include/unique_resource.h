@@ -117,7 +117,7 @@ namespace sr
             if( m_execute_on_destruction == true )
             {
                 m_execute_on_destruction = false;
-                m_deleter(m_resource);
+                get_deleter()(m_resource);
             }
         }
 
