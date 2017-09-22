@@ -222,4 +222,15 @@ TEST_CASE("get returns resource", "[UniqueResource]")
     CHECK(guard.get() == 3);
 }
 
+// TODO: Pointer access functions
 
+TEST_CASE("deleter access", "[UniqueResource]")
+{
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+    guard.release();
+
+    {
+        REQUIRE_CALL(m, deleter(8));
+        guard.get_deleter()(8);
+    }
+}

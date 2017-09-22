@@ -140,8 +140,13 @@ namespace sr
             return m_resource;
         }
 
+        const D& get_deleter() const noexcept
+        {
+            return m_deleter;
+        }
 
-        unique_resource& operator=(unique_resource&& other);
+
+        unique_resource& operator=(unique_resource&& other); // TODO: Implement
         unique_resource& operator=(const unique_resource&) = delete;
 
 
