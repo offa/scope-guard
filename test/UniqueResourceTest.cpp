@@ -222,6 +222,13 @@ TEST_CASE("get returns resource", "[UniqueResource]")
     CHECK(guard.get() == 3);
 }
 
+TEST_CASE("pointer access resturns resource" "[UniqueResource]")
+{
+    const auto p = std::make_pair(3, 4);
+    auto guard = sr::make_unique_resource(&p, [](auto*) { });
+    REQUIRE(guard->first == 3);
+    REQUIRE(guard->second == 4);
+}
 // TODO: Pointer access functions
 
 TEST_CASE("deleter access", "[UniqueResource]")

@@ -149,6 +149,16 @@ namespace sr
             return m_resource;
         }
 
+        template<class RR = R,
+                std::enable_if_t<std::is_pointer<RR>::value && std::is_nothrow_copy_constructible<RR>::value
+                                && ( std::is_class<std::remove_pointer_t<RR>>::value
+                                        || std::is_union<std::remove_pointer_t<RR>>::value ), int> = 0
+                                >
+        RR operator->() const noexcept
+        {
+            return m_resource;
+        }
+
         const D& get_deleter() const noexcept
         {
             return m_deleter;
