@@ -22,8 +22,6 @@
 #include <catch.hpp>
 #include <trompeloeil.hpp>
 
-#include <type_traits>
-
 using namespace trompeloeil;
 
 namespace
@@ -36,13 +34,6 @@ namespace
     {
         MAKE_MOCK1(deleter, void(Handle));
     };
-
-    CallMock m;
-
-    void deleter(Handle h)
-    {
-        m.deleter(h);
-    }
 
 
     struct ThrowOnCopyMock
@@ -87,14 +78,22 @@ namespace
 
     };
 
+    CallMock m;
+
+    void deleter(Handle h)
+    {
+        m.deleter(h);
+    }
 
 }
 
 TEST_CASE("construction with move", "[UniqueResource]")
 {
+    REQUIRE_CALL(m, deleter(3));
     auto guard = sr::make_unique_resource(Handle{3}, deleter);
     static_cast<void>(guard);
 }
+// TODO: Missing constrion with copy successful
 
 TEST_CASE("construction with copy calls deleter and rethrows on failed copy", "[UniqueResource]")
 {
@@ -110,6 +109,7 @@ TEST_CASE("construction with copy calls deleter and rethrows on failed copy", "[
 
 TEST_CASE("move-construction with move", "[UniqueResource]")
 {
+    REQUIRE_CALL(m, deleter(3));
     auto movedFrom = sr::make_unique_resource(Handle{3}, deleter);
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
@@ -119,6 +119,7 @@ TEST_CASE("move-construction with move", "[UniqueResource]")
 TEST_CASE("move-construction with copy", "[UniqueResource]")
 {
     CallMock mock;
+    REQUIRE_CALL(mock, deleter(3));
     const NotNothrowMoveMock notNothrow{&mock};
     Handle h{3};
     sr::unique_resource<Handle, decltype(notNothrow)> movedFrom{h, notNothrow};
@@ -128,3 +129,10 @@ TEST_CASE("move-construction with copy", "[UniqueResource]")
 }
 
 // TODO: Implement move assignment
+
+TEST_CASE("deleter called on destruction", "[UniqueResource]")
+{
+        REQUIRE_CALL(m, deleter(3));
+        auto guard = sr::make_unique_resource(Handle{3}, deleter);
+        static_cast<void>(guard);
+}
