@@ -159,6 +159,13 @@ namespace sr
             return m_resource;
         }
 
+        template<class RR = R,
+            std::enable_if_t<std::is_pointer<RR>::value, int> = 0>
+        std::add_lvalue_reference_t<std::remove_pointer_t<RR>> operator*() const noexcept
+        {
+            return *get();
+        }
+
         const D& get_deleter() const noexcept
         {
             return m_deleter;

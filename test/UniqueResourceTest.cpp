@@ -229,7 +229,13 @@ TEST_CASE("pointer access resturns resource" "[UniqueResource]")
     REQUIRE(guard->first == 3);
     REQUIRE(guard->second == 4);
 }
-// TODO: Pointer access functions
+
+TEST_CASE("pointer dereference resturns resource" "[UniqueResource]")
+{
+    Handle h{5};
+    auto guard = sr::make_unique_resource(PtrHandle{&h}, [](auto*) { });
+    REQUIRE(*guard == 5);
+}
 
 TEST_CASE("deleter access", "[UniqueResource]")
 {
