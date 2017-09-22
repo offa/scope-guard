@@ -57,25 +57,31 @@ namespace sr
                                     && std::is_nothrow_constructible<R, RR>::value, int> = 0,
                 std::enable_if_t<(!std::is_lvalue_reference<DD>::value)
                                     && std::is_nothrow_constructible<D, DD>::value, int> = 0,
-
                 std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
                                 && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
-        explicit unique_resource(RR&& r, DD&& d) : m_resource(std::move(r)), m_deleter(std::move(d)), m_execute_on_destruction(true)
+        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R,RR>::value
+                                                            && std::is_nothrow_constructible<D, DD>::value)
+                                                : m_resource(std::move(r)),
+                                                m_deleter(std::move(d)),
+                                                m_execute_on_destruction(true)
         {
         }
 
         template<class RR, class DD,
                 std::enable_if_t<std::is_lvalue_reference<RR>::value || std::is_lvalue_reference<DD>::value, int> = 0,
-
                 std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
                                 && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
-        explicit unique_resource(RR&& r, DD&& d) try : m_resource(r), m_deleter(d), m_execute_on_destruction(true)
+        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
+                                                            && std::is_nothrow_constructible<D, DD>::value)
+                                                    try : m_resource(r),
+                                                        m_deleter(d),
+                                                        m_execute_on_destruction(true)
         {
         }
         catch( ... )
@@ -88,7 +94,9 @@ namespace sr
                 std::enable_if_t<(std::is_nothrow_move_constructible<TR>::value
                                 && std::is_nothrow_move_constructible<TD>::value), int> = 0
                 >
-        unique_resource(unique_resource&& other) : m_resource(std::forward<R>(other.m_resource)),
+        unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
+                                                            && std::is_nothrow_move_constructible<D>::value)
+                                                : m_resource(std::forward<R>(other.m_resource)),
                                                 m_deleter(std::forward<D>(other.m_deleter)),
                                                 m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
         {
@@ -98,7 +106,9 @@ namespace sr
                 std::enable_if_t<(!std::is_nothrow_move_constructible<TR>::value
                                 || !std::is_nothrow_move_constructible<TD>::value), int> = 0
                 >
-        unique_resource(unique_resource&& other) : m_resource(other.m_resource),
+        unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
+                                                            && std::is_nothrow_move_constructible<D>::value)
+                                                : m_resource(other.m_resource),
                                                 m_deleter(other.m_deleter),
                                                 m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
         {
