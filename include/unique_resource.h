@@ -87,7 +87,6 @@ namespace sr
         catch( ... )
         {
             d(r);
-            throw;
         }
 
         template<class TR = R, class TD = D,
