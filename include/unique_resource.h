@@ -108,10 +108,7 @@ namespace sr
 
         ~unique_resource()
         {
-            if( m_execute_on_destruction == true )
-            {
-                m_deleter(m_resource);
-            }
+            reset();
         }
 
 
