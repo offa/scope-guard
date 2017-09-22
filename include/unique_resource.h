@@ -35,6 +35,18 @@ namespace sr
     constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
 
 
+    template<class T,
+            class U = std::conditional_t<(!std::is_nothrow_move_assignable<T>::value
+                                            && std::is_copy_assignable<T>::value),
+                                        T const &,
+                                        T &&>>
+    constexpr U move_assign_if_noexcept(T&& value) noexcept
+    {
+        return std::move(value);
+    }
+
+
+
     template<class R, class D>
     class unique_resource
     {
