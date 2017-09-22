@@ -51,7 +51,7 @@ namespace sr
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
-        explicit unique_resource(RR&& r, DD& d) : m_resource(std::move(r)), m_deleter(std::move(d))
+        explicit unique_resource(RR&& r, DD&& d) : m_resource(std::move(r)), m_deleter(std::move(d)), m_execute_on_destruction(true)
         {
         }
 
@@ -63,7 +63,7 @@ namespace sr
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
-        explicit unique_resource(RR&& r, DD& d) try : m_resource(r), m_deleter(d)
+        explicit unique_resource(RR&& r, DD&& d) try : m_resource(r), m_deleter(d), m_execute_on_destruction(true)
         {
         }
         catch( ... )
@@ -94,6 +94,13 @@ namespace sr
 
         unique_resource(const unique_resource&) = delete;
 
+        ~unique_resource()
+        {
+            if( m_execute_on_destruction == true )
+            {
+                m_deleter(m_resource);
+            }
+        }
 
 
         unique_resource& operator=(unique_resource&& other);
