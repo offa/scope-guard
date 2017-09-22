@@ -40,7 +40,7 @@ namespace sr
                                             && std::is_copy_assignable<T>::value),
                                         T const &,
                                         T &&>>
-    constexpr U move_assign_if_noexcept(T&& value) noexcept
+    constexpr U move_assign_if_noexcept(T& value) noexcept
     {
         return std::move(value);
     }
@@ -119,6 +119,15 @@ namespace sr
                 m_execute_on_destruction = false;
                 m_deleter(m_resource);
             }
+        }
+
+        template<class RR>
+        void reset(RR&& r)
+        {
+            reset();
+
+            m_resource = move_assign_if_noexcept(r);
+            m_execute_on_destruction = true;
         }
 
         void release()

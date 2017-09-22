@@ -78,6 +78,45 @@ namespace
 
     };
 
+    struct ConditialThrowOnCopyMock
+    {
+        explicit ConditialThrowOnCopyMock(Handle h, bool shouldThrow) : m_handle(h), m_shouldThrow(shouldThrow)
+        {
+        }
+
+        ConditialThrowOnCopyMock(const ConditialThrowOnCopyMock& other) : m_handle(other.m_handle), m_shouldThrow(other.m_shouldThrow)
+        {
+            if( m_shouldThrow == true )
+            {
+                throw std::exception{};
+            }
+        }
+
+        ConditialThrowOnCopyMock(ConditialThrowOnCopyMock&&) = default;
+
+        ConditialThrowOnCopyMock& operator=(const ConditialThrowOnCopyMock& other)
+        {
+            if( &other != this )
+            {
+                m_handle = other.m_handle;
+                m_shouldThrow = other.m_shouldThrow;
+
+                if( m_shouldThrow == true )
+                {
+                    throw std::exception{};
+                }
+            }
+
+            return *this;
+        }
+
+        ConditialThrowOnCopyMock& operator=(ConditialThrowOnCopyMock&&) = default;
+
+        Handle m_handle;
+        bool m_shouldThrow;
+    };
+
+
     CallMock m;
 
     void deleter(Handle h)
@@ -161,7 +200,13 @@ TEST_CASE("reset does not call deleter if released", "[UniqueResource]")
     guard.reset();
 }
 
-// TODO: Reset with new value
+TEST_CASE("reset sets new value and calls deleter on previous", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3));
+    REQUIRE_CALL(m, deleter(7));
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+    guard.reset(Handle{7});
+}
 
 TEST_CASE("release disables deleter", "[UniqueResource]")
 {
@@ -176,3 +221,5 @@ TEST_CASE("get returns resource", "[UniqueResource]")
     auto guard = sr::make_unique_resource(Handle{3}, deleter);
     CHECK(guard.get() == 3);
 }
+
+
