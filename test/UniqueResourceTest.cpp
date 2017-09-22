@@ -93,7 +93,15 @@ TEST_CASE("construction with move", "[UniqueResource]")
     auto guard = sr::make_unique_resource(Handle{3}, deleter);
     static_cast<void>(guard);
 }
-// TODO: Missing constrion with copy successful
+
+TEST_CASE("construction with copy", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3));
+    const Handle h{3};
+    const auto d = [](auto v) { m.deleter(v); };
+    auto guard = sr::make_unique_resource(h, d);
+    static_cast<void>(guard);
+}
 
 TEST_CASE("construction with copy calls deleter and rethrows on failed copy", "[UniqueResource]")
 {
@@ -112,8 +120,7 @@ TEST_CASE("move-construction with move", "[UniqueResource]")
     REQUIRE_CALL(m, deleter(3));
     auto movedFrom = sr::make_unique_resource(Handle{3}, deleter);
     auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
-    // TODO: Check value of guard
+    CHECK(guard.get() == 3);
 }
 
 TEST_CASE("move-construction with copy", "[UniqueResource]")
@@ -124,15 +131,48 @@ TEST_CASE("move-construction with copy", "[UniqueResource]")
     Handle h{3};
     sr::unique_resource<Handle, decltype(notNothrow)> movedFrom{h, notNothrow};
     auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
-    // TODO: Check value of guard
+    CHECK(guard.get() == 3);
 }
 
 // TODO: Implement move assignment
 
 TEST_CASE("deleter called on destruction", "[UniqueResource]")
 {
+    REQUIRE_CALL(m, deleter(3));
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+    static_cast<void>(guard);
+}
+
+TEST_CASE("reset calls deleter", "[UniqueResource]")
+{
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+
+    {
         REQUIRE_CALL(m, deleter(3));
-        auto guard = sr::make_unique_resource(Handle{3}, deleter);
-        static_cast<void>(guard);
+        guard.reset();
+    }
+}
+
+TEST_CASE("reset does not call deleter if released", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3)).TIMES(0);
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+    guard.release();
+    guard.reset();
+}
+
+// TODO: Reset with new value
+
+TEST_CASE("release disables deleter", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3)).TIMES(0);
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+    guard.release();
+}
+
+TEST_CASE("get returns resource", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3));
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+    CHECK(guard.get() == 3);
 }

@@ -103,6 +103,26 @@ namespace sr
         }
 
 
+        void reset()
+        {
+            if( m_execute_on_destruction == true )
+            {
+                m_execute_on_destruction = false;
+                m_deleter(m_resource);
+            }
+        }
+
+        void release()
+        {
+            m_execute_on_destruction = false;
+        }
+
+        const R& get() const noexcept
+        {
+            return m_resource;
+        }
+
+
         unique_resource& operator=(unique_resource&& other);
         unique_resource& operator=(const unique_resource&) = delete;
 
