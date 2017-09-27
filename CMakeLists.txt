@@ -15,6 +15,7 @@ else()
     message(STATUS "Build Type : None")
 endif()
 
+include(Compiler)
 
 if( COVERAGE )
     include(Coverage)
@@ -28,6 +29,12 @@ add_compile_options(-Wall
                     -Wshadow
                     -Wold-style-cast
                     )
+add_compile_options_if_supported(-Wduplicated-cond
+                                -Wduplicated-branches
+                                -Wlogical-op
+                                -Wnull-dereference
+                                -Wuseless-cast
+                                )
 
 
 set(CMAKE_CXX_STANDARD 14)
