@@ -173,14 +173,6 @@ TEST_CASE("move-construction with copy", "[UniqueResource]")
     CHECK(guard.get() == 3);
 }
 
-TEST_CASE("move assignment has no effect if same object", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(3));
-    auto guard = sr::make_unique_resource(Handle{3}, deleter);
-    guard = std::move(guard);
-    REQUIRE(guard.get() == 3);
-}
-
 TEST_CASE("move assignment calls deleter", "[UniqueResource]")
 {
     auto moveFrom = sr::make_unique_resource(Handle{3}, deleter);
