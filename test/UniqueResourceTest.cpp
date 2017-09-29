@@ -258,3 +258,10 @@ TEST_CASE("deleter access", "[UniqueResource]")
     }
 }
 
+TEST_CASE("make unique resource", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(7));
+    auto guard = sr::make_unique_resource(Handle{7}, deleter);
+    static_cast<void>(guard);
+}
+

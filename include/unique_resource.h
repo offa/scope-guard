@@ -199,10 +199,12 @@ namespace sr
     };
 
 
-    template<class Resource, class Deleter>
-    unique_resource<std::decay_t<Resource>, std::decay_t<Deleter>> make_unique_resource(Resource&& r, Deleter&& d)
+    template<class R, class D>
+    unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource(R&& r, D&& d)
+                                                            noexcept(std::is_nothrow_constructible<std::decay_t<R>, R>::value
+                                                                    && std::is_nothrow_constructible<std::decay_t<D>, D>::value)
     {
-        return unique_resource<std::decay_t<Resource>, std::decay_t<Deleter>>{std::forward<Resource>(r), std::forward<Deleter>(d)};
+        return unique_resource<std::decay_t<R>, std::decay_t<D>>{std::forward<R>(r), std::forward<D>(d)};
     }
 
 
