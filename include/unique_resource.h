@@ -207,6 +207,12 @@ namespace sr
         return unique_resource<std::decay_t<R>, std::decay_t<D>>{std::forward<R>(r), std::forward<D>(d)};
     }
 
+    template<class R, class D>
+    unique_resource<R&, std::decay_t<D>> make_unique_resource(std::reference_wrapper<R> r, D d)
+                                            noexcept(std::is_nothrow_constructible<std::decay_t<D>, D>::value)
+    {
+        return unique_resource<R&, std::decay_t<D>>(r.get(), std::forward<D>(d));
+    }
 
 }
 

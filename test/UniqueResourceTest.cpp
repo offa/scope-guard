@@ -265,3 +265,11 @@ TEST_CASE("make unique resource", "[UniqueResource]")
     static_cast<void>(guard);
 }
 
+TEST_CASE("make unique resource with reference wrapper", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3));
+    Handle h{3};
+    auto guard = sr::make_unique_resource(std::ref(h), deleter);
+    static_cast<void>(guard);
+}
+
