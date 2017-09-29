@@ -178,10 +178,13 @@ namespace sr
                             >
         unique_resource& operator=(unique_resource&& other)
         {
-            reset();
-            m_resource = std::forward<RR>(other.m_resource);
-            m_deleter = std::forward<DD>(other.m_deleter);
-            m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
+            if( this != &other )
+            {
+                reset();
+                m_resource = std::forward<RR>(other.m_resource);
+                m_deleter = std::forward<DD>(other.m_deleter);
+                m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
+            }
             return *this;
         }
 
