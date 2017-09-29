@@ -173,7 +173,25 @@ TEST_CASE("move-construction with copy", "[UniqueResource]")
     CHECK(guard.get() == 3);
 }
 
-// TODO: Implement move assignment
+TEST_CASE("move assignment has no effect if same object", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3));
+    auto guard = sr::make_unique_resource(Handle{3}, deleter);
+    guard = std::move(guard);
+    REQUIRE(guard.get() == 3);
+}
+
+TEST_CASE("move assignment calls deleter", "[UniqueResource]")
+{
+    auto moveFrom = sr::make_unique_resource(Handle{3}, deleter);
+    REQUIRE_CALL(m, deleter(4));
+
+    {
+        REQUIRE_CALL(m, deleter(3));
+        auto guard = sr::make_unique_resource(Handle{4}, deleter);
+        guard = std::move(moveFrom);
+    }
+}
 
 TEST_CASE("deleter called on destruction", "[UniqueResource]")
 {
@@ -222,7 +240,7 @@ TEST_CASE("get returns resource", "[UniqueResource]")
     CHECK(guard.get() == 3);
 }
 
-TEST_CASE("pointer access resturns resource" "[UniqueResource]")
+TEST_CASE("pointer access returns resource" "[UniqueResource]")
 {
     const auto p = std::make_pair(3, 4);
     auto guard = sr::make_unique_resource(&p, [](auto*) { });
@@ -230,7 +248,7 @@ TEST_CASE("pointer access resturns resource" "[UniqueResource]")
     REQUIRE(guard->second == 4);
 }
 
-TEST_CASE("pointer dereference resturns resource" "[UniqueResource]")
+TEST_CASE("pointer dereference returns resource" "[UniqueResource]")
 {
     Handle h{5};
     auto guard = sr::make_unique_resource(PtrHandle{&h}, [](auto*) { });
@@ -247,3 +265,4 @@ TEST_CASE("deleter access", "[UniqueResource]")
         guard.get_deleter()(8);
     }
 }
+
