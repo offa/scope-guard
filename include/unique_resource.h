@@ -199,6 +199,7 @@ namespace sr
     };
 
 
+
     template<class R, class D>
     unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource(R&& r, D&& d)
                                                             noexcept(std::is_nothrow_constructible<std::decay_t<R>, R>::value
@@ -209,9 +210,25 @@ namespace sr
 
     template<class R, class D>
     unique_resource<R&, std::decay_t<D>> make_unique_resource(std::reference_wrapper<R> r, D d)
-                                            noexcept(std::is_nothrow_constructible<std::decay_t<D>, D>::value)
+                                                noexcept(std::is_nothrow_constructible<std::decay_t<D>, D>::value)
     {
         return unique_resource<R&, std::decay_t<D>>(r.get(), std::forward<D>(d));
+    }
+
+    template<class R, class D, class S = R>
+    unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource_checked(R&& r, const S& invalid, D&& d)
+                                                            noexcept(std::is_nothrow_constructible<std::decay_t<R>, R>::value
+                                                                    && std::is_nothrow_constructible<std::decay_t<D>, D>::value)
+    {
+        const bool mustRelease{r == invalid};
+        auto ur = make_unique_resource(r, d);
+
+        if( mustRelease == true )
+        {
+            ur.release();
+        }
+
+        return ur;
     }
 
 }

@@ -273,3 +273,16 @@ TEST_CASE("make unique resource with reference wrapper", "[UniqueResource]")
     static_cast<void>(guard);
 }
 
+TEST_CASE("make unique resource checked", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(4));
+    auto guard = sr::make_unique_resource_checked(Handle{4}, Handle{-1}, deleter);
+    static_cast<void>(guard);
+}
+
+TEST_CASE("make unique resource checked releases if invalid", "[UniqueResource]")
+{
+    auto guard = sr::make_unique_resource_checked(Handle{-1}, Handle{-1}, deleter);
+    static_cast<void>(guard);
+}
+
