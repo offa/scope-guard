@@ -26,26 +26,26 @@
 namespace sr
 {
 
-    template<class Deleter>
+    template<class EF>
     class scope_exit
     {
     public:
 
-        template<class D,
-            std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
-            std::enable_if_t<(!std::is_lvalue_reference<D>::value)
-                                && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
+        template<class EFP,
+            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
+            std::enable_if_t<(!std::is_lvalue_reference<EFP>::value)
+                                && std::is_nothrow_constructible<EF, EFP>::value, int> = 0
             >
-        explicit scope_exit(D&& deleter) : m_exitFunction(std::move(deleter)),
+        explicit scope_exit(EFP&& deleter) : m_exitFunction(std::move(deleter)),
                                             m_execute_on_destruction(true)
         {
         }
 
-        template<class D,
-            std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
-            std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
+        template<class EFP,
+            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
+            std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
             >
-        explicit scope_exit(D&& deleter) try : m_exitFunction(deleter),
+        explicit scope_exit(EFP&& deleter) try : m_exitFunction(deleter),
                                             m_execute_on_destruction(true)
         {
         }
@@ -57,7 +57,7 @@ namespace sr
 
         scope_exit(const scope_exit&) = delete;
 
-        template<class T = Deleter,
+        template<class T = EF,
             std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
             >
         scope_exit(scope_exit&& other) : m_exitFunction(std::move(other.m_exitFunction)),
@@ -66,7 +66,7 @@ namespace sr
             other.release();
         }
 
-        template<class T = Deleter,
+        template<class T = EF,
             std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
             >
         scope_exit(scope_exit&& other) : m_exitFunction(other.m_exitFunction),
@@ -96,15 +96,15 @@ namespace sr
 
     private:
 
-        Deleter m_exitFunction;
+        EF m_exitFunction;
         bool m_execute_on_destruction;
     };
 
 
-    template<class Deleter>
-    scope_exit<std::decay_t<Deleter>> make_scope_exit(Deleter&& deleter)
+    template<class EF>
+    scope_exit<std::decay_t<EF>> make_scope_exit(EF&& deleter)
     {
-        return scope_exit<std::decay_t<Deleter>>{std::forward<Deleter>(deleter)};
+        return scope_exit<std::decay_t<EF>>{std::forward<EF>(deleter)};
     }
 
 }
