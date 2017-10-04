@@ -27,27 +27,27 @@
 namespace sr
 {
 
-    template<class Deleter>
+    template<class EF>
     class scope_fail
     {
     public:
 
-        template<class D,
-            std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
-            std::enable_if_t<(!std::is_lvalue_reference<D>::value)
-                                && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
+        template<class EFP,
+            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
+            std::enable_if_t<(!std::is_lvalue_reference<EFP>::value)
+                                && std::is_nothrow_constructible<EF, EFP>::value, int> = 0
             >
-        explicit scope_fail(D&& deleter) : m_deleter(std::move(deleter)),
+        explicit scope_fail(EFP&& deleter) : m_deleter(std::move(deleter)),
                                             m_execute_on_destruction(true),
                                             m_uncaught_on_creation(uncaught_exceptions())
         {
         }
 
-        template<class D,
-            std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
-            std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
+        template<class EFP,
+            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
+            std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
             >
-        explicit scope_fail(D&& deleter) try : m_deleter(deleter),
+        explicit scope_fail(EFP&& deleter) try : m_deleter(deleter),
                                             m_execute_on_destruction(true),
                                             m_uncaught_on_creation(uncaught_exceptions())
         {
@@ -60,7 +60,7 @@ namespace sr
 
         scope_fail(const scope_fail&) = delete;
 
-        template<class T = Deleter,
+        template<class T = EF,
             std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
             >
         scope_fail(scope_fail&& other) : m_deleter(std::move(other.m_deleter)),
@@ -70,7 +70,7 @@ namespace sr
             other.release();
         }
 
-        template<class T = Deleter,
+        template<class T = EF,
             std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
             >
         scope_fail(scope_fail&& other) : m_deleter(other.m_deleter),
@@ -80,7 +80,7 @@ namespace sr
             other.release();
         }
 
-        ~scope_fail() noexcept(noexcept(std::declval<Deleter>()))
+        ~scope_fail() noexcept(noexcept(std::declval<EF>()))
         {
             if( (m_execute_on_destruction == true) && ( uncaught_exceptions() > m_uncaught_on_creation ) )
             {
@@ -106,16 +106,16 @@ namespace sr
             return ( std::uncaught_exception() == true ? 1 : 0 );
         }
 
-        Deleter m_deleter;
+        EF m_deleter;
         bool m_execute_on_destruction;
         int m_uncaught_on_creation;
     };
 
 
-    template<class Deleter>
-    scope_fail<std::decay_t<Deleter>> make_scope_fail(Deleter&& deleter)
+    template<class EF>
+    scope_fail<std::decay_t<EF>> make_scope_fail(EF&& deleter)
     {
-        return scope_fail<std::decay_t<Deleter>>{std::forward<Deleter>(deleter)};
+        return scope_fail<std::decay_t<EF>>{std::forward<EF>(deleter)};
     }
 
 }
