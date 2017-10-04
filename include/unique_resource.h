@@ -46,6 +46,18 @@ namespace sr
     }
 
 
+    template<class T, std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0>
+    constexpr T&& forward_if_nothrow_move_constructible(T&& value)
+    {
+        return std::forward<T>(value);
+    }
+
+    template<class T, std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0>
+    constexpr T forward_if_nothrow_move_constructible(T&& value)
+    {
+        return value;
+    }
+
 
     template<class R, class D>
     class unique_resource
@@ -95,8 +107,8 @@ namespace sr
                 >
         unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
                                                             && std::is_nothrow_move_constructible<D>::value)
-                                                : m_resource(std::forward<R>(other.m_resource)),
-                                                m_deleter(std::forward<D>(other.m_deleter)),
+                                                : m_resource(forward_if_nothrow_move_constructible<R>(std::forward<R>(other.m_resource))),
+                                                m_deleter(forward_if_nothrow_move_constructible<D>(std::forward<D>(other.m_deleter))),
                                                 m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
         {
         }
