@@ -37,7 +37,7 @@ namespace sr
             std::enable_if_t<(!std::is_lvalue_reference<EFP>::value)
                                 && std::is_nothrow_constructible<EF, EFP>::value, int> = 0
             >
-        explicit scope_success(EFP&& deleter) : m_deleter(std::move(deleter)),
+        explicit scope_success(EFP&& deleter) : m_exitFunction(std::move(deleter)),
                                             m_execute_on_destruction(true),
                                             m_uncaught_on_creation(uncaught_exceptions())
         {
@@ -47,7 +47,7 @@ namespace sr
             std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
             >
-        explicit scope_success(EFP&& deleter) try : m_deleter(deleter),
+        explicit scope_success(EFP&& deleter) try : m_exitFunction(deleter),
                                             m_execute_on_destruction(true),
                                             m_uncaught_on_creation(uncaught_exceptions())
         {
@@ -62,7 +62,7 @@ namespace sr
         template<class T = EF,
             std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_success(scope_success&& other) : m_deleter(std::move(other.m_deleter)),
+        scope_success(scope_success&& other) : m_exitFunction(std::move(other.m_exitFunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction),
                                         m_uncaught_on_creation(uncaught_exceptions())
         {
@@ -72,7 +72,7 @@ namespace sr
         template<class T = EF,
             std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_success(scope_success&& other) : m_deleter(other.m_deleter),
+        scope_success(scope_success&& other) : m_exitFunction(other.m_exitFunction),
                                         m_execute_on_destruction(other.m_execute_on_destruction),
                                         m_uncaught_on_creation(other.m_uncaught_on_creation)
         {
@@ -83,7 +83,7 @@ namespace sr
         {
             if( (m_execute_on_destruction == true) && ( uncaught_exceptions() <= m_uncaught_on_creation ) )
             {
-                m_deleter();
+                m_exitFunction();
             }
         }
 
@@ -105,7 +105,7 @@ namespace sr
             return ( std::uncaught_exception() == true ? 1 : 0 );
         }
 
-        EF m_deleter;
+        EF m_exitFunction;
         bool m_execute_on_destruction;
         int m_uncaught_on_creation;
     };
