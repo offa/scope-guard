@@ -160,6 +160,7 @@ TEST_CASE("deleter not called on exception", "[ScopeFail]")
     try
     {
         auto guard = sr::make_scope_success(deleter);
+        static_cast<void>(guard);
         throw 3;
     }
     catch( ... )
@@ -177,6 +178,7 @@ TEST_CASE("deleter called on pending exception", "[ScopeFail]")
     {
         REQUIRE_CALL(m, deleter());
         auto guard = sr::make_scope_success(deleter);
+        static_cast<void>(guard);
     }
 }
 
