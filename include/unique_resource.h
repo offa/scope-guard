@@ -120,7 +120,6 @@ namespace sr
         }
         catch( ... )
         {
-
             other.get_deleter()(other.m_resource);
             other.release();
             throw;

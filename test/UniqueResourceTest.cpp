@@ -40,23 +40,33 @@ namespace
     {
         ThrowOnCopyMock() {  }
 
-        ThrowOnCopyMock(const ThrowOnCopyMock&)
+        ThrowOnCopyMock(const ThrowOnCopyMock&) noexcept(false)
         {
             throw std::exception{};
         }
+
+        ThrowOnCopyMock(ThrowOnCopyMock&&) = delete;
 
         MAKE_CONST_MOCK1(deleter, void(ThrowOnCopyMock));
 
-        ThrowOnCopyMock& operator=(const ThrowOnCopyMock&)
+        ThrowOnCopyMock& operator=(const ThrowOnCopyMock&) noexcept(false)
         {
             throw std::exception{};
         }
+
+        ThrowOnCopyMock& operator=(ThrowOnCopyMock&&) = delete;
+
     };
 
     struct NotNothrowMoveMock
     {
         NotNothrowMoveMock(CallMock* mo) : m_mock(mo) { }
-        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)  { }
+
+        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)
+        {
+            throw std::exception{};
+        }
+
         NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock) { }
 
         void operator()(Handle h) const
@@ -75,7 +85,6 @@ namespace
         }
 
         CallMock* m_mock;
-
     };
 
     struct ConditialThrowOnCopyMock
@@ -115,6 +124,13 @@ namespace
         Handle m_handle;
         bool m_shouldThrow;
     };
+
+    struct CopyMock
+    {
+        CopyMock() {}
+        CopyMock(const CopyMock&) { }
+    };
+
 
 
     CallMock m;
@@ -164,13 +180,13 @@ TEST_CASE("move-construction with move", "[UniqueResource]")
 
 TEST_CASE("move-construction with copy", "[UniqueResource]")
 {
-    CallMock mock;
-    REQUIRE_CALL(mock, deleter(3));
-    const NotNothrowMoveMock notNothrow{&mock};
-    Handle h{3};
-    sr::unique_resource<Handle, decltype(notNothrow)> movedFrom{h, notNothrow};
+    REQUIRE_CALL(m, deleter(7));
+    auto d = [](auto) { deleter(7); };
+
+    const CopyMock copyMock;
+    sr::unique_resource<CopyMock, decltype(d)> movedFrom{copyMock, d};
     auto guard = std::move(movedFrom);
-    CHECK(guard.get() == 3);
+    static_cast<void>(guard);
 }
 
 TEST_CASE("move assignment calls deleter", "[UniqueResource]")
