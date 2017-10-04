@@ -36,7 +36,7 @@ namespace sr
             std::enable_if_t<(!std::is_lvalue_reference<EFP>::value)
                                 && std::is_nothrow_constructible<EF, EFP>::value, int> = 0
             >
-        explicit scope_exit(EFP&& deleter) : m_exitFunction(std::move(deleter)),
+        explicit scope_exit(EFP&& exitFunction) : m_exitFunction(std::move(exitFunction)),
                                             m_execute_on_destruction(true)
         {
         }
@@ -45,13 +45,13 @@ namespace sr
             std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
             >
-        explicit scope_exit(EFP&& deleter) try : m_exitFunction(deleter),
+        explicit scope_exit(EFP&& exitFunction) try : m_exitFunction(exitFunction),
                                             m_execute_on_destruction(true)
         {
         }
         catch( ... )
         {
-            deleter();
+            exitFunction();
             throw;
         }
 
@@ -102,9 +102,9 @@ namespace sr
 
 
     template<class EF>
-    scope_exit<std::decay_t<EF>> make_scope_exit(EF&& deleter)
+    scope_exit<std::decay_t<EF>> make_scope_exit(EF&& exitFunction)
     {
-        return scope_exit<std::decay_t<EF>>{std::forward<EF>(deleter)};
+        return scope_exit<std::decay_t<EF>>{std::forward<EF>(exitFunction)};
     }
 
 }
