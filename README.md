@@ -13,7 +13,7 @@ Implementation of `scope_guard` and `unique_resource` as proposed in [**P0052**]
 This implementation conforms to [P0052][2], except:
 
 ###### Namespace
-Another namespace is used instead of `std`.
+The namespace `sr` is used instead of `std`.
 
 ###### Filenames
 The filenames contain a `.h` extension.
