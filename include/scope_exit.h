@@ -36,7 +36,7 @@ namespace sr
             std::enable_if_t<(!std::is_lvalue_reference<D>::value)
                                 && std::is_nothrow_constructible<Deleter, D>::value, int> = 0
             >
-        explicit scope_exit(D&& deleter) : m_deleter(std::move(deleter)),
+        explicit scope_exit(D&& deleter) : m_exitFunction(std::move(deleter)),
                                             m_execute_on_destruction(true)
         {
         }
@@ -45,7 +45,7 @@ namespace sr
             std::enable_if_t<std::is_constructible<Deleter, D>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<D>::value, int> = 0
             >
-        explicit scope_exit(D&& deleter) try : m_deleter(deleter),
+        explicit scope_exit(D&& deleter) try : m_exitFunction(deleter),
                                             m_execute_on_destruction(true)
         {
         }
@@ -60,7 +60,7 @@ namespace sr
         template<class T = Deleter,
             std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_exit(scope_exit&& other) : m_deleter(std::move(other.m_deleter)),
+        scope_exit(scope_exit&& other) : m_exitFunction(std::move(other.m_exitFunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
@@ -69,7 +69,7 @@ namespace sr
         template<class T = Deleter,
             std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_exit(scope_exit&& other) : m_deleter(other.m_deleter),
+        scope_exit(scope_exit&& other) : m_exitFunction(other.m_exitFunction),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
@@ -79,7 +79,7 @@ namespace sr
         {
             if( m_execute_on_destruction == true )
             {
-                m_deleter();
+                m_exitFunction();
             }
         }
 
@@ -96,7 +96,7 @@ namespace sr
 
     private:
 
-        Deleter m_deleter;
+        Deleter m_exitFunction;
         bool m_execute_on_destruction;
     };
 
