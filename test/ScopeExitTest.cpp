@@ -91,14 +91,14 @@ namespace
 }
 
 
-TEST_CASE("deleter called on destruction", "[ScopeExit]")
+TEST_CASE("exit function called on destruction", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
     auto guard = sr::make_scope_exit(deleter);
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter lambda called on destruction", "[ScopeExit]")
+TEST_CASE("exit function lambda called on destruction", "[ScopeExit]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
@@ -106,7 +106,7 @@ TEST_CASE("deleter lambda called on destruction", "[ScopeExit]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter called and rethrow on copy exception", "[ScopeExit]")
+TEST_CASE("exit function called and rethrow on copy exception", "[ScopeExit]")
 {
     REQUIRE_THROWS([] {
         const ThrowOnCopyMock noMove;
@@ -116,7 +116,7 @@ TEST_CASE("deleter called and rethrow on copy exception", "[ScopeExit]")
         }());
 }
 
-TEST_CASE("deleter is not called if released", "[ScopeExit]")
+TEST_CASE("exit function is not called if released", "[ScopeExit]")
 {
    REQUIRE_CALL(m, deleter()).TIMES(0);
    auto guard = sr::make_scope_exit(deleter);

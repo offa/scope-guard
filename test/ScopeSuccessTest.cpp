@@ -91,14 +91,14 @@ namespace
 }
 
 
-TEST_CASE("deleter called on destruction", "[ScopeSuccess]")
+TEST_CASE("exit function called on destruction", "[ScopeSuccess]")
 {
     REQUIRE_CALL(m, deleter());
     auto guard = sr::make_scope_success(deleter);
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter lambda called on destruction", "[ScopeSuccess]")
+TEST_CASE("exit function lambda called on destruction", "[ScopeSuccess]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
@@ -106,7 +106,7 @@ TEST_CASE("deleter lambda called on destruction", "[ScopeSuccess]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter not called and rethrow on copy exception", "[ScopeSuccess]")
+TEST_CASE("exit function not called and rethrow on copy exception", "[ScopeSuccess]")
 {
     REQUIRE_THROWS([] {
         const ThrowOnCopyMock noMove;
@@ -114,7 +114,7 @@ TEST_CASE("deleter not called and rethrow on copy exception", "[ScopeSuccess]")
         }());
 }
 
-TEST_CASE("deleter is not called if released", "[ScopeSuccess]")
+TEST_CASE("exit function is not called if released", "[ScopeSuccess]")
 {
    REQUIRE_CALL(m, deleter()).TIMES(0);
    auto guard = sr::make_scope_success(deleter);
@@ -155,7 +155,7 @@ TEST_CASE("move transfers state if released", "[ScopeSuccess]")
     static_cast<void>(guard);
 }
 
-TEST_CASE("deleter not called on exception", "[ScopeFail]")
+TEST_CASE("exit function not called on exception", "[ScopeFail]")
 {
     try
     {
@@ -168,7 +168,7 @@ TEST_CASE("deleter not called on exception", "[ScopeFail]")
     }
 }
 
-TEST_CASE("deleter called on pending exception", "[ScopeFail]")
+TEST_CASE("exit function called on pending exception", "[ScopeFail]")
 {
     try
     {
