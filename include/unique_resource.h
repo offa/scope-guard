@@ -28,7 +28,7 @@ namespace sr
 
     template<class T, class TT>
     using is_ntmocp_constructible = std::conditional_t<std::is_reference<TT>::value || !std::is_nothrow_move_constructible<TT>::value,
-                                                    typename std::is_constructible<T, TT const &>::type,
+                                                    typename std::is_constructible<T, const TT&>::type,
                                                     typename std::is_constructible<T, TT>::type>;
 
     template<class T, class TT>
@@ -38,7 +38,7 @@ namespace sr
     template<class T,
             class U = std::conditional_t<(!std::is_nothrow_move_assignable<T>::value
                                             && std::is_copy_assignable<T>::value),
-                                        T const &,
+                                        const T&,
                                         T &&>>
     constexpr U move_assign_if_noexcept(T& value) noexcept
     {
