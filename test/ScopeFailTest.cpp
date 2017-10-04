@@ -157,3 +157,28 @@ TEST_CASE("move transfers state if released", "[ScopeFail]")
     static_cast<void>(guard);
 }
 
+TEST_CASE("deleter called on exception", "[ScopeFail]")
+{
+    try
+    {
+        REQUIRE_CALL(m, deleter());
+        auto guard = sr::make_scope_fail(deleter);
+        throw 3;
+    }
+    catch( ... )
+    {
+    }
+}
+
+TEST_CASE("deleter not called on pending exception", "[ScopeFail]")
+{
+    try
+    {
+        throw 3;
+    }
+    catch( ... )
+    {
+        auto guard = sr::make_scope_fail(deleter);
+    }
+}
+
