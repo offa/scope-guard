@@ -82,7 +82,7 @@ namespace sr
             other.release();
         }
 
-        ~scope_fail() noexcept(noexcept(std::declval<EF>()))
+        ~scope_fail() noexcept(true)
         {
             if( ( m_execute_on_destruction == true ) && ( uncaught_exceptions() > m_uncaught_on_creation ) )
             {
