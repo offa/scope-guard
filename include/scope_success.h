@@ -47,14 +47,10 @@ namespace sr
             std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
             >
-        explicit scope_success(EFP&& exitFunction) try : m_exitFunction(exitFunction),
+        explicit scope_success(EFP&& exitFunction) : m_exitFunction(exitFunction),
                                             m_execute_on_destruction(true),
                                             m_uncaught_on_creation(uncaught_exceptions())
         {
-        }
-        catch( ... )
-        {
-            throw;
         }
 
         scope_success(const scope_success&) = delete;
