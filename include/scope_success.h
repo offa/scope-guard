@@ -79,7 +79,7 @@ namespace sr
 
         ~scope_success() noexcept(noexcept(std::declval<EF>()))
         {
-            if( (m_execute_on_destruction == true) && ( uncaught_exceptions() <= m_uncaught_on_creation ) )
+            if( ( m_execute_on_destruction == true ) && ( uncaught_exceptions() <= m_uncaught_on_creation ) )
             {
                 m_exitFunction();
             }
