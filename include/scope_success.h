@@ -58,7 +58,8 @@ namespace sr
         template<class T = EF,
             std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_success(scope_success&& other) : m_exitFunction(std::move(other.m_exitFunction)),
+        scope_success(scope_success&& other) noexcept(std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value)
+                                        : m_exitFunction(std::move(other.m_exitFunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction),
                                         m_uncaught_on_creation(uncaught_exceptions())
         {
@@ -68,7 +69,8 @@ namespace sr
         template<class T = EF,
             std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_success(scope_success&& other) : m_exitFunction(other.m_exitFunction),
+        scope_success(scope_success&& other) noexcept(std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value)
+                                        : m_exitFunction(other.m_exitFunction),
                                         m_execute_on_destruction(other.m_execute_on_destruction),
                                         m_uncaught_on_creation(other.m_uncaught_on_creation)
         {
