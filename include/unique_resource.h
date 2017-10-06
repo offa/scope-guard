@@ -46,17 +46,12 @@ namespace sr
     }
 
 
-    template<class T, std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0>
-    constexpr T&& forward_if_nothrow_move_constructible(T&& value)
+    template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible<T>::value, T&&, const T&>>
+    constexpr U forward_if_nothrow_move_constructible(T&& value)
     {
         return std::forward<T>(value);
     }
 
-    template<class T, std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0>
-    constexpr const T& forward_if_nothrow_move_constructible(T&& value)
-    {
-        return value;
-    }
 
 
     template<class R, class D>
