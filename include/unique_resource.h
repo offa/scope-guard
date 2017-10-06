@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "scope_exit.h"
 #include <utility>
 #include <type_traits>
 
@@ -141,10 +142,11 @@ namespace sr
         template<class RR>
         void reset(RR&& r)
         {
+            auto se = make_scope_exit([this, &r] { get_deleter()(r); });
             reset();
-
             m_resource = move_assign_if_noexcept(r);
             m_execute_on_destruction = true;
+            se.release();
         }
 
         void release()
