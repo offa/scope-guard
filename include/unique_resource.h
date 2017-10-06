@@ -74,7 +74,7 @@ namespace sr
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
-        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R,RR>::value
+        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
                                                 : m_resource(std::move(r)),
                                                 m_deleter(std::move(d)),
