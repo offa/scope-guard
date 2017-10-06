@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-14-green.svg)
 
-Implementation of `scope_guard` and `unique_resource` as proposed in [**P0052**][2] (former [N3949][1]).
+Implementation of `scope_guard` and `unique_resource` as proposed in [**P0052R5**][2] (former [N3949][1]).
 
 
 ## Compatibility
@@ -26,7 +26,7 @@ The function `std::uncaught_exceptions()` is not available in C++14 and is there
 
 ## Documentation
 
-- [*P0052R3 - Generic Scope Guard and RAII Wrapper for the Standard Library*][2] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
+- [*P0052R5 - Generic Scope Guard and RAII Wrapper for the Standard Library*][2] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
 - [*N3949 - Scoped Resource - Generic RAII Wrapper for the Standard Library*][1] (P. Sommerlad, A. L. Sandoval)
 
 
@@ -50,4 +50,4 @@ The function `std::uncaught_exceptions()` is not available in C++14 and is there
 
 
 [1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3949.pdf
-[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0052r3.pdf
+[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0052r5.pdf
