@@ -37,6 +37,12 @@ namespace sr
     constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
 
 
+    template<class T>
+    constexpr auto is_nothrow_swappable_v = std::is_nothrow_move_constructible<T>::value
+                                            && std::is_nothrow_move_assignable<T>::value;
+
+
+
     template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible<T>::value, T&&, const T&>>
     constexpr U forward_if_nothrow_move_constructible(T&& value) noexcept
     {
@@ -161,6 +167,16 @@ namespace sr
             reset();
         }
 
+
+        void swap(unique_resource& other) noexcept(is_nothrow_swappable_v<R>
+                                                    && is_nothrow_swappable_v<D>
+                                                    && is_nothrow_swappable_v<bool>)
+        {
+            using std::swap;
+            swap(m_resource.get(), other.m_resource.get());
+            swap(m_deleter.get(), other.m_deleter.get());
+            swap(m_execute_on_destruction, other.m_execute_on_destruction);
+        }
 
         void reset()
         {
