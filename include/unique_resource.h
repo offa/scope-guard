@@ -55,12 +55,12 @@ namespace sr
     }
 
 
-    // TODO: Fix old-style casts
+
     template<class T>
     struct Wrapper
     {
         template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{(T&&) value})) : Wrapper((T&&) value)
+        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
         {
             g.release();
         }
@@ -105,7 +105,7 @@ namespace sr
     struct Wrapper<T&>
     {
         template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>((TT&&) value))) : m_value((T&) value)
+        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
         {
             g.release();
         }
