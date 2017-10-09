@@ -55,46 +55,44 @@ namespace sr
 
 
     // TODO: Fix old-style casts
-    // TODO: make class and fix noexcept's
     template<class T>
     struct Wrapper
     {
         template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) : Wrapper((T&&) value)
+        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{(T&&) value})) : Wrapper((T&&) value)
         {
             g.release();
         }
 
 
-        T& get()
+        T& get() noexcept
         {
             return m_value;
         }
 
-        const T& get() const
+        const T& get() const noexcept
         {
             return m_value;
         }
 
-        void reset(T&& newValue)
+        void reset(T&& newValue) noexcept(noexcept(m_value = move_assign_if_noexcept(newValue)))
         {
             m_value = move_assign_if_noexcept(newValue);
         }
 
-        void reset(const T& newValue)
+        void reset(const T& newValue) noexcept(noexcept(m_value = newValue))
         {
             m_value = newValue;
         }
 
 
-
     private:
 
-        Wrapper(const T& value) : m_value(value)
+        Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
         {
         }
 
-        Wrapper(T&& value) : m_value(std::move_if_noexcept(value))
+        Wrapper(T&& value) noexcept(noexcept(T{std::move_if_noexcept(value)})) : m_value(std::move_if_noexcept(value))
         {
         }
 
@@ -106,24 +104,24 @@ namespace sr
     struct Wrapper<T&>
     {
         template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) : m_value((T&) value)
+        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>((TT&&) value))) : m_value((T&) value)
         {
             g.release();
         }
 
 
-        T& get()
+        T& get() noexcept
         {
             return m_value.get();
         }
 
-        const T& get() const
+        const T& get() const noexcept
         {
             return m_value.get();
         }
+
 
     private:
-
 
         std::reference_wrapper<T> m_value;
     };
