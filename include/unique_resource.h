@@ -75,12 +75,12 @@ namespace sr
             return m_value;
         }
 
-        void reset(T&& newValue) noexcept(noexcept(m_value = move_assign_if_noexcept(newValue)))
+        void reset(T&& newValue) noexcept(std::is_nothrow_assignable<T, decltype(move_assign_if_noexcept(newValue))>::value)
         {
             m_value = move_assign_if_noexcept(newValue);
         }
 
-        void reset(const T& newValue) noexcept(noexcept(m_value = newValue))
+        void reset(const T& newValue) noexcept(std::is_nothrow_assignable<T, const T&>::value)
         {
             m_value = newValue;
         }
