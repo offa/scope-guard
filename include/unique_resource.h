@@ -148,8 +148,8 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
-                                                : m_resource(std::forward<RR>(r), make_scope_exit([] { })), // TODO: Call Deleter
-                                                m_deleter(std::forward<DD>(d), make_scope_exit([] { })), // TODO: Call Deleter
+                                                : m_resource(std::forward<RR>(r), make_scope_exit([&r, &d] { d(r); })), // TODO: Call Deleter
+                                                m_deleter(std::forward<DD>(d), make_scope_exit([this, &d] { d(get()); })), // TODO: Call Deleter
                                                 m_execute_on_destruction(true)
         {
         }
