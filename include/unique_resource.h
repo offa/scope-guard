@@ -53,13 +53,18 @@ namespace sr
         return std::forward<T>(value);
     }
 
+    template<class T, class U>
+    constexpr T&& cast(U&& u)
+    {
+        return static_cast<T&&>(const_cast<T&&>(u));
+    }
 
     // TODO: make class and fix noexcept's
     template<class T>
     struct Wrapper
     {
         template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) : Wrapper(static_cast<T&&>(value))
+        explicit Wrapper(TT&& value, G&& g) : Wrapper(cast<T&&>(value))
         {
             g.release();
         }
@@ -74,6 +79,18 @@ namespace sr
         {
             return m_value;
         }
+
+        void reset(T&& newValue)
+        {
+            m_value = move_assign_if_noexcept(newValue);
+        }
+
+        void reset(const T& newValue)
+        {
+            m_value = newValue;
+        }
+
+
 
     private:
 
@@ -92,8 +109,8 @@ namespace sr
     template<class T>
     struct Wrapper<T&>
     {
-        template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) : Wrapper(static_cast<T&>(value))
+        template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
+        explicit Wrapper(TT&& value, G&& g) : m_value(cast<T&>(value))
         {
             g.release();
         }
@@ -209,7 +226,7 @@ namespace sr
         {
             auto se = make_scope_exit([this, &r] { get_deleter()(r); });
             reset();
-            m_resource = move_assign_if_noexcept(r);
+            m_resource.reset(std::forward<RR>(r));
             m_execute_on_destruction = true;
             se.release();
         }
@@ -247,21 +264,23 @@ namespace sr
         }
 
 
-        template<class RR = R, class DD = D,
-            std::enable_if_t<(std::is_nothrow_move_assignable<RR>::value || std::is_nothrow_copy_assignable<RR>::value)
-                            && (std::is_nothrow_copy_assignable<DD>::value || std::is_nothrow_copy_assignable<DD>::value), int> = 0
-            >
-        unique_resource& operator=(unique_resource&& other)
-        {
-            if( this != &other )
-            {
-                reset();
-                m_resource = std::forward<RR>(other.m_resource);
-                m_deleter = std::forward<DD>(other.m_deleter);
-                m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
-            }
-            return *this;
-        }
+        //template<class RR = R, class DD = D,
+            //std::enable_if_t<(std::is_nothrow_move_assignable<RR>::value || std::is_nothrow_copy_assignable<RR>::value)
+                            //&& (std::is_nothrow_copy_assignable<DD>::value || std::is_nothrow_copy_assignable<DD>::value), int> = 0
+            //>
+        //unique_resource& operator=(unique_resource&& other)
+        //{
+            //if( this != &other )
+            //{
+                //reset();
+                //m_resource = std::forward<RR>(other.m_resource);
+                //m_deleter = std::forward<DD>(other.m_deleter);
+                //m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
+            //}
+            //return *this;
+        //}
+        // FIXME: Needs update
+        unique_resource& operator=(unique_resource&&) = default;
 
         unique_resource& operator=(const unique_resource&) = delete;
 
