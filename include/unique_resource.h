@@ -137,10 +137,6 @@ namespace sr
     public:
 
         template<class RR, class DD,
-                //std::enable_if_t<(!std::is_lvalue_reference<RR>::value)
-                                    //&& std::is_nothrow_constructible<R, RR>::value, int> = 0,
-                //std::enable_if_t<(!std::is_lvalue_reference<DD>::value)
-                                    //&& std::is_nothrow_constructible<D, DD>::value, int> = 0,
                 std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
                                 && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
@@ -148,55 +144,12 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
-                                                : m_resource(std::forward<RR>(r), make_scope_exit([&r, &d] { d(r); })), // TODO: Call Deleter
-                                                m_deleter(std::forward<DD>(d), make_scope_exit([this, &d] { d(get()); })), // TODO: Call Deleter
+                                                : m_resource(std::forward<RR>(r), make_scope_exit([&r, &d] { d(r); })),
+                                                m_deleter(std::forward<DD>(d), make_scope_exit([this, &d] { d(get()); })),
                                                 m_execute_on_destruction(true)
         {
         }
 
-        //template<class RR, class DD,
-                //std::enable_if_t<std::is_lvalue_reference<RR>::value || std::is_lvalue_reference<DD>::value, int> = 0,
-                //std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
-                                //&& (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
-                //std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
-                //std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
-                //>
-        //explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
-                                                            //&& std::is_nothrow_constructible<D, DD>::value)
-                                                    //try : m_resource(std::forward<RR>(r), make_scope_exit([]() { [> TODO: Delete value <] })),
-                                                        //m_deleter(d),
-                                                        //m_execute_on_destruction(true)
-        //{
-        //}
-        //catch( ... )
-        //{
-            //d(r);
-        //}
-
-        //template<class TR = R, std::enable_if_t<std::is_nothrow_move_constructible<TR>::value, int> = 0>
-        //unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
-                                                            //&& std::is_nothrow_move_constructible<D>::value)
-                                                //: m_resource(forward_if_nothrow_move_constructible<R>(std::forward<R>(other.m_resource))),
-                                                //m_deleter(forward_if_nothrow_move_constructible<D>(std::forward<D>(other.m_deleter))),
-                                                //m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
-        //{
-        //}
-
-        //template<class TR = R, std::enable_if_t<!std::is_nothrow_move_constructible<TR>::value, int> = 0>
-        //unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
-                                                            //&& std::is_nothrow_move_constructible<D>::value)
-                                                //try : m_resource(forward_if_nothrow_move_constructible<R>(std::forward<R>(other.m_resource))),
-                                                //m_deleter(forward_if_nothrow_move_constructible<D>(std::forward<D>(other.m_deleter))),
-                                                //m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
-        //{
-        //}
-        //catch( ... )
-        //{
-            //other.get_deleter()(other.m_resource.get());
-            //other.release();
-            //throw;
-        //}
-        // FIXME: Needs update
         unique_resource(unique_resource&&) = default;
 
 
