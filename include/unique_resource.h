@@ -23,6 +23,7 @@
 #include "scope_exit.h"
 #include <utility>
 #include <type_traits>
+#include <functional>
 
 namespace sr
 {
@@ -118,6 +119,11 @@ namespace sr
         const T& get() const noexcept
         {
             return m_value.get();
+        }
+
+        void reset(T& newValue) noexcept
+        {
+            m_value = std::ref(newValue);
         }
 
 
