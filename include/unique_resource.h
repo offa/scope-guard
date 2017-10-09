@@ -54,6 +54,41 @@ namespace sr
     }
 
 
+    // TODO: make class and fix noexcept's
+    template<class T>
+    struct Wrapper
+    {
+        template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
+        Wrapper(TT&& value, G&& g) : Wrapper(std::forward<TT>(value))
+        {
+            g.release();
+        }
+
+
+        T& get()
+        {
+            return m_value;
+        }
+
+        const T& get() const
+        {
+            return m_value;
+        }
+
+    private:
+
+        Wrapper(T&& value) : m_value(std::move_if_noexcept(value))
+        {
+        }
+
+        Wrapper(const T& value) : m_value(value)
+        {
+        }
+
+
+        T m_value;
+    };
+
 
     template<class R, class D>
     class unique_resource
@@ -70,7 +105,7 @@ namespace sr
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
-        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R,RR>::value
+        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
                                                 : m_resource(std::move(r)),
                                                 m_deleter(std::move(d)),
