@@ -234,8 +234,23 @@ namespace sr
             if( this != &other )
             {
                 reset();
-                m_resource = std::move(other.m_resource);
-                m_deleter = std::move(other.m_deleter);
+
+                if( std::is_nothrow_move_assignable<R>::value == true )
+                {
+                    m_deleter.reset(forward_if_nothrow_move_constructible(other.m_deleter.get()));
+                    m_resource.reset(std::forward<RR>(other.m_resource.get()));
+                }
+                else if( std::is_nothrow_move_assignable<D>::value == true )
+                {
+                    m_resource.reset(forward_if_nothrow_move_constructible(other.m_resource.get()));
+                    m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
+                }
+                else
+                {
+                    m_resource = other.m_resource;
+                    m_deleter = other.m_deleter;
+                }
+
                 m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
             }
             return *this;
