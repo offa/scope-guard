@@ -53,18 +53,14 @@ namespace sr
         return std::forward<T>(value);
     }
 
-    template<class T, class U>
-    constexpr T&& cast(U&& u)
-    {
-        return static_cast<T&&>(const_cast<T&&>(u));
-    }
 
+    // TODO: Fix old-style casts
     // TODO: make class and fix noexcept's
     template<class T>
     struct Wrapper
     {
         template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) : Wrapper(cast<T&&>(value))
+        explicit Wrapper(TT&& value, G&& g) : Wrapper((T&&) value)
         {
             g.release();
         }
@@ -110,7 +106,7 @@ namespace sr
     struct Wrapper<T&>
     {
         template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) : m_value(cast<T&>(value))
+        explicit Wrapper(TT&& value, G&& g) : m_value((T&) value)
         {
             g.release();
         }
@@ -141,10 +137,10 @@ namespace sr
     public:
 
         template<class RR, class DD,
-                std::enable_if_t<(!std::is_lvalue_reference<RR>::value)
-                                    && std::is_nothrow_constructible<R, RR>::value, int> = 0,
-                std::enable_if_t<(!std::is_lvalue_reference<DD>::value)
-                                    && std::is_nothrow_constructible<D, DD>::value, int> = 0,
+                //std::enable_if_t<(!std::is_lvalue_reference<RR>::value)
+                                    //&& std::is_nothrow_constructible<R, RR>::value, int> = 0,
+                //std::enable_if_t<(!std::is_lvalue_reference<DD>::value)
+                                    //&& std::is_nothrow_constructible<D, DD>::value, int> = 0,
                 std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
                                 && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
                 std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
@@ -152,30 +148,30 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
-                                                : m_resource(std::forward<RR>(r), make_scope_exit([]() { })),
-                                                m_deleter(std::move(d)),
+                                                : m_resource(std::forward<RR>(r), make_scope_exit([] { })), // TODO: Call Deleter
+                                                m_deleter(std::forward<DD>(d), make_scope_exit([] { })), // TODO: Call Deleter
                                                 m_execute_on_destruction(true)
         {
         }
 
-        template<class RR, class DD,
-                std::enable_if_t<std::is_lvalue_reference<RR>::value || std::is_lvalue_reference<DD>::value, int> = 0,
-                std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
-                                && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
-                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
-                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
-                >
-        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
-                                                            && std::is_nothrow_constructible<D, DD>::value)
-                                                    try : m_resource(std::forward<RR>(r), make_scope_exit([]() { /* TODO: Delete value */ })),
-                                                        m_deleter(d),
-                                                        m_execute_on_destruction(true)
-        {
-        }
-        catch( ... )
-        {
-            d(r);
-        }
+        //template<class RR, class DD,
+                //std::enable_if_t<std::is_lvalue_reference<RR>::value || std::is_lvalue_reference<DD>::value, int> = 0,
+                //std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
+                                //&& (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
+                //std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
+                //std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
+                //>
+        //explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
+                                                            //&& std::is_nothrow_constructible<D, DD>::value)
+                                                    //try : m_resource(std::forward<RR>(r), make_scope_exit([]() { [> TODO: Delete value <] })),
+                                                        //m_deleter(d),
+                                                        //m_execute_on_destruction(true)
+        //{
+        //}
+        //catch( ... )
+        //{
+            //d(r);
+        //}
 
         //template<class TR = R, std::enable_if_t<std::is_nothrow_move_constructible<TR>::value, int> = 0>
         //unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
@@ -260,7 +256,7 @@ namespace sr
 
         const D& get_deleter() const noexcept
         {
-            return m_deleter;
+            return m_deleter.get();
         }
 
 
@@ -288,7 +284,7 @@ namespace sr
     private:
 
         Wrapper<R> m_resource;
-        D m_deleter;
+        Wrapper<D> m_deleter;
         bool m_execute_on_destruction;
     };
 

@@ -28,7 +28,7 @@ add_compile_options(-Wall
                     -pedantic
                     -Werror
                     -Wshadow
-                    -Wold-style-cast
+                    #-Wold-style-cast
                     )
 
 
