@@ -221,23 +221,21 @@ namespace sr
         }
 
 
-        //template<class RR = R, class DD = D,
-            //std::enable_if_t<(std::is_nothrow_move_assignable<RR>::value || std::is_nothrow_copy_assignable<RR>::value)
-                            //&& (std::is_nothrow_copy_assignable<DD>::value || std::is_nothrow_copy_assignable<DD>::value), int> = 0
-            //>
-        //unique_resource& operator=(unique_resource&& other)
-        //{
-            //if( this != &other )
-            //{
-                //reset();
-                //m_resource = std::forward<RR>(other.m_resource);
-                //m_deleter = std::forward<DD>(other.m_deleter);
-                //m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
-            //}
-            //return *this;
-        //}
-        // FIXME: Needs update
-        unique_resource& operator=(unique_resource&&) = default;
+        template<class RR = R, class DD = D,
+            std::enable_if_t<(std::is_nothrow_move_assignable<RR>::value || std::is_nothrow_copy_assignable<RR>::value)
+                            && (std::is_nothrow_copy_assignable<DD>::value || std::is_nothrow_copy_assignable<DD>::value), int> = 0
+            >
+        unique_resource& operator=(unique_resource&& other)
+        {
+            if( this != &other )
+            {
+                reset();
+                m_resource = std::move(other.m_resource);
+                m_deleter = std::move(other.m_deleter);
+                m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
+            }
+            return *this;
+        }
 
         unique_resource& operator=(const unique_resource&) = delete;
 
