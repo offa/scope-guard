@@ -59,7 +59,7 @@ namespace sr
     struct Wrapper
     {
         template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-        Wrapper(TT&& value, G&& g) : Wrapper(std::forward<TT>(value))
+        explicit Wrapper(TT&& value, G&& g) : Wrapper(static_cast<T&&>(value))
         {
             g.release();
         }
@@ -77,17 +77,45 @@ namespace sr
 
     private:
 
-        Wrapper(T&& value) : m_value(std::move_if_noexcept(value))
+        Wrapper(const T& value) : m_value(value)
         {
         }
 
-        Wrapper(const T& value) : m_value(value)
+        Wrapper(T&& value) : m_value(std::move_if_noexcept(value))
         {
         }
 
 
         T m_value;
     };
+
+    template<class T>
+    struct Wrapper<T&>
+    {
+        template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
+        explicit Wrapper(TT&& value, G&& g) : Wrapper(static_cast<T&>(value))
+        {
+            g.release();
+        }
+
+
+        T& get()
+        {
+            return m_value.get();
+        }
+
+        const T& get() const
+        {
+            return m_value.get();
+        }
+
+    private:
+
+
+        std::reference_wrapper<T> m_value;
+    };
+
+
 
 
     template<class R, class D>
@@ -107,7 +135,7 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
-                                                : m_resource(std::move(r)),
+                                                : m_resource(std::forward<RR>(r), make_scope_exit([]() { })),
                                                 m_deleter(std::move(d)),
                                                 m_execute_on_destruction(true)
         {
@@ -122,7 +150,7 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
-                                                    try : m_resource(r),
+                                                    try : m_resource(std::forward<RR>(r), make_scope_exit([]() { /* TODO: Delete value */ })),
                                                         m_deleter(d),
                                                         m_execute_on_destruction(true)
         {
@@ -132,29 +160,31 @@ namespace sr
             d(r);
         }
 
-        template<class TR = R, std::enable_if_t<std::is_nothrow_move_constructible<TR>::value, int> = 0>
-        unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
-                                                            && std::is_nothrow_move_constructible<D>::value)
-                                                : m_resource(forward_if_nothrow_move_constructible<R>(std::forward<R>(other.m_resource))),
-                                                m_deleter(forward_if_nothrow_move_constructible<D>(std::forward<D>(other.m_deleter))),
-                                                m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
-        {
-        }
+        //template<class TR = R, std::enable_if_t<std::is_nothrow_move_constructible<TR>::value, int> = 0>
+        //unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
+                                                            //&& std::is_nothrow_move_constructible<D>::value)
+                                                //: m_resource(forward_if_nothrow_move_constructible<R>(std::forward<R>(other.m_resource))),
+                                                //m_deleter(forward_if_nothrow_move_constructible<D>(std::forward<D>(other.m_deleter))),
+                                                //m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
+        //{
+        //}
 
-        template<class TR = R, std::enable_if_t<!std::is_nothrow_move_constructible<TR>::value, int> = 0>
-        unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
-                                                            && std::is_nothrow_move_constructible<D>::value)
-                                                try : m_resource(forward_if_nothrow_move_constructible<R>(std::forward<R>(other.m_resource))),
-                                                m_deleter(forward_if_nothrow_move_constructible<D>(std::forward<D>(other.m_deleter))),
-                                                m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
-        {
-        }
-        catch( ... )
-        {
-            other.get_deleter()(other.m_resource);
-            other.release();
-            throw;
-        }
+        //template<class TR = R, std::enable_if_t<!std::is_nothrow_move_constructible<TR>::value, int> = 0>
+        //unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
+                                                            //&& std::is_nothrow_move_constructible<D>::value)
+                                                //try : m_resource(forward_if_nothrow_move_constructible<R>(std::forward<R>(other.m_resource))),
+                                                //m_deleter(forward_if_nothrow_move_constructible<D>(std::forward<D>(other.m_deleter))),
+                                                //m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
+        //{
+        //}
+        //catch( ... )
+        //{
+            //other.get_deleter()(other.m_resource.get());
+            //other.release();
+            //throw;
+        //}
+        // FIXME: Needs update
+        unique_resource(unique_resource&&) = default;
 
 
         unique_resource(const unique_resource&) = delete;
@@ -170,7 +200,7 @@ namespace sr
             if( m_execute_on_destruction == true )
             {
                 m_execute_on_destruction = false;
-                get_deleter()(m_resource);
+                get_deleter()(m_resource.get());
             }
         }
 
@@ -191,7 +221,7 @@ namespace sr
 
         const R& get() const noexcept
         {
-            return m_resource;
+            return m_resource.get();
         }
 
         template<class RR = R,
@@ -201,7 +231,7 @@ namespace sr
                 >
         RR operator->() const noexcept
         {
-            return m_resource;
+            return m_resource.get();
         }
 
         template<class RR = R,
@@ -238,7 +268,7 @@ namespace sr
 
     private:
 
-        R m_resource;
+        Wrapper<R> m_resource;
         D m_deleter;
         bool m_execute_on_destruction;
     };
