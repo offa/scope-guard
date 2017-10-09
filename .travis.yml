@@ -28,13 +28,13 @@ matrix:
           packages:
             - g++-5
           sources: *sources
-    #- env: CXX=clang++-5.0 CC=clang-5.0
-      #addons:
-        #apt:
-          #packages:
-            #- clang-5.0
-            #- libc++-dev
-          #sources: *sources
+    - env: CXX=clang++-5.0 CC=clang-5.0
+      addons:
+        apt:
+          packages:
+            - clang-5.0
+            - libc++-dev
+          sources: *sources
     - env: CXX=clang++-4.0 CC=clang-4.0
       addons:
         apt:
