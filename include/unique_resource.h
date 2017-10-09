@@ -150,7 +150,15 @@ namespace sr
         {
         }
 
-        unique_resource(unique_resource&&) = default;
+        unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
+                                                    && std::is_nothrow_move_constructible<D>::value)
+                                                : m_resource(forward_if_nothrow_move_constructible(other.m_resource.get()), make_scope_exit([] { })),
+                                                m_deleter(forward_if_nothrow_move_constructible(other.m_deleter.get()), make_scope_exit([&other] {
+                                                                                                                            other.get_deleter()(other.m_resource.get());
+                                                                                                                            other.release(); })),
+                                                m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
+        {
+        }
 
 
         unique_resource(const unique_resource&) = delete;
