@@ -48,7 +48,7 @@ namespace sr
 
 
     template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible<T>::value, T&&, const T&>>
-    constexpr U forward_if_nothrow_move_constructible(T&& value)
+    constexpr U forward_if_nothrow_move_constructible(T&& value) noexcept
     {
         return std::forward<T>(value);
     }
