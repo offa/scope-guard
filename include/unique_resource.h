@@ -37,17 +37,6 @@ namespace sr
     constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
 
 
-    template<class T,
-            class U = std::conditional_t<(!std::is_nothrow_move_assignable<T>::value
-                                            && std::is_copy_assignable<T>::value),
-                                        const T&,
-                                        T &&>>
-    constexpr U move_assign_if_noexcept(T& value) noexcept
-    {
-        return std::move(value);
-    }
-
-
     template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible<T>::value, T&&, const T&>>
     constexpr U forward_if_nothrow_move_constructible(T&& value) noexcept
     {
@@ -76,9 +65,9 @@ namespace sr
             return m_value;
         }
 
-        void reset(T&& newValue) noexcept(std::is_nothrow_assignable<T, decltype(move_assign_if_noexcept(newValue))>::value)
+        void reset(T&& newValue) noexcept(std::is_nothrow_assignable<T, decltype(std::move_assign_if_noexcept(newValue))>::value)
         {
-            m_value = move_assign_if_noexcept(newValue);
+            m_value = std::move_assign_if_noexcept(newValue);
         }
 
         void reset(const T& newValue) noexcept(std::is_nothrow_assignable<T, const T&>::value)
