@@ -27,106 +27,109 @@
 
 namespace sr
 {
-
-    template<class T, class TT>
-    using is_ntmocp_constructible = std::conditional_t<std::is_reference<TT>::value || !std::is_nothrow_move_constructible<TT>::value,
-                                                    typename std::is_constructible<T, const TT&>::type,
-                                                    typename std::is_constructible<T, TT>::type>;
-
-    template<class T, class TT>
-    constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
-
-
-    template<class T>
-    constexpr auto is_nothrow_swappable_v = std::is_nothrow_move_constructible<T>::value
-                                            && std::is_nothrow_move_assignable<T>::value;
-
-
-
-    template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible<T>::value, T&&, const T&>>
-    constexpr U forward_if_nothrow_move_constructible(T&& value) noexcept
+    namespace detail
     {
-        return std::forward<T>(value);
+        template<class T, class TT>
+        using is_ntmocp_constructible = std::conditional_t<std::is_reference<TT>::value || !std::is_nothrow_move_constructible<TT>::value,
+                                                        typename std::is_constructible<T, const TT&>::type,
+                                                        typename std::is_constructible<T, TT>::type>;
+
+        template<class T, class TT>
+        constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
+
+
+        template<class T>
+        constexpr auto is_nothrow_swappable_v = std::is_nothrow_move_constructible<T>::value
+                                                && std::is_nothrow_move_assignable<T>::value;
+
+
+
+        template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible<T>::value, T&&, const T&>>
+        constexpr U forward_if_nothrow_move_constructible(T&& value) noexcept
+        {
+            return std::forward<T>(value);
+        }
+
+
+
+        template<class T>
+        struct Wrapper
+        {
+            template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
+            explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
+            {
+                g.release();
+            }
+
+
+            T& get() noexcept
+            {
+                return m_value;
+            }
+
+            const T& get() const noexcept
+            {
+                return m_value;
+            }
+
+            void reset(T&& newValue) noexcept(std::is_nothrow_assignable<T, decltype(std::move_if_noexcept(newValue))>::value)
+            {
+                m_value = std::move_if_noexcept(newValue);
+            }
+
+            void reset(const T& newValue) noexcept(std::is_nothrow_assignable<T, const T&>::value)
+            {
+                m_value = newValue;
+            }
+
+
+        private:
+
+            Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
+            {
+            }
+
+            Wrapper(T&& value) noexcept(noexcept(T{std::move_if_noexcept(value)})) : m_value(std::move_if_noexcept(value))
+            {
+            }
+
+
+            T m_value;
+        };
+
+
+        template<class T>
+        struct Wrapper<T&>
+        {
+            template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
+            explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
+            {
+                g.release();
+            }
+
+
+            T& get() noexcept
+            {
+                return m_value.get();
+            }
+
+            const T& get() const noexcept
+            {
+                return m_value.get();
+            }
+
+            void reset(T& newValue) noexcept
+            {
+                m_value = std::ref(newValue);
+            }
+
+
+        private:
+
+            std::reference_wrapper<T> m_value;
+        };
+
     }
-
-
-
-    template<class T>
-    struct Wrapper
-    {
-        template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
-        {
-            g.release();
-        }
-
-
-        T& get() noexcept
-        {
-            return m_value;
-        }
-
-        const T& get() const noexcept
-        {
-            return m_value;
-        }
-
-        void reset(T&& newValue) noexcept(std::is_nothrow_assignable<T, decltype(std::move_if_noexcept(newValue))>::value)
-        {
-            m_value = std::move_if_noexcept(newValue);
-        }
-
-        void reset(const T& newValue) noexcept(std::is_nothrow_assignable<T, const T&>::value)
-        {
-            m_value = newValue;
-        }
-
-
-    private:
-
-        Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
-        {
-        }
-
-        Wrapper(T&& value) noexcept(noexcept(T{std::move_if_noexcept(value)})) : m_value(std::move_if_noexcept(value))
-        {
-        }
-
-
-        T m_value;
-    };
-
-    template<class T>
-    struct Wrapper<T&>
-    {
-        template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
-        explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
-        {
-            g.release();
-        }
-
-
-        T& get() noexcept
-        {
-            return m_value.get();
-        }
-
-        const T& get() const noexcept
-        {
-            return m_value.get();
-        }
-
-        void reset(T& newValue) noexcept
-        {
-            m_value = std::ref(newValue);
-        }
-
-
-    private:
-
-        std::reference_wrapper<T> m_value;
-    };
-
 
 
 
@@ -138,8 +141,8 @@ namespace sr
         template<class RR, class DD,
                 std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
                                 && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
-                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
-                std::enable_if_t<is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
+                std::enable_if_t<detail::is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
+                std::enable_if_t<detail::is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
                                                             && std::is_nothrow_constructible<D, DD>::value)
@@ -151,14 +154,14 @@ namespace sr
 
         unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
                                                     && std::is_nothrow_move_constructible<D>::value)
-                                                : m_resource(forward_if_nothrow_move_constructible(other.m_resource.get()), make_scope_exit([] { })),
-                                                m_deleter(forward_if_nothrow_move_constructible(other.m_deleter.get()), make_scope_exit([&other] {
-                                                                                                                            other.get_deleter()(other.m_resource.get());
-                                                                                                                            other.release(); })),
+                                                : m_resource(detail::forward_if_nothrow_move_constructible(other.m_resource.get()), make_scope_exit([] { })),
+                                                m_deleter(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()),
+                                                                                                        make_scope_exit([&other] {
+                                                                                                            other.get_deleter()(other.m_resource.get());
+                                                                                                            other.release(); })),
                                                 m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
         {
         }
-
 
         unique_resource(const unique_resource&) = delete;
 
@@ -168,9 +171,9 @@ namespace sr
         }
 
 
-        void swap(unique_resource& other) noexcept(is_nothrow_swappable_v<R>
-                                                    && is_nothrow_swappable_v<D>
-                                                    && is_nothrow_swappable_v<bool>)
+        void swap(unique_resource& other) noexcept(detail::is_nothrow_swappable_v<R>
+                                                    && detail::is_nothrow_swappable_v<D>
+                                                    && detail::is_nothrow_swappable_v<bool>)
         {
             using std::swap;
             swap(m_resource.get(), other.m_resource.get());
@@ -242,12 +245,12 @@ namespace sr
 
                 if( std::is_nothrow_move_assignable<R>::value == true )
                 {
-                    m_deleter.reset(forward_if_nothrow_move_constructible(other.m_deleter.get()));
+                    m_deleter.reset(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()));
                     m_resource.reset(std::forward<RR>(other.m_resource.get()));
                 }
                 else if( std::is_nothrow_move_assignable<D>::value == true )
                 {
-                    m_resource.reset(forward_if_nothrow_move_constructible(other.m_resource.get()));
+                    m_resource.reset(detail::forward_if_nothrow_move_constructible(other.m_resource.get()));
                     m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
                 }
                 else
@@ -266,8 +269,8 @@ namespace sr
 
     private:
 
-        Wrapper<R> m_resource;
-        Wrapper<D> m_deleter;
+        detail::Wrapper<R> m_resource;
+        detail::Wrapper<D> m_deleter;
         bool m_execute_on_destruction;
     };
 
