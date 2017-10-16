@@ -79,7 +79,7 @@ namespace detail
 
         ~scope_guard_base() noexcept(true)
         {
-            if( m_execute_on_destruction == true && this->should_execute() == true )
+            if( (m_execute_on_destruction == true) && (this->should_execute() == true) )
             {
                 m_exitFunction();
             }
