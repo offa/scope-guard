@@ -62,7 +62,8 @@ namespace detail
             >
         scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value
                                                             || std::is_nothrow_copy_constructible<T>::value)
-                                        : m_exitFunction(std::move(other.m_exitFunction)),
+                                        : Strategy(other),
+                                        m_exitFunction(std::move(other.m_exitFunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
@@ -73,7 +74,8 @@ namespace detail
             >
         scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value
                                                             || std::is_nothrow_copy_constructible<T>::value)
-                                        : m_exitFunction(other.m_exitFunction),
+                                        : Strategy(other),
+                                        m_exitFunction(other.m_exitFunction),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
