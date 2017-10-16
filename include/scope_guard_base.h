@@ -100,7 +100,7 @@ namespace detail
         scope_guard_base& operator=(scope_guard_base&&) = delete;
 
 
-    protected:
+    private:
 
         EF m_exitFunction;
         bool m_execute_on_destruction;
