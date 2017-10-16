@@ -38,7 +38,8 @@ namespace detail
             std::enable_if_t<(!std::is_lvalue_reference<EFP>::value)
                                 && std::is_nothrow_constructible<EF, EFP>::value, int> = 0
             >
-        explicit scope_guard_base(EFP&& exitFunction) : m_exitFunction(std::move(exitFunction)), m_execute_on_destruction(true)
+        explicit scope_guard_base(EFP&& exitFunction) : m_exitFunction(std::move(exitFunction)),
+                                                    m_execute_on_destruction(true)
         {
         }
 
@@ -46,7 +47,8 @@ namespace detail
             std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
             std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
             >
-        explicit scope_guard_base(EFP&& exitFunction) try : m_exitFunction(exitFunction), m_execute_on_destruction(true)
+        explicit scope_guard_base(EFP&& exitFunction) try : m_exitFunction(exitFunction),
+                                                        m_execute_on_destruction(true)
         {
         }
         catch( ... )
@@ -58,7 +60,8 @@ namespace detail
         template<class T = EF,
             std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value)
+        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value
+                                                            || std::is_nothrow_copy_constructible<T>::value)
                                         : m_exitFunction(std::move(other.m_exitFunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
@@ -68,7 +71,8 @@ namespace detail
         template<class T = EF,
             std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
             >
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value)
+        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value
+                                                            || std::is_nothrow_copy_constructible<T>::value)
                                         : m_exitFunction(other.m_exitFunction),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
