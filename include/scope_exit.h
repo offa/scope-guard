@@ -20,93 +20,17 @@
 
 #pragma once
 
-#include <utility>
-#include <type_traits>
+#include "scope_guard_base.h"
 
 namespace sr
 {
+
     template<class EF>
-    class scope_guard_base
+    class scope_exit : public detail::scope_guard_base<EF>
     {
     public:
 
-        template<class EFP,
-            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
-            std::enable_if_t<(!std::is_lvalue_reference<EFP>::value)
-                                && std::is_nothrow_constructible<EF, EFP>::value, int> = 0
-            >
-        explicit scope_guard_base(EFP&& exitFunction) : m_exitFunction(std::move(exitFunction)), m_execute_on_destruction(true)
-        {
-        }
-
-        template<class EFP,
-            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
-            std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
-            >
-        explicit scope_guard_base(EFP&& exitFunction) try : m_exitFunction(exitFunction), m_execute_on_destruction(true)
-        {
-        }
-        catch( ... )
-        {
-            exitFunction();
-            throw;
-        }
-
-        template<class T = EF,
-            std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
-            >
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value)
-                                        : m_exitFunction(std::move(other.m_exitFunction)),
-                                        m_execute_on_destruction(other.m_execute_on_destruction)
-        {
-            other.release();
-        }
-
-        template<class T = EF,
-            std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
-            >
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value || std::is_nothrow_copy_constructible<T>::value)
-                                        : m_exitFunction(other.m_exitFunction),
-                                        m_execute_on_destruction(other.m_execute_on_destruction)
-        {
-            other.release();
-        }
-
-        scope_guard_base(const scope_guard_base&) = delete;
-
-        ~scope_guard_base() noexcept(true)
-        {
-            if( m_execute_on_destruction == true )
-            {
-                m_exitFunction();
-            }
-        }
-
-
-        void release() noexcept
-        {
-            m_execute_on_destruction = false;
-        }
-
-
-        scope_guard_base& operator=(const scope_guard_base&) = delete;
-        scope_guard_base& operator=(scope_guard_base&&) = delete;
-
-
-    protected:
-
-        EF m_exitFunction;
-        bool m_execute_on_destruction;
-    };
-
-
-
-    template<class EF>
-    class scope_exit : public scope_guard_base<EF>
-    {
-    public:
-
-        using scope_guard_base<EF>::scope_guard_base;
+        using detail::scope_guard_base<EF>::scope_guard_base;
 
 
     private:
