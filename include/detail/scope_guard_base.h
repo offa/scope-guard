@@ -29,7 +29,10 @@ namespace detail
 {
 
     template<class F, class S>
-    constexpr bool is_noexcept_dtor_v = true;
+    struct is_noexcept_dtor
+    {
+        static constexpr bool value = true;
+    };
 
 
     template<class EF, class Strategy>
@@ -88,7 +91,7 @@ namespace detail
         scope_guard_base(const scope_guard_base&) = delete;
 
 
-        ~scope_guard_base() noexcept(is_noexcept_dtor_v<EF, Strategy>)
+        ~scope_guard_base() noexcept(is_noexcept_dtor<EF, Strategy>::value)
         {
             if( (m_execute_on_destruction == true) && (this->should_execute() == true) )
             {

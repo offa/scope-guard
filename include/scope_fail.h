@@ -47,7 +47,10 @@ namespace sr
 
 
         template<class F>
-        constexpr bool is_noexcept_dtor_v<F, scope_fail_strategy> = noexcept(std::declval<F>()());
+        struct is_noexcept_dtor<F, scope_fail_strategy>
+        {
+            static constexpr bool value = noexcept(std::declval<F>()());
+        };
 
     }
 
