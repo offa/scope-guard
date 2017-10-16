@@ -30,7 +30,7 @@ namespace sr
 
         struct scope_success_strategy
         {
-            bool should_execute() const
+            bool should_execute() const noexcept
             {
                 return uncaught_exceptions() <= m_uncaught_on_creation;
             }

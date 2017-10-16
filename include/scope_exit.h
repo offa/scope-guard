@@ -29,7 +29,7 @@ namespace sr
 
         struct scope_exit_strategy
         {
-            constexpr bool should_execute() const
+            bool should_execute() const noexcept
             {
                 return true;
             }
