@@ -42,7 +42,12 @@ namespace sr
 
 
             int m_uncaught_on_creation = uncaught_exceptions();
+
         };
+
+
+        template<class F>
+        constexpr bool is_noexcept_dtor_v<F, scope_fail_strategy> = noexcept(std::declval<F>()());
 
     }
 
@@ -53,7 +58,6 @@ namespace sr
     public:
 
         using detail::scope_guard_base<EF, detail::scope_fail_strategy>::scope_guard_base;
-
 
     private:
 

@@ -40,7 +40,6 @@ namespace sr
                 return ( std::uncaught_exception() == true ? 1 : 0 );
             }
 
-
             int m_uncaught_on_creation = uncaught_exceptions();
         };
 
