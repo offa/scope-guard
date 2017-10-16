@@ -35,6 +35,11 @@ namespace detail
     };
 
 
+    template<class F, class S>
+    constexpr bool is_noexcept_dtor_v = is_noexcept_dtor<F, S>::value;
+
+
+
     template<class EF, class Strategy>
     class scope_guard_base : private Strategy
     {
@@ -91,7 +96,7 @@ namespace detail
         scope_guard_base(const scope_guard_base&) = delete;
 
 
-        ~scope_guard_base() noexcept(is_noexcept_dtor<EF, Strategy>::value)
+        ~scope_guard_base() noexcept(is_noexcept_dtor_v<EF, Strategy>)
         {
             if( (m_execute_on_destruction == true) && (this->should_execute() == true) )
             {
