@@ -24,13 +24,24 @@
 
 namespace sr
 {
+    namespace detail
+    {
+        struct scope_exit_strategy
+        {
+            constexpr bool should_execute() const
+            {
+                return true;
+            }
+        };
+    }
+
 
     template<class EF>
-    class scope_exit : public detail::scope_guard_base<EF>
+    class scope_exit : public detail::scope_guard_base<EF, detail::scope_exit_strategy>
     {
     public:
 
-        using detail::scope_guard_base<EF>::scope_guard_base;
+        using detail::scope_guard_base<EF, detail::scope_exit_strategy>::scope_guard_base;
 
 
     private:

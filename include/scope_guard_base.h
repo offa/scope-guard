@@ -28,8 +28,8 @@ namespace sr
 namespace detail
 {
 
-    template<class EF>
-    class scope_guard_base
+    template<class EF, class Strategy>
+    class scope_guard_base : private Strategy
     {
     public:
 
@@ -79,7 +79,7 @@ namespace detail
 
         ~scope_guard_base() noexcept(true)
         {
-            if( m_execute_on_destruction == true )
+            if( m_execute_on_destruction == true && this->should_execute() == true )
             {
                 m_exitFunction();
             }
