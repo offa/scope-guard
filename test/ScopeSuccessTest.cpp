@@ -110,8 +110,9 @@ TEST_CASE("exit function not called and rethrow on copy exception", "[ScopeSucce
 {
     REQUIRE_THROWS([] {
         const ThrowOnCopyMock noMove;
+        REQUIRE_CALL(noMove, deleter());
         sr::scope_success<decltype(noMove)> guard{noMove};
-        }());
+    }());
 }
 
 TEST_CASE("exit function is not called if released", "[ScopeSuccess]")
