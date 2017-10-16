@@ -27,6 +27,7 @@ namespace sr
 {
     namespace detail
     {
+
         struct scope_success_strategy
         {
             bool should_execute() const

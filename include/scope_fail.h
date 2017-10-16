@@ -27,6 +27,7 @@ namespace sr
 {
     namespace detail
     {
+
         struct scope_fail_strategy
         {
             bool should_execute() const
@@ -42,6 +43,7 @@ namespace sr
 
             int m_uncaught_on_creation = uncaught_exceptions();
         };
+
     }
 
 

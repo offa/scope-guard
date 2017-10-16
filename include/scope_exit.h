@@ -26,6 +26,7 @@ namespace sr
 {
     namespace detail
     {
+
         struct scope_exit_strategy
         {
             constexpr bool should_execute() const
@@ -33,6 +34,7 @@ namespace sr
                 return true;
             }
         };
+
     }
 
 
