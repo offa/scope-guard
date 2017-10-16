@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "scope_guard_base.h"
+#include "detail/scope_guard_base.h"
 
 namespace sr
 {
