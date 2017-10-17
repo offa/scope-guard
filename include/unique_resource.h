@@ -221,10 +221,10 @@ namespace sr
                                                             noexcept(std::is_nothrow_constructible<std::decay_t<R>, R>::value
                                                                     && std::is_nothrow_constructible<std::decay_t<D>, D>::value)
     {
-        const bool mustRelease{r == invalid};
+        const bool must_release{r == invalid};
         auto ur = make_unique_resource(r, d);
 
-        if( mustRelease == true )
+        if( must_release == true )
         {
             ur.release();
         }
