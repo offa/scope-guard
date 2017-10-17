@@ -21,6 +21,7 @@
 #pragma once
 
 #include <functional>
+#include <type_traits>
 
 namespace sr
 {
@@ -28,8 +29,10 @@ namespace sr
     {
 
         template<class T>
-        struct Wrapper
+        class Wrapper
         {
+        public:
+
             template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
             explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
             {
@@ -74,8 +77,10 @@ namespace sr
 
 
         template<class T>
-        struct Wrapper<T&>
+        class Wrapper<T&>
         {
+        public:
+
             template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
             explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
             {
