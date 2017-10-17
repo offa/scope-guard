@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-14-green.svg)
 
-Implementation of `scope_guard` and `unique_resource` as proposed in [**P0052R5**][2] (former [N3949][1]).
+Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R5**][2] (former [N3949][1]).
 
 
 ## Compatibility
