@@ -42,7 +42,6 @@ namespace sr
 
 
             int m_uncaught_on_creation = uncaught_exceptions();
-
         };
 
 
@@ -61,6 +60,7 @@ namespace sr
     public:
 
         using detail::scope_guard_base<EF, detail::scope_fail_strategy>::scope_guard_base;
+
 
     private:
 
