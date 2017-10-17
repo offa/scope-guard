@@ -69,25 +69,10 @@ namespace detail
             throw;
         }
 
-        template<class T = EF,
-            std::enable_if_t<std::is_nothrow_move_constructible<T>::value, int> = 0
-            >
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value
-                                                            || std::is_nothrow_copy_constructible<T>::value)
+        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<EF>::value
+                                                            || std::is_nothrow_copy_constructible<EF>::value)
                                         : Strategy(other),
-                                        m_exitFunction(std::move(other.m_exitFunction)),
-                                        m_execute_on_destruction(other.m_execute_on_destruction)
-        {
-            other.release();
-        }
-
-        template<class T = EF,
-            std::enable_if_t<!std::is_nothrow_move_constructible<T>::value, int> = 0
-            >
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<T>::value
-                                                            || std::is_nothrow_copy_constructible<T>::value)
-                                        : Strategy(other),
-                                        m_exitFunction(other.m_exitFunction),
+                                        m_exitFunction(std::move_if_noexcept(other.m_exitFunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
