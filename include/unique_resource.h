@@ -238,7 +238,7 @@ namespace sr
         template<class RR = R, class DD = D,
             std::enable_if_t<(std::is_nothrow_move_assignable<RR>::value
                                 || std::is_nothrow_copy_assignable<RR>::value)
-                            && (std::is_nothrow_copy_assignable<DD>::value
+                            && (std::is_nothrow_move_assignable<DD>::value
                                 || std::is_nothrow_copy_assignable<DD>::value), int> = 0
             >
         unique_resource& operator=(unique_resource&& other)
