@@ -21,9 +21,9 @@
 #pragma once
 
 #include "scope_exit.h"
+#include "detail/wrapper.h"
 #include <utility>
 #include <type_traits>
-#include <functional>
 
 namespace sr
 {
@@ -52,86 +52,7 @@ namespace sr
         }
 
 
-
-        template<class T>
-        struct Wrapper
-        {
-            template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
-            explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
-            {
-                g.release();
-            }
-
-
-            T& get() noexcept
-            {
-                return m_value;
-            }
-
-            const T& get() const noexcept
-            {
-                return m_value;
-            }
-
-            void reset(T&& newValue) noexcept(std::is_nothrow_assignable<T, decltype(std::move_if_noexcept(newValue))>::value)
-            {
-                m_value = std::move_if_noexcept(newValue);
-            }
-
-            void reset(const T& newValue) noexcept(std::is_nothrow_assignable<T, const T&>::value)
-            {
-                m_value = newValue;
-            }
-
-
-        private:
-
-            Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
-            {
-            }
-
-            Wrapper(T&& value) noexcept(noexcept(T{std::move_if_noexcept(value)})) : m_value(std::move_if_noexcept(value))
-            {
-            }
-
-
-            T m_value;
-        };
-
-
-        template<class T>
-        struct Wrapper<T&>
-        {
-            template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
-            explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
-            {
-                g.release();
-            }
-
-
-            T& get() noexcept
-            {
-                return m_value.get();
-            }
-
-            const T& get() const noexcept
-            {
-                return m_value.get();
-            }
-
-            void reset(T& newValue) noexcept
-            {
-                m_value = std::ref(newValue);
-            }
-
-
-        private:
-
-            std::reference_wrapper<T> m_value;
-        };
-
     }
-
 
 
     template<class R, class D>
