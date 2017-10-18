@@ -32,16 +32,11 @@ namespace sr
         {
             bool should_execute() const noexcept
             {
-                return uncaught_exceptions() > m_uncaught_on_creation;
-            }
-
-            int uncaught_exceptions() const noexcept
-            {
-                return ( std::uncaught_exception() == true ? 1 : 0 );
+                return std::uncaught_exceptions() > m_uncaught_on_creation;
             }
 
 
-            int m_uncaught_on_creation = uncaught_exceptions();
+            int m_uncaught_on_creation = std::uncaught_exceptions();
         };
 
 
