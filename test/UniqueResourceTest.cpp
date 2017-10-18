@@ -38,7 +38,9 @@ namespace
 
     struct ThrowOnCopyMock
     {
-        ThrowOnCopyMock() {  }
+        ThrowOnCopyMock()
+        {
+        }
 
         ThrowOnCopyMock(const ThrowOnCopyMock&) noexcept(false)
         {
@@ -47,7 +49,6 @@ namespace
 
         ThrowOnCopyMock(ThrowOnCopyMock&&) = delete;
 
-        MAKE_CONST_MOCK1(deleter, void(ThrowOnCopyMock));
 
         ThrowOnCopyMock& operator=(const ThrowOnCopyMock&) noexcept(false)
         {
@@ -60,19 +61,19 @@ namespace
 
     struct NotNothrowMoveMock
     {
-        NotNothrowMoveMock(CallMock* mo) : m_mock(mo) { }
+        NotNothrowMoveMock(CallMock* mo) : m_mock(mo)
+        {
+        }
 
         NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)
         {
             throw std::exception{};
         }
 
-        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock) { }
-
-        void operator()(Handle h) const
+        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock)
         {
-            m_mock->deleter(h);
         }
+
 
         NotNothrowMoveMock& operator=(const NotNothrowMoveMock&)
         {
