@@ -22,7 +22,7 @@
 
 #include <trompeloeil.hpp>
 
-namespace
+namespace mock
 {
     struct CallMock
     {

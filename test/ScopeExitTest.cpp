@@ -22,6 +22,7 @@
 #include "CallMocks.h"
 #include <catch.hpp>
 
+using namespace mock;
 using namespace trompeloeil;
 
 namespace
