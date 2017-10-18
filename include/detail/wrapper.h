@@ -33,7 +33,7 @@ namespace sr
         {
         public:
 
-            template<class TT, class G, std::enable_if_t<std::is_constructible<T, TT>::value, int> = 0>
+            template<class TT, class G, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
             explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
             {
                 g.release();
@@ -50,12 +50,12 @@ namespace sr
                 return m_value;
             }
 
-            void reset(T&& newValue) noexcept(std::is_nothrow_assignable<T, decltype(std::move_if_noexcept(newValue))>::value)
+            void reset(T&& newValue) noexcept(std::is_nothrow_assignable_v<T, decltype(std::move_if_noexcept(newValue))>)
             {
                 m_value = std::move_if_noexcept(newValue);
             }
 
-            void reset(const T& newValue) noexcept(std::is_nothrow_assignable<T, const T&>::value)
+            void reset(const T& newValue) noexcept(std::is_nothrow_assignable_v<T, const T&>)
             {
                 m_value = newValue;
             }
@@ -81,7 +81,7 @@ namespace sr
         {
         public:
 
-            template<class TT, class G, std::enable_if_t<std::is_convertible<TT, T&>::value, int> = 0>
+            template<class TT, class G, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
             explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
             {
                 g.release();
