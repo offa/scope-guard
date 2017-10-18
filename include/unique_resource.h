@@ -168,12 +168,12 @@ namespace sr
             {
                 reset();
 
-                if( std::is_nothrow_move_assignable_v<R> == true )
+                if constexpr( std::is_nothrow_move_assignable_v<R> == true )
                 {
                     m_deleter.reset(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()));
                     m_resource.reset(std::forward<RR>(other.m_resource.get()));
                 }
-                else if( std::is_nothrow_move_assignable_v<D> == true )
+                else if constexpr( std::is_nothrow_move_assignable_v<D> == true )
                 {
                     m_resource.reset(detail::forward_if_nothrow_move_constructible(other.m_resource.get()));
                     m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
