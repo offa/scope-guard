@@ -46,9 +46,9 @@ namespace detail
     public:
 
         template<class EFP,
-            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
-            std::enable_if_t<(!std::is_lvalue_reference<EFP>::value)
-                                && std::is_nothrow_constructible<EF, EFP>::value, int> = 0
+            std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
+            std::enable_if_t<(!std::is_lvalue_reference_v<EFP>)
+                                && std::is_nothrow_constructible_v<EF, EFP>, int> = 0
             >
         explicit scope_guard_base(EFP&& exitFunction) : m_exitfunction(std::move(exitFunction)),
                                                     m_execute_on_destruction(true)
@@ -56,8 +56,8 @@ namespace detail
         }
 
         template<class EFP,
-            std::enable_if_t<std::is_constructible<EF, EFP>::value, int> = 0,
-            std::enable_if_t<std::is_lvalue_reference<EFP>::value, int> = 0
+            std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
+            std::enable_if_t<std::is_lvalue_reference_v<EFP>, int> = 0
             >
         explicit scope_guard_base(EFP&& exitFunction) try : m_exitfunction(exitFunction),
                                                         m_execute_on_destruction(true)
@@ -69,8 +69,8 @@ namespace detail
             throw;
         }
 
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible<EF>::value
-                                                            || std::is_nothrow_copy_constructible<EF>::value)
+        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible_v<EF>
+                                                            || std::is_nothrow_copy_constructible_v<EF>)
                                         : Strategy(other),
                                         m_exitfunction(std::move_if_noexcept(other.m_exitfunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
