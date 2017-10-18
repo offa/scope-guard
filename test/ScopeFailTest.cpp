@@ -19,70 +19,14 @@
  */
 
 #include "scope_fail.h"
+#include "CallMocks.h"
 #include <catch.hpp>
-#include <trompeloeil.hpp>
 
 using namespace trompeloeil;
 
 namespace
 {
-    struct CallMock
-    {
-        MAKE_MOCK0(deleter, void());
-    };
-
-
-    struct ThrowOnCopyMock
-    {
-        ThrowOnCopyMock() {  }
-
-        ThrowOnCopyMock(const ThrowOnCopyMock&)
-        {
-            throw std::exception{};
-        }
-
-        MAKE_CONST_MOCK0(deleter, void());
-
-        void operator()() const
-        {
-            this->deleter();
-        }
-
-        ThrowOnCopyMock& operator=(const ThrowOnCopyMock&)
-        {
-            throw std::exception{};
-        }
-    };
-
-
-    struct NotNothrowMoveMock
-    {
-        NotNothrowMoveMock(CallMock* m) : m_mock(m) { }
-        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)  { }
-        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock) { }
-
-        void operator()() const
-        {
-            m_mock->deleter();
-        }
-
-        NotNothrowMoveMock& operator=(const NotNothrowMoveMock&)
-        {
-            throw "Not implemented";
-        }
-
-        NotNothrowMoveMock& operator=(NotNothrowMoveMock&&)
-        {
-            throw "Not implemented";
-        }
-
-        CallMock* m_mock;
-
-    };
-
-
     CallMock m;
-
 
     void deleter()
     {
@@ -113,7 +57,7 @@ TEST_CASE("exit function called and rethrow on copy exception", "[ScopeFail]")
         REQUIRE_CALL(noMove, deleter());
 
         sr::scope_fail<decltype(noMove)> guard{noMove};
-        }());
+    }());
 }
 
 TEST_CASE("exit function is not called if released", "[ScopeFail]")
