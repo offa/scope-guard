@@ -71,6 +71,5 @@ install:
 
 
 script:
-  - cmake --version
   - script/ci_build.sh
 
