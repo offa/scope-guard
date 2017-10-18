@@ -70,5 +70,7 @@ install:
 
 
 script:
+    - pwd
+    - ls
     - script/ci_build.sh
 
