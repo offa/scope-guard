@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/offa/scope-guard.svg?branch=master)](https://travis-ci.org/offa/scope-guard)
 [![GitHub release](https://img.shields.io/github/release/offa/scope-guard.svg)](https://github.com/offa/scope-guard/releases)
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
-![C++](https://img.shields.io/badge/c++-14-green.svg)
+![C++](https://img.shields.io/badge/c++-17-green.svg)
 
 Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R5**][2] (former [N3949][1]).
 
