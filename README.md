@@ -22,12 +22,6 @@ The namespace `sr` is used instead of `std`.
 The filenames contain a `.h` extension. To enable the compatible header as specified in the document the CMake option `ENABLE_COMPAT_HEADER` can be used. This will generate and install an additional header named `scope` (without file extension).
 
 
-## Implementation decisions
-
-###### Factory functions
-The Factory functions for both types are kept for the C++14 implementations as *deduction guides* aren't available.
-
-
 ## Documentation
 
 - [*P0052R5 - Generic Scope Guard and RAII Wrapper for the Standard Library*][2] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
