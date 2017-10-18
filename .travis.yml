@@ -25,18 +25,6 @@ matrix:
             - llvm-toolchain-trusty-3.9
             - llvm-toolchain-trusty-4.0
             - llvm-toolchain-trusty-5.0
-    - env: CXX=g++-6 CC=gcc-6
-      addons:
-        apt:
-          packages:
-            - g++-6
-          sources: *sources
-    - env: CXX=g++-5 CC=gcc-5
-      addons:
-        apt:
-          packages:
-            - g++-5
-          sources: *sources
     - env: CXX=clang++-5.0 CC=clang-5.0
       addons:
         apt:
@@ -44,20 +32,7 @@ matrix:
             - clang-5.0
             - libc++-dev
           sources: *sources
-    - env: CXX=clang++-4.0 CC=clang-4.0
-      addons:
-        apt:
-          packages:
-            - clang-4.0
-            - libc++-dev
-          sources: *sources
-    - env: CXX=clang++-3.9 CC=clang-3.9
-      addons:
-        apt:
-          packages:
-            - clang-3.9
-            - libc++-dev
-          sources: *sources
+
 
 install:
   - mkdir -p "${DEPENDENCY_DIR}" && cd "${DEPENDENCY_DIR}"
