@@ -21,9 +21,6 @@ The namespace `sr` is used instead of `std`.
 ###### Filenames
 The filenames contain a `.h` extension. To enable the compatible header as specified in the document the CMake option `ENABLE_COMPAT_HEADER` can be used. This will generate and install an additional header named `scope` (without file extension).
 
-###### std::uncaught_exceptions()
-The function `std::uncaught_exceptions()` is not available in C++14 and is therefore replaced with `std::uncaught_exception()`. This has some limitations, but is the only solution until C++17 is used.
-
 
 ## Implementation decisions
 
