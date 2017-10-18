@@ -40,12 +40,12 @@ namespace sr
 
 
         template<class T>
-        constexpr auto is_nothrow_swappable_v = std::is_nothrow_move_constructible<T>::value
-                                                && std::is_nothrow_move_assignable<T>::value;
+        constexpr auto is_nothrow_swappable_v = std::is_nothrow_move_constructible_v<T>
+                                                && std::is_nothrow_move_assignable_v<T>;
 
 
 
-        template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible<T>::value, T&&, const T&>>
+        template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible_v<T>, T&&, const T&>>
         constexpr U forward_if_nothrow_move_constructible(T&& value) noexcept
         {
             return std::forward<T>(value);
@@ -61,21 +61,21 @@ namespace sr
     public:
 
         template<class RR, class DD,
-                std::enable_if_t<(std::is_copy_constructible<R>::value || std::is_nothrow_move_constructible<R>::value)
-                                && (std::is_copy_constructible<D>::value || std::is_nothrow_move_constructible<D>::value), int> = 0,
+                std::enable_if_t<(std::is_copy_constructible_v<R> || std::is_nothrow_move_constructible_v<R>)
+                                && (std::is_copy_constructible_v<D> || std::is_nothrow_move_constructible_v<D>), int> = 0,
                 std::enable_if_t<detail::is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
                 std::enable_if_t<detail::is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
                 >
-        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible<R, RR>::value
-                                                            && std::is_nothrow_constructible<D, DD>::value)
+        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible_v<R, RR>
+                                                            && std::is_nothrow_constructible_v<D, DD>)
                                                 : m_resource(std::forward<RR>(r), make_scope_exit([&r, &d] { d(r); })),
                                                 m_deleter(std::forward<DD>(d), make_scope_exit([this, &d] { d(get()); })),
                                                 m_execute_on_destruction(true)
         {
         }
 
-        unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible<R>::value
-                                                    && std::is_nothrow_move_constructible<D>::value)
+        unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible_v<R>
+                                                            && std::is_nothrow_move_constructible_v<D>)
                                                 : m_resource(detail::forward_if_nothrow_move_constructible(other.m_resource.get()), make_scope_exit([] { })),
                                                 m_deleter(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()),
                                                                                                         make_scope_exit([&other] {
@@ -133,9 +133,9 @@ namespace sr
         }
 
         template<class RR = R,
-                std::enable_if_t<std::is_pointer<RR>::value
-                                && ( std::is_class<std::remove_pointer_t<RR>>::value
-                                    || std::is_union<std::remove_pointer_t<RR>>::value ), int> = 0
+                std::enable_if_t<std::is_pointer_v<RR>
+                                && (std::is_class_v<std::remove_pointer_t<RR>>
+                                    || std::is_union_v<std::remove_pointer_t<RR>>), int> = 0
                 >
         RR operator->() const noexcept
         {
@@ -143,8 +143,8 @@ namespace sr
         }
 
         template<class RR = R,
-            std::enable_if_t<( std::is_pointer<RR>::value
-                            && !std::is_void<std::remove_pointer_t<RR>>::value), int> = 0>
+            std::enable_if_t<( std::is_pointer_v<RR>
+                            && !std::is_void_v<std::remove_pointer_t<RR>>), int> = 0>
         std::add_lvalue_reference_t<std::remove_pointer_t<RR>> operator*() const noexcept
         {
             return *get();
@@ -157,10 +157,10 @@ namespace sr
 
 
         template<class RR = R, class DD = D,
-            std::enable_if_t<(std::is_nothrow_move_assignable<RR>::value
-                                || std::is_nothrow_copy_assignable<RR>::value)
-                            && (std::is_nothrow_move_assignable<DD>::value
-                                || std::is_nothrow_copy_assignable<DD>::value), int> = 0
+            std::enable_if_t<(std::is_nothrow_move_assignable_v<RR>
+                                || std::is_nothrow_copy_assignable_v<RR>)
+                            && (std::is_nothrow_move_assignable_v<DD>
+                                || std::is_nothrow_copy_assignable_v<DD>), int> = 0
             >
         unique_resource& operator=(unique_resource&& other)
         {
@@ -168,12 +168,12 @@ namespace sr
             {
                 reset();
 
-                if( std::is_nothrow_move_assignable<R>::value == true )
+                if( std::is_nothrow_move_assignable_v<R> == true )
                 {
                     m_deleter.reset(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()));
                     m_resource.reset(std::forward<RR>(other.m_resource.get()));
                 }
-                else if( std::is_nothrow_move_assignable<D>::value == true )
+                else if( std::is_nothrow_move_assignable_v<D> == true )
                 {
                     m_resource.reset(detail::forward_if_nothrow_move_constructible(other.m_resource.get()));
                     m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
@@ -203,23 +203,23 @@ namespace sr
 
     template<class R, class D>
     unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource(R&& r, D&& d)
-                                                            noexcept(std::is_nothrow_constructible<std::decay_t<R>, R>::value
-                                                                    && std::is_nothrow_constructible<std::decay_t<D>, D>::value)
+                                                            noexcept(std::is_nothrow_constructible_v<std::decay_t<R>, R>
+                                                                    && std::is_nothrow_constructible_v<std::decay_t<D>, D>)
     {
         return unique_resource<std::decay_t<R>, std::decay_t<D>>{std::forward<R>(r), std::forward<D>(d)};
     }
 
     template<class R, class D>
     unique_resource<R&, std::decay_t<D>> make_unique_resource(std::reference_wrapper<R> r, D d)
-                                                noexcept(std::is_nothrow_constructible<std::decay_t<D>, D>::value)
+                                                noexcept(std::is_nothrow_constructible_v<std::decay_t<D>, D>)
     {
         return unique_resource<R&, std::decay_t<D>>(r.get(), std::forward<D>(d));
     }
 
     template<class R, class D, class S = R>
     unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource_checked(R&& r, const S& invalid, D&& d)
-                                                            noexcept(std::is_nothrow_constructible<std::decay_t<R>, R>::value
-                                                                    && std::is_nothrow_constructible<std::decay_t<D>, D>::value)
+                                                            noexcept(std::is_nothrow_constructible_v<std::decay_t<R>, R>
+                                                                    && std::is_nothrow_constructible_v<std::decay_t<D>, D>)
     {
         const bool must_release{r == invalid};
         auto ur = make_unique_resource(r, d);
