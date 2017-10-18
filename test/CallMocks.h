@@ -24,20 +24,28 @@
 
 namespace mock
 {
+    using Handle = int;
+    using PtrHandle = std::add_pointer_t<Handle>;
+
+
     struct CallMock
     {
         MAKE_MOCK0(deleter, void());
+        MAKE_MOCK1(deleter, void(Handle));
     };
 
 
     struct ThrowOnCopyMock
     {
-        ThrowOnCopyMock() {  }
+        ThrowOnCopyMock()
+        {
+        }
 
         ThrowOnCopyMock(const ThrowOnCopyMock&)
         {
             throw std::exception{};
         }
+
 
         MAKE_CONST_MOCK0(deleter, void());
 
@@ -55,9 +63,18 @@ namespace mock
 
     struct NotNothrowMoveMock
     {
-        NotNothrowMoveMock(CallMock* m) : m_mock(m) { }
-        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)  { }
-        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock) { }
+        NotNothrowMoveMock(CallMock* m) : m_mock(m)
+        {
+        }
+
+        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)
+        {
+        }
+
+        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock)
+        {
+        }
+
 
         void operator()() const
         {
@@ -74,12 +91,58 @@ namespace mock
             throw "Not implemented";
         }
 
-        CallMock* m_mock;
 
+        CallMock* m_mock;
     };
 
 
+    struct ConditialThrowOnCopyMock
+    {
+        explicit ConditialThrowOnCopyMock(Handle h, bool shouldThrow) : m_handle(h),
+                                                                    m_shouldThrow(shouldThrow)
+        {
+        }
+
+        ConditialThrowOnCopyMock(const ConditialThrowOnCopyMock& other) : m_handle(other.m_handle),
+                                                                    m_shouldThrow(other.m_shouldThrow)
+        {
+            if( m_shouldThrow == true )
+            {
+                throw std::exception{};
+            }
+        }
+
+        ConditialThrowOnCopyMock(ConditialThrowOnCopyMock&&) = default;
+
+        ConditialThrowOnCopyMock& operator=(const ConditialThrowOnCopyMock& other)
+        {
+            if( &other != this )
+            {
+                m_handle = other.m_handle;
+                m_shouldThrow = other.m_shouldThrow;
+
+                if( m_shouldThrow == true )
+                {
+                    throw std::exception{};
+                }
+            }
+
+            return *this;
+        }
+
+        ConditialThrowOnCopyMock& operator=(ConditialThrowOnCopyMock&&) = default;
+
+
+        Handle m_handle;
+        bool m_shouldThrow;
+    };
+
+
+    struct CopyMock
+    {
+        CopyMock() {}
+        CopyMock(const CopyMock&) { }
+    };
+
 }
-
-
 

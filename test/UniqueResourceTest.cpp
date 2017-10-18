@@ -19,128 +19,21 @@
  */
 
 #include "unique_resource.h"
+#include "CallMocks.h"
 #include <catch.hpp>
 #include <trompeloeil.hpp>
 
+using namespace mock;
 using namespace trompeloeil;
 
 namespace
 {
-    using Handle = int;
-    using PtrHandle = std::add_pointer_t<Handle>;
-
-
-    struct CallMock
-    {
-        MAKE_MOCK1(deleter, void(Handle));
-    };
-
-
-    struct ThrowOnCopyMock
-    {
-        ThrowOnCopyMock()
-        {
-        }
-
-        ThrowOnCopyMock(const ThrowOnCopyMock&) noexcept(false)
-        {
-            throw std::exception{};
-        }
-
-        ThrowOnCopyMock(ThrowOnCopyMock&&) = delete;
-
-
-        ThrowOnCopyMock& operator=(const ThrowOnCopyMock&) noexcept(false)
-        {
-            throw std::exception{};
-        }
-
-        ThrowOnCopyMock& operator=(ThrowOnCopyMock&&) = delete;
-
-    };
-
-    struct NotNothrowMoveMock
-    {
-        NotNothrowMoveMock(CallMock* mo) : m_mock(mo)
-        {
-        }
-
-        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)
-        {
-            throw std::exception{};
-        }
-
-        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock)
-        {
-        }
-
-
-        NotNothrowMoveMock& operator=(const NotNothrowMoveMock&)
-        {
-            throw "Not implemented";
-        }
-
-        NotNothrowMoveMock& operator=(NotNothrowMoveMock&&)
-        {
-            throw "Not implemented";
-        }
-
-        CallMock* m_mock;
-    };
-
-    struct ConditialThrowOnCopyMock
-    {
-        explicit ConditialThrowOnCopyMock(Handle h, bool shouldThrow) : m_handle(h), m_shouldThrow(shouldThrow)
-        {
-        }
-
-        ConditialThrowOnCopyMock(const ConditialThrowOnCopyMock& other) : m_handle(other.m_handle), m_shouldThrow(other.m_shouldThrow)
-        {
-            if( m_shouldThrow == true )
-            {
-                throw std::exception{};
-            }
-        }
-
-        ConditialThrowOnCopyMock(ConditialThrowOnCopyMock&&) = default;
-
-        ConditialThrowOnCopyMock& operator=(const ConditialThrowOnCopyMock& other)
-        {
-            if( &other != this )
-            {
-                m_handle = other.m_handle;
-                m_shouldThrow = other.m_shouldThrow;
-
-                if( m_shouldThrow == true )
-                {
-                    throw std::exception{};
-                }
-            }
-
-            return *this;
-        }
-
-        ConditialThrowOnCopyMock& operator=(ConditialThrowOnCopyMock&&) = default;
-
-        Handle m_handle;
-        bool m_shouldThrow;
-    };
-
-    struct CopyMock
-    {
-        CopyMock() {}
-        CopyMock(const CopyMock&) { }
-    };
-
-
-
     CallMock m;
 
     void deleter(Handle h)
     {
         m.deleter(h);
     }
-
 }
 
 TEST_CASE("construction with move", "[UniqueResource]")
