@@ -11,8 +11,5 @@ if [[ ! -d "$(ls -A ${DEPENDENCY_DIR}/cmake)" ]]; then
     wget --no-check-certificate --quiet -O - "${CMAKE_URL}" | tar --strip-components=1 -xz -C cmake
 fi
 
-export PATH="${DEPENDENCY_DIR}/cmake/bin:${PATH}"
-cmake --version
-
 cd ${BUILD_DIR}
 

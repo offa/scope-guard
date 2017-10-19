@@ -25,6 +25,7 @@ matrix:
 
 install:
   - script/ci_install.sh
+  - export PATH="${DEPENDENCY_DIR}/cmake/bin:${PATH}"
 
 script:
   - script/ci_build.sh
