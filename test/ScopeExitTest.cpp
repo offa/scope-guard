@@ -39,7 +39,7 @@ namespace
 TEST_CASE("exit function called on destruction", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
-    auto guard = sr::make_scope_exit(deleter);
+    auto guard = sr::scope_exit(deleter);
     static_cast<void>(guard);
 }
 
