@@ -31,4 +31,3 @@ add_custom_target(unittest ScopeExitTest
                     VERBATIM
                     )
 
-
