@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 BUILD_DIR=${TRAVIS_BUILD_DIR}
 
 mkdir -p "${DEPENDENCY_DIR}" && cd "${DEPENDENCY_DIR}"
