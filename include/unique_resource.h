@@ -68,19 +68,19 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible_v<R, RR>
                                                             && std::is_nothrow_constructible_v<D, DD>)
-                                                : m_resource(std::forward<RR>(r), make_scope_exit([&r, &d] { d(r); })),
-                                                m_deleter(std::forward<DD>(d), make_scope_exit([this, &d] { d(get()); })),
+                                                : m_resource(std::forward<RR>(r), scope_exit{[&r, &d] { d(r); }}),
+                                                m_deleter(std::forward<DD>(d), scope_exit{[this, &d] { d(get()); }}),
                                                 m_execute_on_destruction(true)
         {
         }
 
         unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible_v<R>
                                                             && std::is_nothrow_move_constructible_v<D>)
-                                                : m_resource(detail::forward_if_nothrow_move_constructible(other.m_resource.get()), make_scope_exit([] { })),
+                                                : m_resource(detail::forward_if_nothrow_move_constructible(other.m_resource.get()), scope_exit{[] { }}),
                                                 m_deleter(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()),
-                                                                                                        make_scope_exit([&other] {
+                                                                                                        scope_exit{[&other] {
                                                                                                             other.get_deleter()(other.m_resource.get());
-                                                                                                            other.release(); })),
+                                                                                                            other.release(); }}),
                                                 m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
         {
         }
@@ -115,7 +115,7 @@ namespace sr
         template<class RR>
         void reset(RR&& r)
         {
-            auto se = make_scope_exit([this, &r] { get_deleter()(r); });
+            auto se = scope_exit{[this, &r] { get_deleter()(r); }};
             reset();
             m_resource.reset(std::forward<RR>(r));
             m_execute_on_destruction = true;
@@ -230,7 +230,7 @@ namespace sr
                                                                     && std::is_nothrow_constructible_v<std::decay_t<D>, D>)
     {
         const bool must_release{r == invalid};
-        auto ur = make_unique_resource(r, d);
+        auto ur = unique_resource{r, d};
 
         if( must_release == true )
         {
