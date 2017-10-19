@@ -17,6 +17,7 @@ then
 fi
 
 sudo ./${CMAKE_INSTALLER} --prefix=/usr/local --skip-license
+cmake --version
 
 
 cd ${BUILD_DIR}
