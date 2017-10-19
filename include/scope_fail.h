@@ -62,8 +62,8 @@ namespace sr
     };
 
 
-    template <class EF>
-    scope_fail(EF &&ef) -> scope_fail<std::decay_t<EF>>;
+    template<class EF>
+    scope_fail(EF&& ef) -> scope_fail<std::decay_t<EF>>;
 
 
     template<class EF>
