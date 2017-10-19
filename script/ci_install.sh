@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 BUILD_DIR=${TRAVIS_BUILD_DIR}
 
 mkdir -p "${DEPENDENCY_DIR}" && cd "${DEPENDENCY_DIR}"
@@ -7,6 +9,7 @@ mkdir -p "${DEPENDENCY_DIR}" && cd "${DEPENDENCY_DIR}"
 
 ## Install CMake
 CMAKE_INSTALLER=install-cmake.sh
+
 if [[ ! -f ${CMAKE_INSTALLER} ]]
 then
     echo "CMake installer not available, downloading ..."
