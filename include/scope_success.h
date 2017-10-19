@@ -58,13 +58,5 @@ namespace sr
     template<class EF>
     scope_success(EF&& ef) -> scope_success<std::decay_t<EF>>;
 
-
-    template<class EF>
-    [[deprecated("Use ctor instead. Will be removed in a future v0.2.x release")]]
-    scope_success<std::decay_t<EF>> make_scope_success(EF&& exitFunction)
-    {
-        return scope_success{std::forward<EF>(exitFunction)};
-    }
-
 }
 

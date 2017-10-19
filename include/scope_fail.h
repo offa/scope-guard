@@ -65,13 +65,5 @@ namespace sr
     template<class EF>
     scope_fail(EF&& ef) -> scope_fail<std::decay_t<EF>>;
 
-
-    template<class EF>
-    [[deprecated("Use ctor instead. Will be removed in a future v0.2.x release")]]
-    scope_fail<std::decay_t<EF>> make_scope_fail(EF&& exitFunction)
-    {
-        return scope_fail{std::forward<EF>(exitFunction)};
-    }
-
 }
 

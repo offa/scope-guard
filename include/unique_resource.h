@@ -207,23 +207,6 @@ namespace sr
     unique_resource(std::reference_wrapper<R> r, D&& d) -> unique_resource<R&, std::decay_t<D>>;
 
 
-    template<class R, class D>
-    [[deprecated("Use ctor instead. Will be removed in a future v0.2.x release")]]
-    unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource(R&& r, D&& d)
-                                                            noexcept(std::is_nothrow_constructible_v<std::decay_t<R>, R>
-                                                                    && std::is_nothrow_constructible_v<std::decay_t<D>, D>)
-    {
-        return unique_resource{std::forward<R>(r), std::forward<D>(d)};
-    }
-
-    template<class R, class D>
-    [[deprecated("Use ctor instead. Will be removed in a future v0.2.x release")]]
-    unique_resource<R&, std::decay_t<D>> make_unique_resource(std::reference_wrapper<R> r, D d)
-                                                noexcept(std::is_nothrow_constructible_v<std::decay_t<D>, D>)
-    {
-        return unique_resource{r.get(), std::forward<D>(d)};
-    }
-
     template<class R, class D, class S = R>
     unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource_checked(R&& r, const S& invalid, D&& d)
                                                             noexcept(std::is_nothrow_constructible_v<std::decay_t<R>, R>
