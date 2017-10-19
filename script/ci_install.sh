@@ -20,7 +20,7 @@ else
     echo "CMake installer available"
 fi
 
-sudo ./install-cmake.sh --prefix=$/local --skip-license
+sudo ./${CMAKE_INSTALLER} --prefix=/usr/local --skip-license
 
 
 cd ${BUILD_DIR}
