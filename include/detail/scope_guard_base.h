@@ -23,9 +23,7 @@
 #include <utility>
 #include <type_traits>
 
-namespace sr
-{
-namespace detail
+namespace sr::detail
 {
 
     template<class F, class S>
@@ -106,5 +104,4 @@ namespace detail
         bool m_execute_on_destruction;
     };
 
-}
 }

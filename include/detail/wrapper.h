@@ -23,91 +23,89 @@
 #include <functional>
 #include <type_traits>
 
-namespace sr
+namespace sr::detail
 {
-    namespace detail
-    {
 
-        template<class T>
-        class Wrapper
-        {
-        public:
+   template<class T>
+   class Wrapper
+   {
+   public:
 
-            template<class TT, class G, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
-            explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
-            {
-                g.release();
-            }
+       template<class TT, class G, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
+       explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
+       {
+           g.release();
+       }
 
 
-            T& get() noexcept
-            {
-                return m_value;
-            }
+       T& get() noexcept
+       {
+           return m_value;
+       }
 
-            const T& get() const noexcept
-            {
-                return m_value;
-            }
+       const T& get() const noexcept
+       {
+           return m_value;
+       }
 
-            void reset(T&& newValue) noexcept(std::is_nothrow_assignable_v<T, decltype(std::move_if_noexcept(newValue))>)
-            {
-                m_value = std::move_if_noexcept(newValue);
-            }
+       void reset(T&& newValue) noexcept(std::is_nothrow_assignable_v<T, decltype(std::move_if_noexcept(newValue))>)
+       {
+           m_value = std::move_if_noexcept(newValue);
+       }
 
-            void reset(const T& newValue) noexcept(std::is_nothrow_assignable_v<T, const T&>)
-            {
-                m_value = newValue;
-            }
-
-
-        private:
-
-            Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
-            {
-            }
-
-            Wrapper(T&& value) noexcept(noexcept(T{std::move_if_noexcept(value)})) : m_value(std::move_if_noexcept(value))
-            {
-            }
+       void reset(const T& newValue) noexcept(std::is_nothrow_assignable_v<T, const T&>)
+       {
+           m_value = newValue;
+       }
 
 
-            T m_value;
-        };
+   private:
+
+       Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
+       {
+       }
+
+       Wrapper(T&& value) noexcept(noexcept(T{std::move_if_noexcept(value)})) : m_value(std::move_if_noexcept(value))
+       {
+       }
 
 
-        template<class T>
-        class Wrapper<T&>
-        {
-        public:
-
-            template<class TT, class G, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
-            explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
-            {
-                g.release();
-            }
+       T m_value;
+   };
 
 
-            T& get() noexcept
-            {
-                return m_value.get();
-            }
+   template<class T>
+   class Wrapper<T&>
+   {
+   public:
 
-            const T& get() const noexcept
-            {
-                return m_value.get();
-            }
-
-            void reset(T& newValue) noexcept
-            {
-                m_value = std::ref(newValue);
-            }
+       template<class TT, class G, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
+       explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
+       {
+           g.release();
+       }
 
 
-        private:
+       T& get() noexcept
+       {
+           return m_value.get();
+       }
 
-            std::reference_wrapper<T> m_value;
-        };
+       const T& get() const noexcept
+       {
+           return m_value.get();
+       }
 
-    }
+       void reset(T& newValue) noexcept
+       {
+           m_value = std::ref(newValue);
+       }
+
+
+   private:
+
+       std::reference_wrapper<T> m_value;
+   };
+
+
 }
