@@ -39,7 +39,7 @@ namespace
 TEST_CASE("exit function called on destruction", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
-    auto guard = sr::scope_exit(deleter);
+    auto guard = sr::scope_exit{deleter};
     static_cast<void>(guard);
 }
 
@@ -47,7 +47,7 @@ TEST_CASE("exit function lambda called on destruction", "[ScopeExit]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
-    auto guard = sr::make_scope_exit([&cm] { cm.deleter(); });
+    auto guard = sr::scope_exit{[&cm] { cm.deleter(); }};
     static_cast<void>(guard);
 }
 
@@ -57,21 +57,21 @@ TEST_CASE("exit function called and rethrow on copy exception", "[ScopeExit]")
         const ThrowOnCopyMock noMove;
         REQUIRE_CALL(noMove, deleter());
 
-        sr::scope_exit<decltype(noMove)> guard{noMove};
+        sr::scope_exit guard{noMove};
     }());
 }
 
 TEST_CASE("exit function is not called if released", "[ScopeExit]")
 {
    REQUIRE_CALL(m, deleter()).TIMES(0);
-   auto guard = sr::make_scope_exit(deleter);
+   auto guard = sr::scope_exit{deleter};
    guard.release();
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
-    auto movedFrom = sr::make_scope_exit(deleter);
+    auto movedFrom = sr::scope_exit{deleter};
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
 }
@@ -81,14 +81,14 @@ TEST_CASE("move with copy init releases moved-from object", "[ScopeExit]")
     CallMock mock;
     const NotNothrowMoveMock notNothrow{&mock};
     REQUIRE_CALL(mock, deleter());
-    sr::scope_exit<decltype(notNothrow)> movedFrom{notNothrow};
+    sr::scope_exit movedFrom{notNothrow};
     auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
-    auto movedFrom = sr::make_scope_exit(deleter);
+    auto movedFrom = sr::scope_exit{deleter};
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
 }
@@ -96,7 +96,7 @@ TEST_CASE("move transfers state", "[ScopeExit]")
 TEST_CASE("move transfers state if released", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter()).TIMES(0);
-    auto movedFrom = sr::make_scope_exit(deleter);
+    auto movedFrom = sr::scope_exit{deleter};
     movedFrom.release();
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
