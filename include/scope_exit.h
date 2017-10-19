@@ -60,7 +60,7 @@ namespace sr
     [[deprecated("Use ctor instead. Will be removed in a future v0.2.x release")]]
     scope_exit<std::decay_t<EF>> make_scope_exit(EF&& exitFunction)
     {
-        return scope_exit<std::decay_t<EF>>{std::forward<EF>(exitFunction)};
+        return scope_exit{std::forward<EF>(exitFunction)};
     }
 
 }
