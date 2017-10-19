@@ -6,10 +6,14 @@ mkdir -p "${DEPENDENCY_DIR}" && cd "${DEPENDENCY_DIR}"
 
 
 ## Install CMake
-if [[ ! -d "$(ls -A ${DEPENDENCY_DIR}/cmake)" ]]; then
-    CMAKE_URL="https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz"
-    mkdir -p cmake
-    wget --no-check-certificate --quiet -O - "${CMAKE_URL}" | tar --strip-components=1 -xz -C cmake
+CMAKE_INSTALLER=install-cmake.sh
+if [[ ! -f ${CMAKE_INSTALLER} ]]
+then
+    echo "CMake installer not available, downloading ..."
+
+    curl -sSL https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.sh -o ${CMAKE_INSTALLER}
+    chmod +x ${CMAKE_INSTALLER}
+    sudo ./install-cmake.sh --prefix=/usr/local --skip-license
 fi
 
 cd ${BUILD_DIR}
