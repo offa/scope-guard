@@ -39,7 +39,7 @@ namespace
 TEST_CASE("exit function called on destruction", "[ScopeFail]")
 {
     REQUIRE_CALL(m, deleter()).TIMES(0);
-    auto guard = sr::make_scope_fail(deleter);
+    auto guard = sr::scope_fail{deleter};
     static_cast<void>(guard);
 }
 
@@ -47,7 +47,7 @@ TEST_CASE("exit function lambda called on destruction", "[ScopeFail]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter()).TIMES(0);
-    auto guard = sr::make_scope_fail([&cm] { cm.deleter(); });
+    auto guard = sr::scope_fail{[&cm] { cm.deleter(); }};
     static_cast<void>(guard);
 }
 
@@ -57,21 +57,21 @@ TEST_CASE("exit function called and rethrow on copy exception", "[ScopeFail]")
         const ThrowOnCopyMock noMove;
         REQUIRE_CALL(noMove, deleter());
 
-        sr::scope_fail<decltype(noMove)> guard{noMove};
+        sr::scope_fail guard{noMove};
     }());
 }
 
 TEST_CASE("exit function is not called if released", "[ScopeFail]")
 {
    REQUIRE_CALL(m, deleter()).TIMES(0);
-   auto guard = sr::make_scope_fail(deleter);
+   auto guard = sr::scope_fail{deleter};
    guard.release();
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeFail]")
 {
     REQUIRE_CALL(m, deleter()).TIMES(0);
-    auto movedFrom = sr::make_scope_fail(deleter);
+    auto movedFrom = sr::scope_fail{deleter};
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
 }
@@ -81,14 +81,14 @@ TEST_CASE("move with copy init releases moved-from object", "[ScopeFail]")
     CallMock mock;
     const NotNothrowMoveMock notNothrow{&mock};
     REQUIRE_CALL(mock, deleter()).TIMES(0);
-    sr::scope_fail<decltype(notNothrow)> movedFrom{notNothrow};
+    sr::scope_fail movedFrom{notNothrow};
     auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state", "[ScopeFail]")
 {
     REQUIRE_CALL(m, deleter()).TIMES(0);
-    auto movedFrom = sr::make_scope_fail(deleter);
+    auto movedFrom = sr::scope_fail{deleter};
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
 }
@@ -96,7 +96,7 @@ TEST_CASE("move transfers state", "[ScopeFail]")
 TEST_CASE("move transfers state if released", "[ScopeFail]")
 {
     REQUIRE_CALL(m, deleter()).TIMES(0);
-    auto movedFrom = sr::make_scope_fail(deleter);
+    auto movedFrom = sr::scope_fail{deleter};
     movedFrom.release();
     auto guard = std::move(movedFrom);
     static_cast<void>(guard);
@@ -107,7 +107,7 @@ TEST_CASE("exit function called on exception", "[ScopeFail]")
     try
     {
         REQUIRE_CALL(m, deleter());
-        auto guard = sr::make_scope_fail(deleter);
+        auto guard = sr::scope_fail{deleter};
         static_cast<void>(guard);
         throw 3;
     }
@@ -124,7 +124,7 @@ TEST_CASE("exit function not called on pending exception", "[ScopeFail]")
     }
     catch( ... )
     {
-        auto guard = sr::make_scope_fail(deleter);
+        auto guard = sr::scope_fail{deleter};
         static_cast<void>(guard);
     }
 }
