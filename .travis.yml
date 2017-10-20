@@ -21,6 +21,15 @@ matrix:
             - g++-7
           sources: &sources
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty
+            - llvm-toolchain-trusty-5.0
+    - env: CXX=clang++-5.0 CC=clang-5.0
+      addons:
+        apt:
+          packages:
+            - clang-5.0
+            - libc++-dev
+          sources: *sources
 
 
 install:
