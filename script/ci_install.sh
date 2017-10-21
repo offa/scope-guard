@@ -45,7 +45,6 @@ then
                 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
                 -DCMAKE_INSTALL_PREFIX=/usr \
                 -DLIBCXX_ABI_UNSTABLE=ON \
-                -DLLVM_USE_SANITIZER=${LIBCXX_SANITIZER} \
                 -DLLVM_BUILD_32_BITS=${BUILD_32_BITS} \
                 ../llvm-source
         make cxx -j4
