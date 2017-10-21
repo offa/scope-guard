@@ -3,7 +3,7 @@
 set -ex
 
 if [[ "${CXX}" == clang* ]]; then
-    export CXXFLAGS="-stdlib=libc++"
+    export CXXFLAGS="-stdlib=libc++ -lc++abi"
 fi
 
 mkdir build && cd build
