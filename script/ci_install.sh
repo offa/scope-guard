@@ -26,6 +26,8 @@ cd ${DEPENDENCY_DIR}
 # --- LibC++
 if [[ "${CXX}" = clang* ]]
 then
+    mkdir build && cd build
+
     if [[ ! -d "$(ls -A ${DEPENDENCY_DIR}/llvm-source)" ]]
     then
         LLVM_RELEASE=release_50
@@ -33,7 +35,6 @@ then
         git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/libcxx.git llvm-source/projects/libcxx
         git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/libcxxabi.git llvm-source/projects/libcxxabi
 
-        mkdir build && cd build
 
         cmake -DCMAKE_C_COMPILER=${CC} \
                 -DCMAKE_CXX_COMPILER=${CXX} \
@@ -41,7 +42,8 @@ then
                 -DCMAKE_INSTALL_PREFIX=/usr \
                 ../llvm-source
         make cxx -j4
-        sudo make install-cxxabi install-cxx
     fi
+
+    sudo make install-cxxabi install-cxx
 fi
 

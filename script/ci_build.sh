@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ "$CXX" == clang* ]]; then
+if [[ "${CXX}" == clang* ]]; then
     export CXXFLAGS="-stdlib=libc++"
 fi
 
