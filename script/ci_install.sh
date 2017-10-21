@@ -7,7 +7,7 @@ BUILD_DIR=${TRAVIS_BUILD_DIR}
 mkdir -p "${DEPENDENCY_DIR}" && cd "${DEPENDENCY_DIR}"
 
 
-## Install CMake
+# --- CMake
 CMAKE_INSTALLER=install-cmake.sh
 
 if [[ ! -f ${CMAKE_INSTALLER} ]]
@@ -20,5 +20,28 @@ sudo ./${CMAKE_INSTALLER} --prefix=/usr/local --skip-license
 cmake --version
 
 
-cd ${BUILD_DIR}
+cd ${DEPENDENCY_DIR}
+
+
+# --- LibC++
+if [[ "${CXX}" = clang* ]]
+then
+    if [[ ! -d "$(ls -A ${DEPENDENCY_DIR}/llvm-source)" ]]
+    then
+        LLVM_RELEASE=release_50
+        git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/llvm.git llvm-source
+        git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/libcxx.git llvm-source/projects/libcxx
+        git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/libcxxabi.git llvm-source/projects/libcxxabi
+
+        mkdir build && cd build
+
+        cmake -DCMAKE_C_COMPILER=${CC} \
+                -DCMAKE_CXX_COMPILER=${CXX} \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DCMAKE_INSTALL_PREFIX=/usr \
+                ../llvm-source
+        make cxx -j4
+        sudo make install-cxxabi install-cxx
+    fi
+fi
 
