@@ -48,3 +48,5 @@ then
     sudo make install-cxxabi install-cxx
 fi
 
+
+cd ${BUILD_DIR}
