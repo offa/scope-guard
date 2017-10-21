@@ -26,12 +26,8 @@ cd ${DEPENDENCY_DIR}
 # --- LibC++
 if [[ "${CXX}" = clang* ]]
 then
-    pwd
-    ls
-
     if [[ ! -d "${DEPENDENCY_DIR}/llvm-source" ]]
     then
-        echo "*** LLVM Source not available ***"
         LLVM_RELEASE=release_50
         git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/llvm.git llvm-source
         git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/libcxx.git llvm-source/projects/libcxx
@@ -46,7 +42,6 @@ then
                 ../llvm-source
         make cxx -j4
     else
-        echo "*** LLVM Source available ***"
         cd build
     fi
 
