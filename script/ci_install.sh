@@ -29,31 +29,23 @@ then
     if [[ ! -d "${DEPENDENCY_DIR}/llvm-source" ]]
     then
         LLVM_RELEASE=release_50
-        git clone --depth=1 https://github.com/llvm-mirror/llvm.git llvm-source
-        git clone --depth=1 https://github.com/llvm-mirror/libcxx.git llvm-source/projects/libcxx
-        git clone --depth=1 https://github.com/llvm-mirror/libcxxabi.git llvm-source/projects/libcxxabi
-
-        if [[ -z "${BUILD_32_BITS}" ]]
-        then
-            export BUILD_32_BITS=OFF
-            echo disabling 32 bit build
-        fi
-
-        mkdir -p build && cd build
-
-        cmake -DCMAKE_C_COMPILER=${CC} \
-                -DCMAKE_CXX_COMPILER=${CXX} \
-                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                -DCMAKE_INSTALL_PREFIX=/usr \
-                -DLIBCXX_ABI_UNSTABLE=ON \
-                -DLLVM_BUILD_32_BITS=${BUILD_32_BITS} \
-                ../llvm-source
-        make cxx -j4
-    else
-        cd build
+        git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/llvm.git llvm-source
+        git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/libcxx.git llvm-source/projects/libcxx
+        git clone --depth=1 -b ${LLVM_RELEASE} https://github.com/llvm-mirror/libcxxabi.git llvm-source/projects/libcxxabi
     fi
 
+    mkdir -p build && cd build
+
+    cmake -DCMAKE_C_COMPILER=${CC} \
+        -DCMAKE_CXX_COMPILER=${CXX} \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DLIBCXX_ABI_UNSTABLE=ON \
+        ../llvm-source
+    make cxx -j4
+
     sudo make install-cxxabi install-cxx
+    rm -rf *
 fi
 
 
