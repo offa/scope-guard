@@ -11,6 +11,9 @@ cache:
   directories:
     - ${DEPENDENCY_DIR}
 
+services:
+  - docker
+
 
 matrix:
     include:
@@ -31,6 +34,9 @@ matrix:
             - libc++-dev
           sources: *sources
 
+before_install:
+  - docker pull jorj/clang5_qt5
+  - docker  run jorj/clang5_qt5 /bin/bash -c "${CXX} --version; cmake --version"
 
 install:
   - script/ci_install.sh
