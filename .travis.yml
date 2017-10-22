@@ -36,7 +36,7 @@ matrix:
 
 before_install:
   - docker pull jorj/clang5_qt5
-  - docker  run jorj/clang5_qt5 /bin/bash -c "${CXX} --version; cmake --version"
+  - docker  run jorj/clang5_qt5 --name devtest -v .:/mnt /bin/bash -c "${cxx} --version; cmake --version ls /mnt"
 
 install:
   - script/ci_install.sh
