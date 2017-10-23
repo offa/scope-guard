@@ -45,7 +45,6 @@ then
     make cxx -j4
 
     sudo make install-cxxabi install-cxx
-    rm -rf *
 fi
 
 
