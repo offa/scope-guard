@@ -63,7 +63,7 @@ namespace mock
 
     struct NotNothrowMoveMock
     {
-        NotNothrowMoveMock(CallMock* m) : m_mock(m)
+        explicit NotNothrowMoveMock(CallMock* m) : m_mock(m)
         {
         }
 
