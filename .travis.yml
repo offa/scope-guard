@@ -14,9 +14,7 @@ env:
 matrix:
     include:
     - env: CC=gcc-7
-    - env: CC=gcc-6
     - env: CC=clang-5
-    - env: CC=clang-4
 
 
 before_install:
