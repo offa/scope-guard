@@ -3,37 +3,26 @@ language: generic
 dist: trusty
 sudo: required
 
+services:
+  - docker
+
 env:
   global:
-    - DEPENDENCY_DIR="${TRAVIS_BUILD_DIR}/dependencies"
-
-cache:
-  directories:
-    - ${DEPENDENCY_DIR}
+    - DOCKER_IMG="registry.gitlab.com/offa/docker-images"
 
 
 matrix:
     include:
-    - env: CXX=g++-7 CC=gcc-7
-      addons:
-        apt:
-          packages:
-            - g++-7
-          sources: &sources
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty
-            - llvm-toolchain-trusty-5.0
-    - env: CXX=clang++-5.0 CC=clang-5.0
-      addons:
-        apt:
-          packages:
-            - clang-5.0
-          sources: *sources
+    - env: CC=gcc-7
+    - env: CC=gcc-6
+    - env: CC=clang-5
+    - env: CC=clang-4
 
 
-install:
-  - script/ci_install.sh
+before_install:
+  - docker pull ${DOCKER_IMG}/${CC}:latest
+  - docker images
 
 script:
-  - script/ci_build.sh
+  - docker run -v ${PWD}:/mnt -it ${DOCKER_IMG}/${CC} /bin/bash -c "cd /mnt; script/ci_build.sh"
 
