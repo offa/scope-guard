@@ -13,14 +13,13 @@ env:
 
 matrix:
     include:
-    - env: CC=gcc-7
-    - env: CC=clang-5
+    - env: COMPILER=gcc-7
+    - env: COMPILER=clang-5
 
 
 before_install:
-  - docker pull ${DOCKER_IMG}/${CC}:stable
-  - docker images
+  - docker pull ${DOCKER_IMG}/${COMPILER}:stable
 
 script:
-  - docker run -v ${PWD}:/mnt -it ${DOCKER_IMG}/${CC} /bin/bash -c "cd /mnt; script/ci_build.sh"
+  - docker run -v ${PWD}:/mnt -it ${DOCKER_IMG}/${COMPILER} /bin/bash -c "cd /mnt; script/ci_build.sh"
 
