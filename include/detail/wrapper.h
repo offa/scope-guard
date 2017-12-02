@@ -32,7 +32,7 @@ namespace sr::detail
    public:
 
        template<class TT, class G, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
-       explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(value)
+       explicit Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(std::forward<TT>(value))
        {
            g.release();
        }
