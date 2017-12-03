@@ -186,7 +186,7 @@ namespace sr
 
 
     template<class R, class D>
-    unique_resource(R&& r, D&& d) -> unique_resource<std::decay_t<R>, std::decay_t<D>>;
+    unique_resource(R, D) -> unique_resource<R, D>;
 
 
     template<class R, class D, class S = R>
