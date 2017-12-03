@@ -88,16 +88,6 @@ namespace sr
         }
 
 
-        void swap(unique_resource& other) noexcept(std::is_nothrow_swappable_v<R>
-                                                    && std::is_nothrow_swappable_v<D>
-                                                    && std::is_nothrow_swappable_v<bool>)
-        {
-            using std::swap;
-            swap(m_resource.get(), other.m_resource.get());
-            swap(m_deleter.get(), other.m_deleter.get());
-            swap(m_execute_on_destruction, other.m_execute_on_destruction);
-        }
-
         void reset()
         {
             if( m_execute_on_destruction == true )

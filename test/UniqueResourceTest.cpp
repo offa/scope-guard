@@ -177,20 +177,6 @@ TEST_CASE("deleter access", "[UniqueResource]")
     }
 }
 
-TEST_CASE("swap", "[UniqueResource]")
-{
-    REQUIRE_CALL(m, deleter(7));
-    auto guard1 = sr::unique_resource(Handle{3}, deleter);
-
-    {
-        REQUIRE_CALL(m, deleter(3));
-        auto guard2 = sr::unique_resource{Handle{7}, deleter};
-        guard2.swap(guard1);
-        REQUIRE(guard1.get() == 7);
-        REQUIRE(guard2.get() == 3);
-    }
-}
-
 TEST_CASE("make unique resource", "[UniqueResource]")
 {
     REQUIRE_CALL(m, deleter(7));
