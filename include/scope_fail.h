@@ -39,13 +39,6 @@ namespace sr
             int m_uncaught_on_creation = std::uncaught_exceptions();
         };
 
-
-        template<class F>
-        struct is_noexcept_dtor<F, scope_fail_strategy>
-        {
-            static constexpr bool value = noexcept(std::declval<F>()());
-        };
-
     }
 
 
