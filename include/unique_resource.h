@@ -147,7 +147,8 @@ namespace sr
                             && (std::is_nothrow_move_assignable_v<DD>
                                 || std::is_nothrow_copy_assignable_v<DD>), int> = 0
             >
-        unique_resource& operator=(unique_resource&& other)
+        unique_resource& operator=(unique_resource&& other) noexcept(std::is_nothrow_assignable_v<R&, R>
+                                                                    && std::is_nothrow_assignable_v<D&, D>)
         {
             if( this != &other )
             {
