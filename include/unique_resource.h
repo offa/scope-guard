@@ -117,7 +117,7 @@ namespace sr
             return m_resource.get();
         }
 
-        template<class RR = R, std::enable_if_t<std::is_pointer_v<RR>>
+        template<class RR = R, std::enable_if_t<std::is_pointer_v<RR>, int> = 0>
         RR operator->() const noexcept
         {
             return m_resource.get();
@@ -192,7 +192,7 @@ namespace sr
                                                                     && std::is_nothrow_constructible_v<std::decay_t<D>, D>)
     {
         const bool must_release{r == invalid};
-        auto ur = unique_resource{r, d};
+        unique_resource<std::decay_t<R>, std::decay_t<D>> ur{std::forward<R>(r), std::forward<D>(d)};
 
         if( must_release == true )
         {
