@@ -117,11 +117,7 @@ namespace sr
             return m_resource.get();
         }
 
-        template<class RR = R,
-                std::enable_if_t<std::is_pointer_v<RR>
-                                && (std::is_class_v<std::remove_pointer_t<RR>>
-                                    || std::is_union_v<std::remove_pointer_t<RR>>), int> = 0
-                >
+        template<class RR = R, std::enable_if_t<std::is_pointer_v<RR>>
         RR operator->() const noexcept
         {
             return m_resource.get();
