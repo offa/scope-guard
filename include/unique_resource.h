@@ -88,7 +88,7 @@ namespace sr
         }
 
 
-        void reset()
+        void reset() noexcept
         {
             if( m_execute_on_destruction == true )
             {
@@ -107,7 +107,7 @@ namespace sr
             se.release();
         }
 
-        void release()
+        void release() noexcept
         {
             m_execute_on_destruction = false;
         }
