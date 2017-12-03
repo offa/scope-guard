@@ -112,7 +112,7 @@ namespace sr
             m_execute_on_destruction = false;
         }
 
-        decltype(auto) get() const noexcept
+        const R& get() const noexcept
         {
             return m_resource.get();
         }
