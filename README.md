@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-GPLv3-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-17-green.svg)
 
-Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R5**][2] (former [N3949][1]).
+Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R6**][2] (former [N3949][1]).
 
 
 There's a *C++14* implementation on the [**`cpp14`**](https://github.com/offa/scope-guard/tree/cpp14) Branch.
@@ -24,7 +24,7 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 
 ## Documentation
 
-- [*P0052R5 - Generic Scope Guard and RAII Wrapper for the Standard Library*][2] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
+- [*P0052R6 - Generic Scope Guard and RAII Wrapper for the Standard Library*][2] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
 - [*N3949 - Scoped Resource - Generic RAII Wrapper for the Standard Library*][1] (P. Sommerlad, A. L. Sandoval)
 
 
@@ -48,4 +48,4 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 
 
 [1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3949.pdf
-[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0052r5.pdf
+[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0052r6.pdf
