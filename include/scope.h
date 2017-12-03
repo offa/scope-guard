@@ -20,6 +20,8 @@
 
 #pragma once
 
+#define __cpp_lib_scope     201711
+
 #include "scope_exit.h"
 #include "scope_fail.h"
 #include "scope_success.h"
