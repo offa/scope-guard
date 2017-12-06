@@ -59,6 +59,9 @@ namespace sr::detail
        }
 
 
+       using type = T;
+
+
    private:
 
        Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
@@ -100,6 +103,9 @@ namespace sr::detail
        {
            m_value = std::ref(newValue);
        }
+
+
+       using type = std::reference_wrapper<T>;
 
 
    private:
