@@ -138,9 +138,31 @@ namespace mock
     };
 
 
+    struct NotNothrowAssignable
+    {
+        explicit NotNothrowAssignable(int value) : m_value(value) { }
+        NotNothrowAssignable(const NotNothrowAssignable&) = default;
+
+        NotNothrowAssignable& operator=(const NotNothrowAssignable& other)
+        {
+            if( this != &other )
+            {
+                assignNotNoexcept(other.m_value);
+            }
+            return *this;
+        }
+
+        void assignNotNoexcept(int value) noexcept(false)
+        {
+            m_value = value;
+        }
+
+        int m_value;
+    };
+
     struct CopyMock
     {
-        CopyMock() {}
+        CopyMock() { }
         CopyMock(const CopyMock&) { }
     };
 

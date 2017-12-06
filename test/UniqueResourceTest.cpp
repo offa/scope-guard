@@ -132,8 +132,9 @@ TEST_CASE("reset sets new lvalue and calls deleter on previous", "[UniqueResourc
 {
     REQUIRE_CALL(m, deleter(3));
     REQUIRE_CALL(m, deleter(7));
-    auto guard = sr::unique_resource{Handle{3}, deleter};
-    const Handle h{7};
+    auto d = [](const auto& v) { deleter(v.m_value); };
+    auto guard = sr::unique_resource{NotNothrowAssignable{3}, d};
+    const NotNothrowAssignable h{7};
     guard.reset(h);
 }
 

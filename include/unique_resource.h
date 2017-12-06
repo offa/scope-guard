@@ -111,7 +111,7 @@ namespace sr
             }
             else
             {
-                m_resource = std::as_const(r);
+                m_resource.reset(std::as_const(r));
             }
 
             m_execute_on_destruction = true;
