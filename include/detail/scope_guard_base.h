@@ -25,6 +25,14 @@
 
 namespace sr::detail
 {
+    // From P0550
+    template<class T>
+    using remove_cvref = std::remove_cv_t<std::remove_reference_t<T>>;
+
+    template<class T>
+    using remove_cvref_t = typename remove_cvref<T>::type;
+
+
 
     template<class F, class S>
     struct is_noexcept_dtor
