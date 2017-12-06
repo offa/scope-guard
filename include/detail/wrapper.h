@@ -50,7 +50,7 @@ namespace sr::detail
 
        void reset(T&& newValue) noexcept(std::is_nothrow_assignable_v<T, decltype(std::move_if_noexcept(newValue))>)
        {
-           m_value = std::move_if_noexcept(newValue);
+           m_value = std::forward<T>(newValue);
        }
 
        void reset(const T& newValue) noexcept(std::is_nothrow_assignable_v<T, const T&>)

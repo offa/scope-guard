@@ -120,12 +120,21 @@ TEST_CASE("reset does not call deleter if released", "[UniqueResource]")
     guard.reset();
 }
 
-TEST_CASE("reset sets new value and calls deleter on previous", "[UniqueResource]")
+TEST_CASE("reset sets new rvalue and calls deleter on previous", "[UniqueResource]")
 {
     REQUIRE_CALL(m, deleter(3));
     REQUIRE_CALL(m, deleter(7));
     auto guard = sr::unique_resource{Handle{3}, deleter};
     guard.reset(Handle{7});
+}
+
+TEST_CASE("reset sets new lvalue and calls deleter on previous", "[UniqueResource]")
+{
+    REQUIRE_CALL(m, deleter(3));
+    REQUIRE_CALL(m, deleter(7));
+    auto guard = sr::unique_resource{Handle{3}, deleter};
+    const Handle h{7};
+    guard.reset(h);
 }
 
 TEST_CASE("reset handles exception on assignment", "[UniqueResource]")

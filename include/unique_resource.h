@@ -100,9 +100,20 @@ namespace sr
         template<class RR>
         void reset(RR&& r)
         {
-            auto se = scope_exit{[this, &r] { get_deleter()(r); }};
             reset();
-            m_resource.reset(std::forward<RR>(r));
+
+            using R1 = typename detail::Wrapper<R>::type;
+            auto se = scope_exit{[this, &r] { get_deleter()(r); }};
+
+            if constexpr( std::is_nothrow_assignable_v<R1&, RR> == true )
+            {
+                m_resource.reset(std::forward<RR>(r));
+            }
+            else
+            {
+                m_resource = std::as_const(r);
+            }
+
             m_execute_on_destruction = true;
             se.release();
         }
