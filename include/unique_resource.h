@@ -161,20 +161,31 @@ namespace sr
             {
                 reset();
 
-                if constexpr( std::is_nothrow_move_assignable_v<R> == true )
+                if constexpr( std::is_nothrow_move_assignable_v<RR> == true )
                 {
-                    m_deleter.reset(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()));
-                    m_resource.reset(std::forward<RR>(other.m_resource.get()));
-                }
-                else if constexpr( std::is_nothrow_move_assignable_v<D> == true )
-                {
-                    m_resource.reset(detail::forward_if_nothrow_move_constructible(other.m_resource.get()));
-                    m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
+                    if constexpr( std::is_nothrow_move_assignable_v<DD> == true )
+                    {
+                        m_resource.reset(std::forward<RR>(other.m_resource.get()));
+                        m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
+                    }
+                    else
+                    {
+                        m_deleter.reset(other.m_deleter.get());
+                        m_resource.reset(std::forward<RR>(other.m_resource.get()));
+                    }
                 }
                 else
                 {
-                    m_resource = other.m_resource;
-                    m_deleter = other.m_deleter;
+                    if constexpr( std::is_nothrow_move_assignable_v<DD> == true )
+                    {
+                        m_resource.reset(other.m_resource.get());
+                        m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
+                    }
+                    else
+                    {
+                        m_resource.reset(other.m_resource.get());
+                        m_deleter.reset(other.m_deleter.get());
+                    }
                 }
 
                 m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
