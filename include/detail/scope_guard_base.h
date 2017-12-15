@@ -27,7 +27,7 @@ namespace sr::detail
 {
     // From P0550
     template<class T>
-    using remove_cvref = std::remove_cv_t<std::remove_reference_t<T>>;
+    using remove_cvref = std::remove_cv<std::remove_reference<T>>;
 
     template<class T>
     using remove_cvref_t = typename remove_cvref<T>::type;
