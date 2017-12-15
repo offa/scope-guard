@@ -45,9 +45,19 @@ namespace sr
     template<class EF>
     class scope_fail : public detail::scope_guard_base<EF, detail::scope_fail_strategy>
     {
+        using Base = detail::scope_guard_base<EF, detail::scope_fail_strategy>;
+
+
     public:
 
-        using detail::scope_guard_base<EF, detail::scope_fail_strategy>::scope_guard_base;
+        template<class EFP,
+            std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
+            std::enable_if_t<!std::is_same_v<detail::remove_cvref_t<EFP>, scope_fail<EF>>, int> = 0
+            >
+        explicit scope_fail(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>)
+                                                : Base(std::forward<EFP>(exitFunction))
+        {
+        }
 
 
     private:
