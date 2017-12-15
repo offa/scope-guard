@@ -59,9 +59,6 @@ namespace sr
         {
         }
 
-
-    private:
-
     };
 
 
