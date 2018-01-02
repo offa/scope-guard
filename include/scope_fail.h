@@ -1,6 +1,6 @@
 /*
  * Scope Guard
- * Copyright (C) 2017  offa
+ * Copyright (C) 2017-2018  offa
  *
  * This file is part of Scope Guard.
  *
