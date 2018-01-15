@@ -7,12 +7,12 @@ target_include_directories(Trompeloeil INTERFACE "trompeloeil")
 
 
 add_library(TestMain TestMain.cpp)
-target_link_libraries(TestMain Catch Trompeloeil)
+target_link_libraries(TestMain PUBLIC Catch Trompeloeil)
 
 
 function(add_test_suite name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(${name} TestMain ScopeGuard)
+    target_link_libraries(${name} PRIVATE TestMain ScopeGuard)
     add_test(${name} ${name})
 endfunction()
 
