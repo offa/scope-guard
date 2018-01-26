@@ -8,9 +8,6 @@
 Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R6**][2] (former [N3949][1]).
 
 
-There's a *C++14* implementation on the [**`cpp14`**](https://github.com/offa/scope-guard/tree/cpp14) Branch.
-
-
 ## Compatibility
 
 This implementation conforms to [P0052][2], except:
