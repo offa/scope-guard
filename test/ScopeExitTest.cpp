@@ -39,16 +39,14 @@ namespace
 TEST_CASE("exit function called on destruction", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
-    auto guard = sr::scope_exit{deleter};
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = sr::scope_exit{deleter};
 }
 
 TEST_CASE("exit function lambda called on destruction", "[ScopeExit]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
-    auto guard = sr::scope_exit{[&cm] { cm.deleter(); }};
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = sr::scope_exit{[&cm] { cm.deleter(); }};
 }
 
 TEST_CASE("exit function called and rethrow on copy exception", "[ScopeExit]")
@@ -72,8 +70,7 @@ TEST_CASE("move releases moved-from object", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
     auto movedFrom = sr::scope_exit{deleter};
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move with copy init releases moved-from object", "[ScopeExit]")
@@ -89,8 +86,7 @@ TEST_CASE("move transfers state", "[ScopeExit]")
 {
     REQUIRE_CALL(m, deleter());
     auto movedFrom = sr::scope_exit{deleter};
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state if released", "[ScopeExit]")
@@ -98,7 +94,6 @@ TEST_CASE("move transfers state if released", "[ScopeExit]")
     REQUIRE_CALL(m, deleter()).TIMES(0);
     auto movedFrom = sr::scope_exit{deleter};
     movedFrom.release();
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 

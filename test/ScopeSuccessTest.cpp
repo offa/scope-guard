@@ -39,16 +39,14 @@ namespace
 TEST_CASE("exit function called on destruction", "[ScopeSuccess]")
 {
     REQUIRE_CALL(m, deleter());
-    auto guard = sr::scope_success{deleter};
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = sr::scope_success{deleter};
 }
 
 TEST_CASE("exit function lambda called on destruction", "[ScopeSuccess]")
 {
     CallMock cm;
     REQUIRE_CALL(cm, deleter());
-    auto guard = sr::scope_success{[&cm] { cm.deleter(); }};
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = sr::scope_success{[&cm] { cm.deleter(); }};
 }
 
 TEST_CASE("exit function not called and rethrow on copy exception", "[ScopeSuccess]")
@@ -71,8 +69,7 @@ TEST_CASE("move releases moved-from object", "[ScopeSuccess]")
 {
     REQUIRE_CALL(m, deleter());
     auto movedFrom = sr::scope_success{deleter};
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move with copy init releases moved-from object", "[ScopeSuccess]")
@@ -81,15 +78,14 @@ TEST_CASE("move with copy init releases moved-from object", "[ScopeSuccess]")
     const NotNothrowMoveMock notNothrow{&mock};
     REQUIRE_CALL(mock, deleter());
     sr::scope_success movedFrom{notNothrow};
-    auto guard = std::move(movedFrom);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state", "[ScopeSuccess]")
 {
     REQUIRE_CALL(m, deleter());
     auto movedFrom = sr::scope_success{deleter};
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state if released", "[ScopeSuccess]")
@@ -97,16 +93,14 @@ TEST_CASE("move transfers state if released", "[ScopeSuccess]")
     REQUIRE_CALL(m, deleter()).TIMES(0);
     auto movedFrom = sr::scope_success{deleter};
     movedFrom.release();
-    auto guard = std::move(movedFrom);
-    static_cast<void>(guard);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("exit function not called on exception", "[ScopeFail]")
 {
     try
     {
-        auto guard = sr::scope_success{deleter};
-        static_cast<void>(guard);
+        [[maybe_unused]] auto guard = sr::scope_success{deleter};
         throw 3;
     }
     catch( ... )
@@ -123,8 +117,7 @@ TEST_CASE("exit function called on pending exception", "[ScopeFail]")
     catch( ... )
     {
         REQUIRE_CALL(m, deleter());
-        auto guard = sr::scope_success{deleter};
-        static_cast<void>(guard);
+        [[maybe_unused]] auto guard = sr::scope_success{deleter};
     }
 }
 
