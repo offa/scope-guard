@@ -105,12 +105,12 @@ namespace sr::detail
         }
 
 
-        using type = std::reference_wrapper<T>;
+        using type = std::reference_wrapper<std::remove_reference_t<T>>;
 
 
     private:
 
-        std::reference_wrapper<T> m_value;
+        type m_value;
    };
 
 }
