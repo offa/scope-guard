@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.1)
+cmake_minimum_required(VERSION 3.11)
 
 project(ScopeGuard VERSION 0.2.4)
 message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
