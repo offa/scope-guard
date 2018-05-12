@@ -208,7 +208,7 @@ namespace sr
     unique_resource(R, D) -> unique_resource<R, D>;
 
 
-    template<class R, class D, class S = R>
+    template<class R, class D, class S = std::decay_t<R>>
     unique_resource<std::decay_t<R>, std::decay_t<D>> make_unique_resource_checked(R&& r, const S& invalid, D&& d)
                                                             noexcept(std::is_nothrow_constructible_v<std::decay_t<R>, R>
                                                                     && std::is_nothrow_constructible_v<std::decay_t<D>, D>)
