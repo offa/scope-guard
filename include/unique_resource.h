@@ -47,13 +47,12 @@ namespace sr
     public:
 
         template<class RR, class DD,
-                std::enable_if_t<(std::is_copy_constructible_v<R> || std::is_nothrow_move_constructible_v<R>)
-                                && (std::is_copy_constructible_v<D> || std::is_nothrow_move_constructible_v<D>), int> = 0,
-                std::enable_if_t<detail::is_nothrow_move_or_copy_constructible_from_v<R, RR>, int> = 0,
-                std::enable_if_t<detail::is_nothrow_move_or_copy_constructible_from_v<D, DD>, int> = 0
+                std::enable_if_t<(std::is_constructible_v<R ,RR> && std::is_constructible_v<D, DD>
+                                && (std::is_nothrow_constructible_v<R, RR> || std::is_constructible_v<R, RR&>)
+                                && (std::is_nothrow_constructible_v<D, DD> || std::is_constructible_v<D, DD&>)), int> = 0
                 >
-        explicit unique_resource(RR&& r, DD&& d) noexcept(std::is_nothrow_constructible_v<R, RR>
-                                                            && std::is_nothrow_constructible_v<D, DD>)
+        explicit unique_resource(RR&& r, DD&& d) noexcept((std::is_nothrow_constructible_v<R, RR> || std::is_nothrow_constructible_v<R, RR&>)
+                                                            && (std::is_nothrow_constructible_v<D, DD> || std::is_nothrow_constructible_v<D, DD&>))
                                                 : m_resource(std::forward<RR>(r), scope_exit{[&r, &d] { d(r); }}),
                                                 m_deleter(std::forward<DD>(d), scope_exit{[this, &d] { d(get()); }}),
                                                 m_execute_on_destruction(true)
