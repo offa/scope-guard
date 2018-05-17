@@ -38,15 +38,6 @@ namespace sr
         template<class T, class TT>
         constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
 
-
-
-        template<class T, class U = std::conditional_t<std::is_nothrow_move_constructible_v<T>, T&&, const T&>>
-        constexpr U forward_if_nothrow_move_constructible(T&& value) noexcept
-        {
-            return std::forward<T>(value);
-        }
-
-
     }
 
 
