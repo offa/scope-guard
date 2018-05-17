@@ -32,7 +32,7 @@ namespace sr::detail
    public:
 
         template<class TT, class G, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
-        Wrapper(TT&& value, G&& g) noexcept(noexcept(Wrapper{value})) : Wrapper(std::forward<TT>(value))
+        Wrapper(TT&& value, G&& g) noexcept(std::is_nothrow_constructible_v<T, TT>) : m_value(std::forward<TT>(value))
         {
             g.release();
         }
@@ -69,15 +69,6 @@ namespace sr::detail
 
     private:
 
-        Wrapper(const T& value) noexcept(noexcept(T{value})) : m_value(value)
-        {
-        }
-
-        Wrapper(T&& value) noexcept(noexcept(T{std::move_if_noexcept(value)})) : m_value(std::move_if_noexcept(value))
-        {
-        }
-
-
         T m_value;
     };
 
@@ -88,7 +79,7 @@ namespace sr::detail
    public:
 
         template<class TT, class G, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
-        Wrapper(TT&& value, G&& g) noexcept(noexcept(static_cast<T&>(value))) : m_value(static_cast<T&>(value))
+        Wrapper(TT&& value, G&& g) noexcept(std::is_nothrow_constructible_v<TT, T&>) : m_value(static_cast<T&>(value))
         {
             g.release();
         }
