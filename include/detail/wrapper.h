@@ -48,6 +48,11 @@ namespace sr::detail
             return m_value;
         }
 
+        void reset(Wrapper<T>&& other) noexcept
+        {
+            m_value = std::move(other.m_value);
+        }
+
         void reset(T&& newValue) noexcept(std::is_nothrow_assignable_v<T, decltype(std::move_if_noexcept(newValue))>)
         {
             m_value = std::forward<T>(newValue);
@@ -97,6 +102,11 @@ namespace sr::detail
         const T& get() const noexcept
         {
             return m_value.get();
+        }
+
+        void reset(Wrapper<T>&& other) noexcept
+        {
+            m_value = std::move(other.m_value);
         }
 
         void reset(T& newValue) noexcept

@@ -165,26 +165,26 @@ namespace sr
                 {
                     if constexpr( std::is_nothrow_move_assignable_v<DD> == true )
                     {
-                        m_resource.reset(std::forward<RR>(other.m_resource.get()));
-                        m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
+                        m_resource.reset(std::move(other.m_resource));
+                        m_deleter.reset(std::move(other.m_deleter));
                     }
                     else
                     {
-                        m_deleter.reset(other.m_deleter.get());
-                        m_resource.reset(std::forward<RR>(other.m_resource.get()));
+                        m_deleter.reset(other.m_deleter);
+                        m_resource.reset(std::move(other.m_resource));
                     }
                 }
                 else
                 {
                     if constexpr( std::is_nothrow_move_assignable_v<DD> == true )
                     {
-                        m_resource.reset(other.m_resource.get());
-                        m_deleter.reset(std::forward<DD>(other.m_deleter.get()));
+                        m_resource.reset(other.m_resource);
+                        m_deleter.reset(std::move(other.m_deleter));
                     }
                     else
                     {
-                        m_resource.reset(other.m_resource.get());
-                        m_deleter.reset(other.m_deleter.get());
+                        m_resource.reset(other.m_resource);
+                        m_deleter.reset(other.m_deleter);
                     }
                 }
 
