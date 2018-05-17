@@ -27,19 +27,6 @@
 
 namespace sr
 {
-    namespace detail
-    {
-        template<class T, class TT>
-        using is_ntmocp_constructible = std::conditional_t<std::is_reference_v<TT>
-                                                            || !std::is_nothrow_move_constructible_v<TT>,
-                                                        typename std::is_constructible<T, const TT&>::type,
-                                                        typename std::is_constructible<T, TT>::type>;
-
-        template<class T, class TT>
-        constexpr auto is_nothrow_move_or_copy_constructible_from_v = is_ntmocp_constructible<T, TT>::value;
-
-    }
-
 
     template<class R, class D>
     class unique_resource
