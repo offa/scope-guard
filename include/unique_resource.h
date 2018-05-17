@@ -71,8 +71,8 @@ namespace sr
 
         unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible_v<R>
                                                             && std::is_nothrow_move_constructible_v<D>)
-                                                : m_resource(detail::forward_if_nothrow_move_constructible(other.m_resource.get()), scope_exit{[] { }}),
-                                                m_deleter(detail::forward_if_nothrow_move_constructible(other.m_deleter.get()),
+                                                : m_resource(std::move_if_noexcept(other.m_resource.get()), scope_exit{[] { }}),
+                                                m_deleter(std::move_if_noexcept(other.m_deleter.get()),
                                                                                                         scope_exit{[&other] {
                                                                                                             other.get_deleter()(other.m_resource.get());
                                                                                                             other.release(); }}),
