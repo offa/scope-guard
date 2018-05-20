@@ -27,6 +27,17 @@
 
 namespace sr
 {
+    namespace detail
+    {
+        template<class T, class U,
+                    class R = std::conditional_t<std::is_nothrow_constructible_v<T, U>, U&&, U>
+                >
+        constexpr R forward_if_nothrow_constructible(U&& arg)
+        {
+            return std::forward<U>(arg);
+        }
+    }
+
 
     template<class R, class D>
     class unique_resource
@@ -40,8 +51,8 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept((std::is_nothrow_constructible_v<R, RR> || std::is_nothrow_constructible_v<R, RR&>)
                                                             && (std::is_nothrow_constructible_v<D, DD> || std::is_nothrow_constructible_v<D, DD&>))
-                                                : m_resource(std::forward<RR>(r), scope_exit{[&r, &d] { d(r); }}),
-                                                m_deleter(std::forward<DD>(d), scope_exit{[this, &d] { d(get()); }}),
+                                                : m_resource(detail::forward_if_nothrow_constructible<R, RR>(std::forward<RR>(r)), scope_exit{[&r, &d] { d(r); }}),
+                                                m_deleter(detail::forward_if_nothrow_constructible<D, DD>(std::forward<DD>(d)), scope_exit{[this, &d] { d(get()); }}),
                                                 m_execute_on_destruction(true)
         {
         }
