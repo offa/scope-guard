@@ -80,7 +80,7 @@ namespace sr::detail
         scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible_v<EF>
                                                             || std::is_nothrow_copy_constructible_v<EF>)
                                         : Strategy(other),
-                                        m_exitfunction(std::move_if_noexcept(other.m_exitfunction)),
+                                        m_exitfunction(std::forward<EF>(other.m_exitfunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
