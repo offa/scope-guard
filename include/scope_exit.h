@@ -51,7 +51,8 @@ namespace sr
             std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
             std::enable_if_t<!std::is_same_v<detail::remove_cvref_t<EFP>, scope_exit<EF>>, int> = 0
             >
-        explicit scope_exit(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>)
+        explicit scope_exit(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>
+                                                        || std::is_nothrow_constructible_v<EF, EFP&>)
                                                 : Base(std::forward<EFP>(exitFunction))
         {
         }

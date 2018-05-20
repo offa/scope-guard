@@ -56,7 +56,8 @@ namespace sr::detail
             std::enable_if_t<(!std::is_lvalue_reference_v<EFP>)
                                 && std::is_nothrow_constructible_v<EF, EFP>, int> = 0
             >
-        explicit scope_guard_base(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>)
+        explicit scope_guard_base(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>
+                                                                || std::is_nothrow_constructible_v<EF, EFP&>)
                                                     : m_exitfunction(std::move(exitFunction)),
                                                     m_execute_on_destruction(true)
         {
