@@ -58,7 +58,7 @@ namespace sr::detail
             >
         explicit scope_guard_base(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>
                                                                 || std::is_nothrow_constructible_v<EF, EFP&>)
-                                                    : m_exitfunction(std::move(exitFunction)),
+                                                    : m_exitfunction(std::forward<EFP>(exitFunction)),
                                                     m_execute_on_destruction(true)
         {
         }
