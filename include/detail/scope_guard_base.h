@@ -44,6 +44,16 @@ namespace sr::detail
     template<class F, class S>
     constexpr bool is_noexcept_dtor_v = is_noexcept_dtor<F, S>::value;
 
+    template<class T>
+    constexpr decltype(auto) forward_if_nothrow_move_constructible(T&& arg)
+    {
+        if constexpr( std::is_nothrow_move_constructible_v<T> == true )
+        {
+            return std::forward<T>(arg);
+        }
+        return arg;
+    }
+
 
 
     template<class EF, class Strategy>
@@ -77,10 +87,13 @@ namespace sr::detail
             throw;
         }
 
+        template<class EFP = EF, std::enable_if_t<(std::is_nothrow_move_constructible_v<EF>
+                                                    || std::is_copy_constructible_v<EF>), int> = 0
+                >
         scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible_v<EF>
                                                             || std::is_nothrow_copy_constructible_v<EF>)
                                         : Strategy(other),
-                                        m_exitfunction(std::forward<EF>(other.m_exitfunction)),
+                                        m_exitfunction(forward_if_nothrow_move_constructible(other.m_exitfunction)),
                                         m_execute_on_destruction(other.m_execute_on_destruction)
         {
             other.release();
