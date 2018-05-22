@@ -45,4 +45,4 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 
 
 [1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3949.pdf
-[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0052r6.pdf
+[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0052r8.pdf
