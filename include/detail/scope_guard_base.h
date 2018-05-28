@@ -37,12 +37,12 @@ namespace sr::detail
     template<class F, class S>
     struct is_noexcept_dtor
     {
-        static constexpr bool value = true;
+        static inline constexpr bool value = true;
     };
 
 
     template<class F, class S>
-    constexpr bool is_noexcept_dtor_v = is_noexcept_dtor<F, S>::value;
+    inline constexpr bool is_noexcept_dtor_v = is_noexcept_dtor<F, S>::value;
 
     template<class T>
     constexpr decltype(auto) forward_if_nothrow_move_constructible(T&& arg)
