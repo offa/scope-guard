@@ -5,8 +5,6 @@ message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 option(UNITTEST "Build Unit Tests" ON)
-option(COVERAGE "Enable Coverage" OFF)
-message(STATUS "Coverage : ${COVERAGE}")
 option(ENABLE_COMPAT_HEADER "Enable compatible header 'scope'" OFF)
 message(STATUS "Compatible Header : ${ENABLE_COMPAT_HEADER}")
 
@@ -17,10 +15,6 @@ else()
     message(STATUS "Build Type : None")
 endif()
 
-
-if( COVERAGE )
-    include(Coverage)
-endif()
 
 
 add_compile_options(-Wall
