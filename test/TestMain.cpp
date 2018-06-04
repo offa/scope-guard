@@ -32,7 +32,7 @@ namespace trompeloeil
     {
         std::ostringstream os;
 
-        if( line )
+        if( line != 0 )
         {
             os << file << ':' << line << '\n';
         }
