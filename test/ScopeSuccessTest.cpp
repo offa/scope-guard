@@ -103,7 +103,7 @@ TEST_CASE("exit function not called on exception", "[ScopeFail]")
     try
     {
         [[maybe_unused]] auto guard = sr::scope_success{deleter};
-        throw 3;
+        throw std::exception{};
     }
     catch( ... )
     {
@@ -114,7 +114,7 @@ TEST_CASE("exit function called on pending exception", "[ScopeFail]")
 {
     try
     {
-        throw 3;
+        throw std::exception{};
     }
     catch( ... )
     {
