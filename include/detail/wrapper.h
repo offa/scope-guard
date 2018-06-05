@@ -34,7 +34,7 @@ namespace sr::detail
    public:
 
         template<class TT, class G, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
-        Wrapper(TT&& value, G&& g) noexcept(std::is_nothrow_constructible_v<T, TT>) : m_value(std::forward<TT>(value))
+        Wrapper(TT&& v, G&& g) noexcept(std::is_nothrow_constructible_v<T, TT>) : value(std::forward<TT>(v))
         {
             g.release();
         }
@@ -42,27 +42,27 @@ namespace sr::detail
 
         T& get() noexcept
         {
-            return m_value;
+            return value;
         }
 
         const T& get() const noexcept
         {
-            return m_value;
+            return value;
         }
 
         void reset(Wrapper<T>&& other) noexcept
         {
-            m_value = std::move(other.m_value);
+            value = std::move(other.value);
         }
 
         void reset(T&& newValue) noexcept(std::is_nothrow_assignable_v<T, decltype(std::move_if_noexcept(newValue))>)
         {
-            m_value = std::forward<T>(newValue);
+            value = std::forward<T>(newValue);
         }
 
         void reset(const T& newValue) noexcept(std::is_nothrow_assignable_v<T, const T&>)
         {
-            m_value = newValue;
+            value = newValue;
         }
 
 
@@ -71,7 +71,7 @@ namespace sr::detail
 
     private:
 
-        T m_value;
+        T value;
     };
 
 
@@ -81,7 +81,7 @@ namespace sr::detail
    public:
 
         template<class TT, class G, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
-        Wrapper(TT&& value, G&& g) noexcept(std::is_nothrow_constructible_v<TT, T&>) : m_value(static_cast<T&>(value))
+        Wrapper(TT&& v, G&& g) noexcept(std::is_nothrow_constructible_v<TT, T&>) : value(static_cast<T&>(v))
         {
             g.release();
         }
@@ -89,22 +89,22 @@ namespace sr::detail
 
         T& get() noexcept
         {
-            return m_value.get();
+            return value.get();
         }
 
         const T& get() const noexcept
         {
-            return m_value.get();
+            return value.get();
         }
 
         void reset(Wrapper<T>&& other) noexcept
         {
-            m_value = std::move(other.m_value);
+            value = std::move(other.value);
         }
 
         void reset(T& newValue) noexcept
         {
-            m_value = std::ref(newValue);
+            value = std::ref(newValue);
         }
 
 
@@ -113,7 +113,7 @@ namespace sr::detail
 
     private:
 
-        type m_value;
+        type value;
    };
 
 }

@@ -53,19 +53,19 @@ namespace sr
                 >
         explicit unique_resource(RR&& r, DD&& d) noexcept((std::is_nothrow_constructible_v<R, RR> || std::is_nothrow_constructible_v<R, RR&>)
                                                             && (std::is_nothrow_constructible_v<D, DD> || std::is_nothrow_constructible_v<D, DD&>))
-                                                : m_resource(detail::forward_if_nothrow_constructible<R, RR>(std::forward<RR>(r)), scope_exit{[&r, &d] { d(r); }}),
-                                                m_deleter(detail::forward_if_nothrow_constructible<D, DD>(std::forward<DD>(d)), scope_exit{[this, &d] { d(get()); }}),
-                                                m_execute_on_destruction(true)
+                                                : resource(detail::forward_if_nothrow_constructible<R, RR>(std::forward<RR>(r)), scope_exit{[&r, &d] { d(r); }}),
+                                                deleter(detail::forward_if_nothrow_constructible<D, DD>(std::forward<DD>(d)), scope_exit{[this, &d] { d(get()); }}),
+                                                execute_on_destruction(true)
         {
         }
 
         unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible_v<R>
                                                             && std::is_nothrow_move_constructible_v<D>)
-                                                : m_resource(std::move_if_noexcept(other.m_resource.get()), scope_exit{[] { }}),
-                                                m_deleter(std::move_if_noexcept(other.m_deleter.get()), scope_exit{[&other] {
-                                                                                                            other.get_deleter()(other.m_resource.get());
+                                                : resource(std::move_if_noexcept(other.resource.get()), scope_exit{[] { }}),
+                                                deleter(std::move_if_noexcept(other.deleter.get()), scope_exit{[&other] {
+                                                                                                            other.get_deleter()(other.resource.get());
                                                                                                             other.release(); }}),
-                                                m_execute_on_destruction(std::exchange(other.m_execute_on_destruction, false))
+                                                execute_on_destruction(std::exchange(other.execute_on_destruction, false))
         {
         }
 
@@ -79,10 +79,10 @@ namespace sr
 
         void reset() noexcept
         {
-            if( m_execute_on_destruction == true )
+            if( execute_on_destruction == true )
             {
-                m_execute_on_destruction = false;
-                get_deleter()(m_resource.get());
+                execute_on_destruction = false;
+                get_deleter()(resource.get());
             }
         }
 
@@ -96,31 +96,31 @@ namespace sr
 
             if constexpr( std::is_nothrow_assignable_v<R1&, RR> == true )
             {
-                m_resource.reset(std::forward<RR>(r));
+                resource.reset(std::forward<RR>(r));
             }
             else
             {
-                m_resource.reset(std::as_const(r));
+                resource.reset(std::as_const(r));
             }
 
-            m_execute_on_destruction = true;
+            execute_on_destruction = true;
             se.release();
         }
 
         void release() noexcept
         {
-            m_execute_on_destruction = false;
+            execute_on_destruction = false;
         }
 
         const R& get() const noexcept
         {
-            return m_resource.get();
+            return resource.get();
         }
 
         template<class RR = R, std::enable_if_t<std::is_pointer_v<RR>, int> = 0>
         RR operator->() const noexcept
         {
-            return m_resource.get();
+            return resource.get();
         }
 
         template<class RR = R,
@@ -133,7 +133,7 @@ namespace sr
 
         const D& get_deleter() const noexcept
         {
-            return m_deleter.get();
+            return deleter.get();
         }
 
 
@@ -154,30 +154,30 @@ namespace sr
                 {
                     if constexpr( std::is_nothrow_move_assignable_v<DD> == true )
                     {
-                        m_resource.reset(std::move(other.m_resource));
-                        m_deleter.reset(std::move(other.m_deleter));
+                        resource.reset(std::move(other.resource));
+                        deleter.reset(std::move(other.deleter));
                     }
                     else
                     {
-                        m_deleter.reset(other.m_deleter);
-                        m_resource.reset(std::move(other.m_resource));
+                        deleter.reset(other.deleter);
+                        resource.reset(std::move(other.resource));
                     }
                 }
                 else
                 {
                     if constexpr( std::is_nothrow_move_assignable_v<DD> == true )
                     {
-                        m_resource.reset(other.m_resource);
-                        m_deleter.reset(std::move(other.m_deleter));
+                        resource.reset(other.resource);
+                        deleter.reset(std::move(other.deleter));
                     }
                     else
                     {
-                        m_resource.reset(other.m_resource);
-                        m_deleter.reset(other.m_deleter);
+                        resource.reset(other.resource);
+                        deleter.reset(other.deleter);
                     }
                 }
 
-                m_execute_on_destruction = std::exchange(other.m_execute_on_destruction, false);
+                execute_on_destruction = std::exchange(other.execute_on_destruction, false);
             }
             return *this;
         }
@@ -187,9 +187,9 @@ namespace sr
 
     private:
 
-        detail::Wrapper<R> m_resource;
-        detail::Wrapper<D> m_deleter;
-        bool m_execute_on_destruction;
+        detail::Wrapper<R> resource;
+        detail::Wrapper<D> deleter;
+        bool execute_on_destruction;
     };
 
 

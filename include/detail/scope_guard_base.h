@@ -70,8 +70,8 @@ namespace sr::detail
             >
         explicit scope_guard_base(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>
                                                                 || std::is_nothrow_constructible_v<EF, EFP&>)
-                                                    : m_exitfunction(std::forward<EFP>(exitFunction)),
-                                                    m_execute_on_destruction(true)
+                                                    : exitfunction(std::forward<EFP>(exitFunction)),
+                                                    execute_on_destruction(true)
         {
         }
 
@@ -79,8 +79,8 @@ namespace sr::detail
             std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
             std::enable_if_t<std::is_lvalue_reference_v<EFP>, int> = 0
             >
-        explicit scope_guard_base(EFP&& exitFunction) try : m_exitfunction(exitFunction),
-                                                        m_execute_on_destruction(true)
+        explicit scope_guard_base(EFP&& exitFunction) try : exitfunction(exitFunction),
+                                                        execute_on_destruction(true)
         {
         }
         catch( ... )
@@ -95,8 +95,8 @@ namespace sr::detail
         scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible_v<EF>
                                                             || std::is_nothrow_copy_constructible_v<EF>)
                                         : Strategy(other),
-                                        m_exitfunction(forward_if_nothrow_move_constructible(other.m_exitfunction)),
-                                        m_execute_on_destruction(other.m_execute_on_destruction)
+                                        exitfunction(forward_if_nothrow_move_constructible(other.exitfunction)),
+                                        execute_on_destruction(other.execute_on_destruction)
         {
             other.release();
         }
@@ -106,16 +106,16 @@ namespace sr::detail
 
         ~scope_guard_base() noexcept(is_noexcept_dtor_v<EF, Strategy>)
         {
-            if( (m_execute_on_destruction == true) && (this->should_execute() == true) )
+            if( (execute_on_destruction == true) && (this->should_execute() == true) )
             {
-                m_exitfunction();
+                exitfunction();
             }
         }
 
 
         void release() noexcept
         {
-            m_execute_on_destruction = false;
+            execute_on_destruction = false;
         }
 
 
@@ -125,8 +125,8 @@ namespace sr::detail
 
     private:
 
-        EF m_exitfunction;
-        bool m_execute_on_destruction;
+        EF exitfunction;
+        bool execute_on_destruction;
     };
 
 }

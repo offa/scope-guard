@@ -129,7 +129,7 @@ TEST_CASE("reset sets new lvalue and calls deleter on previous", "[UniqueResourc
 {
     REQUIRE_CALL(m, deleter(3));
     REQUIRE_CALL(m, deleter(7));
-    auto d = [](const auto& v) { deleter(v.m_value); };
+    auto d = [](const auto& v) { deleter(v.value); };
     auto guard = sr::unique_resource{NotNothrowAssignable{3}, d};
     const NotNothrowAssignable h{7};
     guard.reset(h);
@@ -139,7 +139,7 @@ TEST_CASE("reset handles exception on assignment", "[UniqueResource]")
 {
     REQUIRE_CALL(m, deleter(3));
     REQUIRE_CALL(m, deleter(7));
-    auto d = [](const auto& v) { deleter(v.m_handle); };
+    auto d = [](const auto& v) { deleter(v.handle); };
     auto guard = sr::unique_resource{ConditialThrowOnCopyMock{3, false}, d};
     guard.reset(ConditialThrowOnCopyMock{7, true});
 }

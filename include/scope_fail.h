@@ -34,11 +34,11 @@ namespace sr
         {
             bool should_execute() const noexcept
             {
-                return std::uncaught_exceptions() > m_uncaught_on_creation;
+                return std::uncaught_exceptions() > uncaught_on_creation;
             }
 
 
-            int m_uncaught_on_creation = std::uncaught_exceptions();
+            int uncaught_on_creation = std::uncaught_exceptions();
         };
 
     }

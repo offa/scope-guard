@@ -65,22 +65,22 @@ namespace mock
 
     struct NotNothrowMoveMock
     {
-        explicit NotNothrowMoveMock(CallMock* m) : m_mock(m)
+        explicit NotNothrowMoveMock(CallMock* m) : mock(m)
         {
         }
 
-        NotNothrowMoveMock(const NotNothrowMoveMock& other) : m_mock(other.m_mock)
+        NotNothrowMoveMock(const NotNothrowMoveMock& other) : mock(other.mock)
         {
         }
 
-        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : m_mock(other.m_mock)
+        NotNothrowMoveMock(NotNothrowMoveMock&& other) noexcept(false) : mock(other.mock)
         {
         }
 
 
         void operator()() const
         {
-            m_mock->deleter();
+            mock->deleter();
         }
 
         NotNothrowMoveMock& operator=(const NotNothrowMoveMock&)
@@ -94,21 +94,21 @@ namespace mock
         }
 
 
-        CallMock* m_mock;
+        CallMock* mock;
     };
 
 
     struct ConditialThrowOnCopyMock
     {
-        explicit ConditialThrowOnCopyMock(Handle h, bool shouldThrow) : m_handle(h),
-                                                                    m_shouldThrow(shouldThrow)
+        explicit ConditialThrowOnCopyMock(Handle h, bool throwOnCopyMock) : handle(h),
+                                                                    shouldThrow(throwOnCopyMock)
         {
         }
 
-        ConditialThrowOnCopyMock(const ConditialThrowOnCopyMock& other) : m_handle(other.m_handle),
-                                                                    m_shouldThrow(other.m_shouldThrow)
+        ConditialThrowOnCopyMock(const ConditialThrowOnCopyMock& other) : handle(other.handle),
+                                                                    shouldThrow(other.shouldThrow)
         {
-            if( m_shouldThrow == true )
+            if( shouldThrow == true )
             {
                 throw std::exception{};
             }
@@ -120,10 +120,10 @@ namespace mock
         {
             if( &other != this )
             {
-                m_handle = other.m_handle;
-                m_shouldThrow = other.m_shouldThrow;
+                handle = other.handle;
+                shouldThrow = other.shouldThrow;
 
-                if( m_shouldThrow == true )
+                if( shouldThrow == true )
                 {
                     throw std::exception{};
                 }
@@ -135,31 +135,31 @@ namespace mock
         ConditialThrowOnCopyMock& operator=(ConditialThrowOnCopyMock&&) = default;
 
 
-        Handle m_handle;
-        bool m_shouldThrow;
+        Handle handle;
+        bool shouldThrow;
     };
 
 
     struct NotNothrowAssignable
     {
-        explicit NotNothrowAssignable(int value) : m_value(value) { }
+        explicit NotNothrowAssignable(int v) : value(v) { }
         NotNothrowAssignable(const NotNothrowAssignable&) = default;
 
         NotNothrowAssignable& operator=(const NotNothrowAssignable& other)
         {
             if( this != &other )
             {
-                assignNotNoexcept(other.m_value);
+                assignNotNoexcept(other.value);
             }
             return *this;
         }
 
-        void assignNotNoexcept(int value) noexcept(false)
+        void assignNotNoexcept(int v) noexcept(false)
         {
-            m_value = value;
+            value = v;
         }
 
-        int m_value;
+        int value;
     };
 
     struct CopyMock
