@@ -22,7 +22,7 @@
 
 #include "unique_resource.h"
 #include "CallMocks.h"
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <trompeloeil.hpp>
 
 using namespace mock;

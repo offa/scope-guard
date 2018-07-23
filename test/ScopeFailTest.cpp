@@ -22,7 +22,7 @@
 
 #include "scope_fail.h"
 #include "CallMocks.h"
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 using namespace mock;
 using namespace trompeloeil;
