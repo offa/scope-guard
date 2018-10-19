@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-17-green.svg)
 
-Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R8**][2] (former [N3949][1]).
+Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R9**][2] (former [N3949][1]).
 
 
 ## Compatibility
@@ -21,7 +21,7 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 
 ## Documentation
 
-- [*P0052R8 - Generic Scope Guard and RAII Wrapper for the Standard Library*][2] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
+- [*P0052R9 - Generic Scope Guard and RAII Wrapper for the Standard Library*][2] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
 - [*N3949 - Scoped Resource - Generic RAII Wrapper for the Standard Library*][1] (P. Sommerlad, A. L. Sandoval)
 
 
@@ -52,4 +52,4 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 
 
 [1]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3949.pdf
-[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0052r8.pdf
+[2]: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0052r9.pdf
