@@ -51,11 +51,11 @@ namespace sr
                                 && (std::is_nothrow_constructible_v<R, RR> || std::is_constructible_v<R, RR&>)
                                 && (std::is_nothrow_constructible_v<D, DD> || std::is_constructible_v<D, DD&>)), int> = 0
                 >
-        explicit unique_resource(RR&& r, DD&& d) noexcept((std::is_nothrow_constructible_v<R, RR> || std::is_nothrow_constructible_v<R, RR&>)
-                                                            && (std::is_nothrow_constructible_v<D, DD> || std::is_nothrow_constructible_v<D, DD&>))
-                                                : resource(detail::forward_if_nothrow_constructible<R, RR>(std::forward<RR>(r)), scope_exit{[&r, &d] { d(r); }}),
-                                                deleter(detail::forward_if_nothrow_constructible<D, DD>(std::forward<DD>(d)), scope_exit{[this, &d] { d(get()); }}),
-                                                execute_on_reset(true)
+        unique_resource(RR&& r, DD&& d) noexcept((std::is_nothrow_constructible_v<R, RR> || std::is_nothrow_constructible_v<R, RR&>)
+                                                    && (std::is_nothrow_constructible_v<D, DD> || std::is_nothrow_constructible_v<D, DD&>))
+                                        : resource(detail::forward_if_nothrow_constructible<R, RR>(std::forward<RR>(r)), scope_exit{[&r, &d] { d(r); }}),
+                                        deleter(detail::forward_if_nothrow_constructible<D, DD>(std::forward<DD>(d)), scope_exit{[this, &d] { d(get()); }}),
+                                        execute_on_reset(true)
         {
         }
 
