@@ -55,7 +55,7 @@ namespace sr
                                                             && (std::is_nothrow_constructible_v<D, DD> || std::is_nothrow_constructible_v<D, DD&>))
                                                 : resource(detail::forward_if_nothrow_constructible<R, RR>(std::forward<RR>(r)), scope_exit{[&r, &d] { d(r); }}),
                                                 deleter(detail::forward_if_nothrow_constructible<D, DD>(std::forward<DD>(d)), scope_exit{[this, &d] { d(get()); }}),
-                                                execute_on_destruction(true)
+                                                execute_on_reset(true)
         {
         }
 
@@ -65,7 +65,7 @@ namespace sr
                                                 deleter(std::move_if_noexcept(other.deleter.get()), scope_exit{[&other] {
                                                                                                             other.get_deleter()(other.resource.get());
                                                                                                             other.release(); }}),
-                                                execute_on_destruction(std::exchange(other.execute_on_destruction, false))
+                                                execute_on_reset(std::exchange(other.execute_on_reset, false))
         {
         }
 
@@ -79,9 +79,9 @@ namespace sr
 
         void reset() noexcept
         {
-            if( execute_on_destruction == true )
+            if( execute_on_reset == true )
             {
-                execute_on_destruction = false;
+                execute_on_reset = false;
                 get_deleter()(resource.get());
             }
         }
@@ -103,13 +103,13 @@ namespace sr
                 resource.reset(std::as_const(r));
             }
 
-            execute_on_destruction = true;
+            execute_on_reset = true;
             se.release();
         }
 
         void release() noexcept
         {
-            execute_on_destruction = false;
+            execute_on_reset = false;
         }
 
         const R& get() const noexcept
@@ -177,7 +177,7 @@ namespace sr
                     }
                 }
 
-                execute_on_destruction = std::exchange(other.execute_on_destruction, false);
+                execute_on_reset = std::exchange(other.execute_on_reset, false);
             }
             return *this;
         }
@@ -189,7 +189,7 @@ namespace sr
 
         detail::Wrapper<R> resource;
         detail::Wrapper<D> deleter;
-        bool execute_on_destruction;
+        bool execute_on_reset;
     };
 
 
