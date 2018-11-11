@@ -168,5 +168,28 @@ namespace mock
         CopyMock(const CopyMock&) { }
     };
 
+    struct ConditionalThrowOnCopyDeleter
+    {
+        ConditionalThrowOnCopyDeleter() { }
+
+        ConditionalThrowOnCopyDeleter(const ConditionalThrowOnCopyDeleter&)
+        {
+            if( throwOnNextCopy == true )
+            {
+                throw std::exception{};
+            }
+            throwOnNextCopy = false;
+        }
+
+        MAKE_CONST_MOCK1(deleter, void(Handle));
+
+        void operator()(Handle h) const
+        {
+            this->deleter(h);
+        }
+
+        static inline bool throwOnNextCopy{false};
+    };
+
 }
 

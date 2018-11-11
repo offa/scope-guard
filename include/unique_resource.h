@@ -63,7 +63,10 @@ namespace sr
                                                             && std::is_nothrow_move_constructible_v<D>)
                                                 : resource(std::move_if_noexcept(other.resource.get()), scope_exit{[] { }}),
                                                 deleter(std::move_if_noexcept(other.deleter.get()), scope_exit{[&other] {
-                                                                                                            other.get_deleter()(other.resource.get());
+                                                                                                            if( other.execute_on_reset == true )
+                                                                                                            {
+                                                                                                                other.get_deleter()(other.resource.get());
+                                                                                                            }
                                                                                                             other.release(); }}),
                                                 execute_on_reset(std::exchange(other.execute_on_reset, false))
         {

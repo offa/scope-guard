@@ -81,6 +81,15 @@ TEST_CASE("move-construction with copy", "[UniqueResource]")
     [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
+TEST_CASE("move-construction prevents double release", "[UniqueResource]")
+{
+    auto movedFrom = sr::unique_resource{Handle{3}, ConditionalThrowOnCopyDeleter{}};
+    movedFrom.release();
+    ConditionalThrowOnCopyDeleter::throwOnNextCopy = true;
+
+    REQUIRE_THROWS([&movedFrom] { [[maybe_unused]] auto guard = std::move(movedFrom); }());
+}
+
 TEST_CASE("move assignment calls deleter", "[UniqueResource]")
 {
     auto moveFrom = sr::unique_resource{Handle{3}, deleter};
