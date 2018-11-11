@@ -149,8 +149,8 @@ TEST_CASE("reset handles exception on assignment", "[UniqueResource]")
     REQUIRE_CALL(m, deleter(3));
     REQUIRE_CALL(m, deleter(7));
     auto d = [](const auto& v) { deleter(v.handle); };
-    auto guard = sr::unique_resource{ConditialThrowOnCopyMock{3, false}, d};
-    guard.reset(ConditialThrowOnCopyMock{7, true});
+    auto guard = sr::unique_resource{ConditionalThrowOnCopyMock{3, false}, d};
+    guard.reset(ConditionalThrowOnCopyMock{7, true});
 }
 
 TEST_CASE("release disables deleter", "[UniqueResource]")

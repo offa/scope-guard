@@ -98,14 +98,14 @@ namespace mock
     };
 
 
-    struct ConditialThrowOnCopyMock
+    struct ConditionalThrowOnCopyMock
     {
-        explicit ConditialThrowOnCopyMock(Handle h, bool throwOnCopyMock) : handle(h),
+        explicit ConditionalThrowOnCopyMock(Handle h, bool throwOnCopyMock) : handle(h),
                                                                     shouldThrow(throwOnCopyMock)
         {
         }
 
-        ConditialThrowOnCopyMock(const ConditialThrowOnCopyMock& other) : handle(other.handle),
+        ConditionalThrowOnCopyMock(const ConditionalThrowOnCopyMock& other) : handle(other.handle),
                                                                     shouldThrow(other.shouldThrow)
         {
             if( shouldThrow == true )
@@ -114,9 +114,9 @@ namespace mock
             }
         }
 
-        ConditialThrowOnCopyMock(ConditialThrowOnCopyMock&&) = default;
+        ConditionalThrowOnCopyMock(ConditionalThrowOnCopyMock&&) = default;
 
-        ConditialThrowOnCopyMock& operator=(const ConditialThrowOnCopyMock& other)
+        ConditionalThrowOnCopyMock& operator=(const ConditionalThrowOnCopyMock& other)
         {
             if( &other != this )
             {
@@ -132,7 +132,7 @@ namespace mock
             return *this;
         }
 
-        ConditialThrowOnCopyMock& operator=(ConditialThrowOnCopyMock&&) = default;
+        ConditionalThrowOnCopyMock& operator=(ConditionalThrowOnCopyMock&&) = default;
 
 
         Handle handle;
