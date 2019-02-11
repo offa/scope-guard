@@ -1,7 +1,7 @@
 /*
  * Trompeloeil C++ mocking framework
  *
- * Copyright Björn Fahller 2014-2018
+ * Copyright Björn Fahller 2014-2019
  * Copyright (C) 2017, 2018 Andrew Paxie
  *
  *  Use, modification and distribution is subject to the
@@ -294,6 +294,8 @@
   /**/
 
 #endif /* !(TROMPELOEIL_CPLUSPLUS == 201103L) */
+
+static constexpr bool trompeloeil_movable_mock = false;
 
 namespace trompeloeil
 {
@@ -1053,7 +1055,9 @@ template <typename T>
   };
 
   template <typename T, typename U>
-  using equality_comparison = decltype(std::declval<T>() == std::declval<U>());
+  using equality_comparison = decltype((std::declval<T>() == std::declval<U>())
+                                       ? true
+                                       : false);
 
   template <typename T, typename U>
   using is_equal_comparable = is_detected<equality_comparison, T, U>;
@@ -1186,10 +1190,11 @@ template <typename T>
     {
       os << "{ ";
       const char* sep = "";
-      for (auto& elem : t)
+      auto const end = std::end(t);
+      for (auto i = std::begin(t); i != end; ++i)
       {
         os << sep;
-        ::trompeloeil::print(os, elem);
+        ::trompeloeil::print(os, *i);
         sep = ", ";
       }
       os << " }";
@@ -2016,17 +2021,33 @@ template <typename T>
     return {std::move(pred), std::move(print), std::forward<T>(t)...};
   }
 
+
   template <
     typename T,
     typename R = make_matcher_return<T, lambdas::any_predicate, lambdas::any_printer>>
   inline
   auto
-  any_matcher(char const* type_name)
+  any_matcher_impl(char const* type_name, std::false_type)
   TROMPELOEIL_TRAILING_RETURN_TYPE(R)
   {
     return make_matcher<T>(lambdas::any_predicate(), lambdas::any_printer(type_name));
   }
 
+  template <typename T>
+  wildcard
+  any_matcher_impl(char const*, std::true_type);
+
+  template <typename T>
+  inline
+  auto
+  any_matcher(char const* name)
+  TROMPELOEIL_TRAILING_RETURN_TYPE(decltype(any_matcher_impl<T>(name, std::is_array<T>{})))
+  {
+    static_assert(!std::is_array<T>::value,
+                  "array parameter type decays to pointer type for ANY()"
+                  " matcher. Please rephrase as pointer instead");
+    return any_matcher_impl<T>(name, std::is_array<T>{});
+  }
   template <
     typename T = wildcard,
     typename V,
@@ -3857,25 +3878,46 @@ template <typename T>
     }
   };
 
-  template <typename Sig>
+  template <bool movable, typename Sig>
   struct expectations
   {
+    expectations() = default;
+    expectations(expectations&&) = default;
     ~expectations() {
       active.decommission();
       saturated.decommission();
     }
-    call_matcher_list<Sig> active;
-    call_matcher_list<Sig> saturated;
+    call_matcher_list<Sig> active{};
+    call_matcher_list<Sig> saturated{};
+  };
+
+  template <typename Sig>
+  struct expectations<false, Sig>
+  {
+    expectations() = default;
+    expectations(expectations&&)
+    {
+      static_assert(std::is_same<Sig,void>::value,
+        "By default, mock objects are not movable. "
+        "To make a mock object movable, see: "
+        "https://github.com/rollbear/trompeloeil/blob/master/docs/reference.md#movable_mock");
+    }
+    ~expectations() {
+      active.decommission();
+      saturated.decommission();
+    }
+    call_matcher_list<Sig> active{};
+    call_matcher_list<Sig> saturated{};
   };
 
   template <typename Sig, typename ... P>
   return_of_t<Sig> mock_func(std::false_type, P&& ...);
 
 
-  template <typename Sig, typename ... P>
+  template <bool movable, typename Sig, typename ... P>
   return_of_t<Sig>
   mock_func(std::true_type,
-            expectations<Sig>& e,
+            expectations<movable, Sig>& e,
             char const *func_name,
             char const *sig_name,
             P&& ... p)
@@ -3965,6 +4007,9 @@ template <typename T>
     using T::T;
  };
 
+#if defined(TROMPELOEIL_USER_DEFINED_COMPILE_TIME_REPORTER)
+ extern template struct reporter<specialized>;
+#endif // TROMPELOEIL_USER_DEFINED_COMPILE_TIME_REPORTER
 }
 
 #define TROMPELOEIL_LINE_ID(name)                                        \
@@ -4189,7 +4234,9 @@ template <typename T>
   static_assert(TROMPELOEIL_LINE_ID(cardinality_match)::value,                 \
                 "Function signature does not have " #num " parameters");       \
   using TROMPELOEIL_LINE_ID(matcher_list_t) = ::trompeloeil::call_matcher_list<sig>;\
-  using TROMPELOEIL_LINE_ID(expectation_list_t) = ::trompeloeil::expectations<sig>; \
+  using TROMPELOEIL_LINE_ID(expectation_list_t) =                              \
+    ::trompeloeil::expectations<trompeloeil_movable_mock, sig>;                \
+                                                                               \
   struct TROMPELOEIL_LINE_ID(tag_type_trompeloeil)                             \
   {                                                                            \
     const char* trompeloeil_expectation_file;                                  \
@@ -4246,21 +4293,22 @@ template <typename T>
     using T_ ## name = typename std::remove_reference<decltype(*this)>::type;  \
                                                                                \
     using pmf_s_t = typename ::trompeloeil::signature_to_member_function<      \
-      T_ ## name, decltype(*this), sig>::type;                                 \
+      T_ ## name, decltype(*this), sig>::type const;                           \
                                                                                \
     using pmf_e_t = typename ::trompeloeil::signature_to_member_function<      \
-      T_ ## name, TROMPELOEIL_LINE_ID(tag_type_trompeloeil), sig>::type;       \
+      T_ ## name, TROMPELOEIL_LINE_ID(tag_type_trompeloeil), sig>::type const; \
                                                                                \
-    auto s_ptr = static_cast<pmf_s_t>(&T_ ## name::trompeloeil_self_ ## name); \
-    auto e_ptr = static_cast<pmf_e_t>(&T_ ## name::trompeloeil_tag_ ## name);  \
+    pmf_s_t const s_ptr = &T_ ## name::trompeloeil_self_ ## name;              \
+    pmf_e_t const e_ptr = &T_ ## name::trompeloeil_tag_ ## name;               \
                                                                                \
     ::trompeloeil::ignore(s_ptr, e_ptr);                                       \
                                                                                \
-    return ::trompeloeil::mock_func<sig>(TROMPELOEIL_LINE_ID(cardinality_match){},  \
-                                         TROMPELOEIL_LINE_ID(expectations),    \
-                                         #name,                                \
-                                         #sig                                  \
-                                         TROMPELOEIL_PARAMS(num));             \
+    return ::trompeloeil::mock_func<trompeloeil_movable_mock, sig>(            \
+                                    TROMPELOEIL_LINE_ID(cardinality_match){},  \
+                                    TROMPELOEIL_LINE_ID(expectations),         \
+                                    #name,                                     \
+                                    #sig                                       \
+                                    TROMPELOEIL_PARAMS(num));                  \
   }                                                                            \
                                                                                \
   auto                                                                         \
@@ -4278,7 +4326,7 @@ template <typename T>
     return {nullptr, 0ul, nullptr};                                            \
   }                                                                            \
                                                                                \
-  mutable TROMPELOEIL_LINE_ID(expectation_list_t) TROMPELOEIL_LINE_ID(expectations)
+  mutable TROMPELOEIL_LINE_ID(expectation_list_t) TROMPELOEIL_LINE_ID(expectations){}
 
 
 #define TROMPELOEIL_LPAREN (
@@ -4312,8 +4360,10 @@ template <typename T>
 #define TROMPELOEIL_REQUIRE_CALL_V_LAMBDA(obj, func, obj_s, func_s, ...)       \
   [&]                                                                          \
   {                                                                            \
-    using s_t = decltype((obj).TROMPELOEIL_CONCAT(trompeloeil_self_, func));   \
-    using e_t = decltype((obj).TROMPELOEIL_CONCAT(trompeloeil_tag_,func));     \
+    using trompeloeil_s_t = decltype((obj)                                     \
+                              .TROMPELOEIL_CONCAT(trompeloeil_self_, func));   \
+    using trompeloeil_e_t = decltype((obj)                                     \
+                              .TROMPELOEIL_CONCAT(trompeloeil_tag_,func));     \
                                                                                \
     return TROMPELOEIL_REQUIRE_CALL_LAMBDA_OBJ(obj, func, obj_s, func_s)       \
       __VA_ARGS__                                                              \
@@ -4322,10 +4372,10 @@ template <typename T>
 
 
 #define TROMPELOEIL_REQUIRE_CALL_LAMBDA_OBJ(obj, func, obj_s, func_s)          \
-  ::trompeloeil::call_validator_t<s_t>{(obj)} +                                \
+  ::trompeloeil::call_validator_t<trompeloeil_s_t>{(obj)} +                    \
       ::trompeloeil::detail::conditional_t<false,                              \
                                            decltype((obj).func),               \
-                                           e_t>                                \
+                                           trompeloeil_e_t>                    \
     {__FILE__, static_cast<unsigned long>(__LINE__), obj_s "." func_s}.func
 
 
@@ -4494,7 +4544,8 @@ template <typename T>
 #define TROMPELOEIL_WITH_(capture, arg_s, ...)                                 \
   with(                                                                        \
     arg_s,                                                                     \
-    [capture](e_t::trompeloeil_call_params_type_t const& trompeloeil_x)        \
+    [capture]                                                                  \
+    (trompeloeil_e_t::trompeloeil_call_params_type_t const& trompeloeil_x)     \
     {                                                                          \
       auto& _1 = ::trompeloeil::mkarg<1>(trompeloeil_x);                       \
       auto& _2 = ::trompeloeil::mkarg<2>(trompeloeil_x);                       \
@@ -4550,7 +4601,7 @@ template <typename T>
 
 #define TROMPELOEIL_SIDE_EFFECT_(capture, ...)                                 \
   sideeffect(                                                                  \
-    [capture](e_t::trompeloeil_call_params_type_t& trompeloeil_x) {            \
+    [capture](trompeloeil_e_t::trompeloeil_call_params_type_t& trompeloeil_x) {\
       auto& _1 = ::trompeloeil::mkarg<1>(trompeloeil_x);                       \
       auto& _2 = ::trompeloeil::mkarg<2>(trompeloeil_x);                       \
       auto& _3 = ::trompeloeil::mkarg<3>(trompeloeil_x);                       \
@@ -4605,8 +4656,8 @@ template <typename T>
 
 #define TROMPELOEIL_RETURN_(capture, ...)                                      \
   handle_return(                                                               \
-    [capture](e_t::trompeloeil_call_params_type_t& trompeloeil_x)              \
-      -> e_t::trompeloeil_return_of_t                                          \
+    [capture](trompeloeil_e_t::trompeloeil_call_params_type_t& trompeloeil_x)  \
+      -> trompeloeil_e_t::trompeloeil_return_of_t                              \
     {                                                                          \
       auto& _1 = ::trompeloeil::mkarg<1>(trompeloeil_x);                       \
       auto& _2 = ::trompeloeil::mkarg<2>(trompeloeil_x);                       \
@@ -4662,7 +4713,7 @@ template <typename T>
 
 #define TROMPELOEIL_THROW_(capture, ...)                                       \
   handle_throw(                                                                \
-    [capture](e_t::trompeloeil_call_params_type_t& trompeloeil_x) {            \
+    [capture](trompeloeil_e_t::trompeloeil_call_params_type_t& trompeloeil_x) {\
       auto& _1 = ::trompeloeil::mkarg<1>(trompeloeil_x);                       \
       auto& _2 = ::trompeloeil::mkarg<2>(trompeloeil_x);                       \
       auto& _3 = ::trompeloeil::mkarg<3>(trompeloeil_x);                       \
