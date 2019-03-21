@@ -15,6 +15,7 @@ matrix:
     include:
     - env: COMPILER=gcc-8
     - env: COMPILER=gcc-7
+    - env: COMPILER=clang-8
     - env: COMPILER=clang-7
     - env: COMPILER=clang-6
     - env: COMPILER=clang-5
