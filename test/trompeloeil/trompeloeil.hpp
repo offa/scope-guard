@@ -276,6 +276,11 @@
 
 #define TROMPELOEIL_PARAMS(num) TROMPELOEIL_CONCAT(TROMPELOEIL_PARAMS, num)
 
+#if defined(__cxx_rtti) || defined(__GXX_RTTI) || defined(_CPPRTTI)
+#  define TROMPELOEIL_TYPE_ID_NAME(x) typeid(x).name()
+#else
+#  define TROMPELOEIL_TYPE_ID_NAME(x) "object"
+#endif
 
 #if (TROMPELOEIL_CPLUSPLUS == 201103L)
 
@@ -654,23 +659,22 @@ namespace trompeloeil
 
   class specialized;
 
-  namespace {
-    inline
-    const std::shared_ptr<std::recursive_mutex>&
-    get_mutex_obj()
-    {
-      static auto obj = std::make_shared<std::recursive_mutex>();
-      return obj;
-    }
-
-    auto mutex_holder = get_mutex_obj();
-
-  }
+  template <typename T>
+  using aligned_storage_for =
+    typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
   template <typename T = void>
   std::unique_lock<std::recursive_mutex> get_lock()
   {
-    return std::unique_lock<std::recursive_mutex>{ *get_mutex_obj() };
+    // Ugly hack for lifetime of mutex. The statically allocated
+    // recursive_mutex is intentionally leaked, to ensure that the
+    // mutex is available and valid even if the last use is from
+    // the destructor of a global object in a translation unit
+    // without #include <trompeloeil.hpp>
+
+    static aligned_storage_for<std::recursive_mutex> buffer;
+    static auto mutex = new (&buffer) std::recursive_mutex;
+    return std::unique_lock<std::recursive_mutex>{*mutex};
   }
 
   template <size_t N, typename T>
@@ -1638,6 +1642,7 @@ template <typename T>
     , exp_loc(loc)
     , seq(*i.second)
     {
+      auto lock = get_lock();
       seq.add_last(this);
     }
 
@@ -2547,7 +2552,7 @@ template <typename T>
     }
     std::ostringstream os;
     os << "Unexpected destruction of "
-       << typeid(T).name() << "@" << this << '\n';
+       << TROMPELOEIL_TYPE_ID_NAME(T) << "@" << this << '\n';
     send_report<specialized>(severity::nonfatal,
                              location{},
                              os.str());
