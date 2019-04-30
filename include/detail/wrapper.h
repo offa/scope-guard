@@ -27,14 +27,21 @@
 
 namespace sr::detail
 {
+    struct NoopGuard
+    {
+        constexpr void release() const
+        {
+        }
+    };
+
 
    template<class T>
    class Wrapper
    {
    public:
 
-        template<class TT, class G, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
-        Wrapper(TT&& v, G&& g) noexcept(std::is_nothrow_constructible_v<T, TT>) : value(std::forward<TT>(v))
+        template<class TT, class G = NoopGuard, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
+        Wrapper(TT&& v, G&& g = G{}) noexcept(std::is_nothrow_constructible_v<T, TT>) : value(std::forward<TT>(v))
         {
             g.release();
         }
@@ -80,8 +87,8 @@ namespace sr::detail
    {
    public:
 
-        template<class TT, class G, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
-        Wrapper(TT&& v, G&& g) noexcept(std::is_nothrow_constructible_v<TT, T&>) : value(static_cast<T&>(v))
+        template<class TT, class G = NoopGuard, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
+        Wrapper(TT&& v, G&& g = G{}) noexcept(std::is_nothrow_constructible_v<TT, T&>) : value(static_cast<T&>(v))
         {
             g.release();
         }

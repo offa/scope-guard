@@ -47,8 +47,8 @@ namespace sr
     public:
 
         unique_resource()
-            : resource(R{}, scope_exit{[] { }}),
-            deleter(D{}, scope_exit{[] { }}),
+            : resource(R{}),
+            deleter(D{}),
             execute_on_reset(false)
         {
         }
@@ -68,7 +68,7 @@ namespace sr
 
         unique_resource(unique_resource&& other) noexcept(std::is_nothrow_move_constructible_v<R>
                                                             && std::is_nothrow_move_constructible_v<D>)
-                                                : resource(std::move_if_noexcept(other.resource.get()), scope_exit{[] { }}),
+                                                : resource(std::move_if_noexcept(other.resource.get())),
                                                 deleter(std::move_if_noexcept(other.deleter.get()), scope_exit{[&other] {
                                                                                                             if( other.execute_on_reset == true )
                                                                                                             {
