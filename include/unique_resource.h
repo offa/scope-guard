@@ -205,10 +205,9 @@ namespace sr
                                                             noexcept(std::is_nothrow_constructible_v<std::decay_t<R>, R>
                                                                     && std::is_nothrow_constructible_v<std::decay_t<D>, D>)
     {
-        const bool must_release{r == invalid};
         unique_resource<std::decay_t<R>, std::decay_t<D>> ur{std::forward<R>(r), std::forward<D>(d)};
 
-        if( must_release == true )
+        if( bool(r == invalid) == true )
         {
             ur.release();
         }
