@@ -37,11 +37,9 @@ namespace sr::detail
 
 
     template<class F, class S>
-    struct is_noexcept_dtor
+    struct is_noexcept_dtor : public std::true_type
     {
-        static inline constexpr bool value = true;
     };
-
 
     template<class F, class S>
     inline constexpr bool is_noexcept_dtor_v = is_noexcept_dtor<F, S>::value;
