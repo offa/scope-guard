@@ -38,6 +38,11 @@ namespace
     }
 }
 
+TEST_CASE("default construction", "[UniqueResource]")
+{
+    sr::unique_resource<int, MoveableMock> guard{};
+}
+
 TEST_CASE("construction with move", "[UniqueResource]")
 {
     REQUIRE_CALL(m, deleter(3));

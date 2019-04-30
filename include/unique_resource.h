@@ -46,6 +46,13 @@ namespace sr
     {
     public:
 
+        unique_resource()
+            : resource(R{}, scope_exit{[] { }}),
+            deleter(D{}, scope_exit{[] { }}),
+            execute_on_reset(false)
+        {
+        }
+
         template<class RR, class DD,
                 std::enable_if_t<(std::is_constructible_v<R ,RR> && std::is_constructible_v<D, DD>
                                 && (std::is_nothrow_constructible_v<R, RR> || std::is_constructible_v<R, RR&>)

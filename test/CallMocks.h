@@ -37,6 +37,19 @@ namespace mock
     };
 
 
+    struct MoveableMock
+    {
+        static constexpr bool trompeloeil_movable_mock = true;
+
+        MAKE_CONST_MOCK1(deleter, void(Handle));
+
+        void operator()(Handle h) const
+        {
+            this->deleter(h);
+        }
+    };
+
+
     struct ThrowOnCopyMock
     {
         ThrowOnCopyMock()
