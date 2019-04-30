@@ -40,7 +40,7 @@ namespace
 
 TEST_CASE("default construction", "[UniqueResource]")
 {
-    sr::unique_resource<int, MoveableMock> guard{};
+    [[maybe_unused]] sr::unique_resource<int, MoveableMock> guard{};
 }
 
 TEST_CASE("construction with move", "[UniqueResource]")
