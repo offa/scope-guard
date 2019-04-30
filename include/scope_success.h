@@ -44,8 +44,8 @@ namespace sr
 
         template<class F>
         struct is_noexcept_dtor<F, scope_success_strategy>
+            : public std::conditional_t<noexcept(std::declval<F>()()), std::true_type, std::false_type>
         {
-            static inline constexpr bool value = noexcept(std::declval<F>()());
         };
 
     }
