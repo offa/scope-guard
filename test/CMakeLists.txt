@@ -1,11 +1,8 @@
 find_package(Catch2 REQUIRED)
-
-add_library(Trompeloeil INTERFACE)
-target_include_directories(Trompeloeil INTERFACE "trompeloeil")
-
+find_package(trompeloeil REQUIRED)
 
 add_library(TestMain TestMain.cpp)
-target_link_libraries(TestMain PUBLIC Catch2::Catch2 Trompeloeil)
+target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil::trompeloeil)
 
 
 function(add_test_suite name)

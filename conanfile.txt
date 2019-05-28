@@ -1,6 +1,8 @@
 [requires]
 Catch2/2.8.0@catchorg/stable
+trompeloeil/v34@rollbear/stable 
 
 [generators]
 cmake_find_package
 cmake_paths
+
