@@ -6,6 +6,10 @@ set -ex
 apt-get install -y python3-pip
 pip3 install conan
 
+# #156 Workaround for conan#4938
+mkdir -p ~/.conan
+cp script/settings.yml ~/.conan/
+
 
 if [[ "${CXX}" == clang* ]]
 then
