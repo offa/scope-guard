@@ -14,10 +14,13 @@ cp script/settings.yml ~/.conan/
 if [[ "${CXX}" == clang* ]]
 then
     export CXXFLAGS="-stdlib=libc++"
+    CONAN_STDLIB=libc++
+else
+    CONAN_STDLIB=libstdc++11
 fi
 
 mkdir build && cd build
-conan install --build missing -s compiler.libcxx=libstdc++11 ..
+conan install --build missing -s compiler.libcxx=${CONAN_STDLIB} ..
 
 cmake ..
 make
