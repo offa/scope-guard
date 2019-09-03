@@ -18,7 +18,8 @@ fi
 mkdir build && cd build
 conan install --build missing \
     -s compiler.libcxx=${CONAN_STDLIB} \
-    -g cmake_find_package cmake_find_paths \
+    -g cmake_find_package \
+    -g cmake_paths \
     ..
 
 cmake ..
