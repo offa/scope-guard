@@ -5,12 +5,12 @@ from conans import ConanFile, CMake, tools
 
 class ScopeguardConan(ConanFile):
     name = "scope-guard"
-    version = "0.3.5"
+    version = "v0.3.4"
     license = "MIT"
     author = "offa <offa@github>"
     url = "https://github.com.offa/scope-guard"
     description = "Implementation of Scoped Guards and Unique Resource as proposed in P0052."
-    homepage = "https://github.com/mrtazz/restclient-cpp"
+    homepage = "https://github.com/offa/scope-guard"
     topics = ("cpp", "cpp17", "p0052", "scope-guard",
               "scope-exit", "scope-fail", "scope-success", "unique-resource", "cmake")
     no_copy_source = True
