@@ -1,6 +1,4 @@
-import os
-
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, CMake
 
 
 class ScopeguardConan(ConanFile):
@@ -25,7 +23,6 @@ class ScopeguardConan(ConanFile):
         "Catch2/2.9.2@catchorg/stable",
         "trompeloeil/v34@rollbear/stable"
     )
-
 
     def _configure_cmake(self):
         cmake = CMake(self)
