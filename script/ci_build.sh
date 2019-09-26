@@ -16,7 +16,8 @@ else
 fi
 
 mkdir build && cd build
-conan install --build missing \
+
+conan install \
     -s compiler.libcxx=${CONAN_STDLIB} \
     -g cmake_find_package \
     -g cmake_paths \
