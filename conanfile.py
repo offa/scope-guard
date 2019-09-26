@@ -21,7 +21,7 @@ class ScopeguardConan(ConanFile):
     }
     requires = (
         "Catch2/2.9.2@catchorg/stable",
-        "trompeloeil/v34@rollbear/stable"
+        "trompeloeil/v35@rollbear/stable"
     )
 
     def _configure_cmake(self):
