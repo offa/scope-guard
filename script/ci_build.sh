@@ -16,7 +16,7 @@ else
 fi
 
 mkdir build && cd build
-conan install --build missing -s compiler.libcxx=${CONAN_STDLIB} ..
+conan install -s compiler.libcxx=${CONAN_STDLIB} ..
 
 cmake ..
 make
