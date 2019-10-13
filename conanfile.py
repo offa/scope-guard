@@ -23,9 +23,19 @@ class ScopeguardConan(ConanFile):
         "Catch2/2.9.2@catchorg/stable",
         "trompeloeil/v35@rollbear/stable"
     )
+    options = {
+        "unittest": ["ON", "OFF"],
+        "enable_compat_header": ["ON", "OFF"]
+    }
+    default_options = (
+        "unittest=ON",
+        "enable_compat_header=OFF"
+    )
 
     def _configure_cmake(self):
         cmake = CMake(self)
+        cmake.definitions["UNITTEST"] = self.options.unittest
+        cmake.definitions["ENABLE_COMPAT_HEADER"] = self.options.enable_compat_header
         cmake.configure(source_folder=self._source_dir, build_folder="build")
         return cmake
 
