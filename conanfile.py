@@ -21,7 +21,7 @@ class ScopeguardConan(ConanFile):
     }
     requires = (
         "Catch2/2.11.1@catchorg/stable",
-        "trompeloeil/v35@rollbear/stable"
+        "trompeloeil/v36@rollbear/stable"
     )
     options = {
         "unittest": ["ON", "OFF"],
