@@ -21,6 +21,7 @@ add_compile_options(-Wall
                     -Wextra
                     -pedantic
                     -Werror
+                    -pedantic-errors
                     -Wshadow
                     -Wold-style-cast
                     )
@@ -57,4 +58,3 @@ if( UNITTEST )
 endif()
 
 include(Install)
-
