@@ -20,10 +20,13 @@ endif()
 add_compile_options(-Wall
                     -Wextra
                     -pedantic
-                    -Werror
                     -pedantic-errors
+                    -Werror
                     -Wshadow
                     -Wold-style-cast
+                    -Wnull-dereference
+                    -Wnon-virtual-dtor
+                    -Woverloaded-virtual
                     )
 
 
