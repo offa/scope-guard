@@ -10,7 +10,7 @@ env:
     - DOCKER_IMG="registry.gitlab.com/offa/docker-images"
 
 
-matrix:
+jobs:
     include:
     - env: COMPILER=gcc-9
     - env: COMPILER=gcc-8
@@ -27,4 +27,3 @@ before_install:
 
 script:
   - docker run --cap-add SYS_PTRACE -v ${PWD}:/mnt -it ${DOCKER_IMG}/${COMPILER} /bin/bash -c "cd /mnt; script/ci_build.sh"
-
