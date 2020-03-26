@@ -21,7 +21,6 @@ conan install \
     -g cmake_paths \
     ..
 
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 make unittest
-
