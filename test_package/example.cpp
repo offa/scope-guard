@@ -1,4 +1,3 @@
-#include <iostream>
 #include <scope.h>
 
 int main()
