@@ -12,6 +12,7 @@ env:
 
 jobs:
     include:
+    - env: COMPILER=gcc-10
     - env: COMPILER=gcc-9
     - env: COMPILER=gcc-8
     - env: COMPILER=gcc-7
