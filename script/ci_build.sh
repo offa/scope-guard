@@ -7,9 +7,6 @@ apt-get install -y python3-pip
 pip3 install conan
 conan profile new default --detect
 
-# Workaround for GCC 10 support (#168)
-cp -f script/settings.yml ~/.conan/
-
 if [[ "${CXX}" == clang* ]]
 then
     export CXXFLAGS="-stdlib=libc++"
