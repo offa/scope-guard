@@ -22,10 +22,12 @@ jobs:
     - env: COMPILER=clang-7
     - env: COMPILER=clang-6
     - env: COMPILER=clang-5
+    - env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9
 
 
 before_install:
-  - docker pull ${DOCKER_IMG}/${COMPILER}:stable
+  - if [[ -v COMPILER ]]; then docker pull ${DOCKER_IMG}/${COMPILER}:stable; fi
 
 script:
-  - docker run -v ${PWD}:/mnt -it ${DOCKER_IMG}/${COMPILER} /bin/bash -c "cd /mnt; script/ci_build.sh"
+  - if [[ -v COMPILER ]]; then docker run -v ${PWD}:/mnt -it ${DOCKER_IMG}/${COMPILER} /bin/bash -c "cd /mnt; script/ci_build.sh"; fi
+  - if [[ -v CONAN_DOCKER_IMAGE ]]; then script/conan_build.sh; fi
