@@ -22,7 +22,7 @@ jobs:
     - env: COMPILER=clang-7
     - env: COMPILER=clang-6
     - env: COMPILER=clang-5
-    - env: CONAN_GCC_VERSIONS=9 CONAN_DOCKER_IMAGE=conanio/gcc9
+    - env: CONAN_GCC_VERSIONS=9
 
 
 before_install:
