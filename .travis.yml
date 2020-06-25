@@ -30,4 +30,4 @@ before_install:
 
 script:
   - if [[ -v COMPILER ]]; then docker run -v ${PWD}:/mnt -it ${DOCKER_IMG}/${COMPILER} /bin/bash -c "cd /mnt; script/ci_build.sh"; fi
-  - if [[ -v CONAN_DOCKER_IMAGE ]]; then script/conan_build.sh; fi
+  - if [[ -v CONAN_GCC_VERSIONS ]]; then script/conan_build.sh; fi
