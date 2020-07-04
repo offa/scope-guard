@@ -20,7 +20,7 @@ class ScopeguardConan(ConanFile):
         "revision": version
     }
     requires = (
-        "catch2/2.12.2",
+        "catch2/2.12.3",
         "trompeloeil/v38@rollbear/stable"
     )
     options = {
