@@ -204,5 +204,50 @@ namespace mock
         static inline bool throwOnNextCopy{false};
     };
 
-}
+    template<bool noexceptMove>
+    struct NoexceptResource
+    {
+        NoexceptResource() = default;
+        ~NoexceptResource() = default;
 
+        NoexceptResource(const NoexceptResource&) = default;
+
+        NoexceptResource(NoexceptResource&&) noexcept(noexceptMove)
+        {
+        }
+
+        NoexceptResource& operator=(const NoexceptResource&) = default;
+
+        NoexceptResource& operator=(NoexceptResource&&) noexcept(noexceptMove)
+        {
+            return *this;
+        }
+    };
+
+    template<bool noexceptMove>
+    struct NoexceptDeleter
+    {
+        NoexceptDeleter() = default;
+        ~NoexceptDeleter() = default;
+
+        NoexceptDeleter(const NoexceptDeleter&) = default;
+
+        NoexceptDeleter(NoexceptDeleter&&) noexcept(noexceptMove)
+        {
+        }
+
+        NoexceptDeleter& operator=(const NoexceptDeleter&) = default;
+
+        NoexceptDeleter& operator=(NoexceptDeleter&&) noexcept(noexceptMove)
+        {
+            return *this;
+        }
+
+        template<class Resource>
+        void operator()(const Resource&) const
+        {
+        }
+    };
+
+
+}

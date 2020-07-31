@@ -222,3 +222,18 @@ TEST_CASE("make unique resource checked releases if invalid", "[UniqueResource]"
     [[maybe_unused]] auto guard = sr::make_unique_resource_checked(Handle{-1}, Handle{-1}, deleter);
 }
 
+TEST_CASE("not noexcept move", "[UniqueResource]")
+{
+    NoexceptDeleter<false> deleter{};
+    auto guard = sr::unique_resource{NoexceptResource<false>{}, deleter};
+    auto temp = std::move(guard);
+    guard = std::move(temp);
+}
+
+TEST_CASE("noexcept move", "[UniqueResource]")
+{
+    NoexceptDeleter<true> deleter{};
+    auto guard = sr::unique_resource{NoexceptResource<true>{}, deleter};
+    auto temp = std::move(guard);
+    guard = std::move(temp);
+}

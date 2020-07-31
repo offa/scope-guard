@@ -62,6 +62,11 @@ namespace sr::detail
             value = std::move(other.value);
         }
 
+        void reset(const Wrapper<T>& other) noexcept(std::is_nothrow_assignable_v<T, const T&>)
+        {
+            value = other.value;
+        }
+
         void reset(T&& newValue) noexcept(std::is_nothrow_assignable_v<T, decltype(std::move_if_noexcept(newValue))>)
         {
             value = std::forward<T>(newValue);
