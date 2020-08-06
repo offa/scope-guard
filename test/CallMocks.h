@@ -249,5 +249,25 @@ namespace mock
         }
     };
 
+    struct FunctionDeleter
+    {
+        FunctionDeleter() noexcept = default;
+        FunctionDeleter(const FunctionDeleter&) = default;
+        FunctionDeleter(FunctionDeleter&&) = default;
+
+        FunctionDeleter& operator=(const FunctionDeleter&)
+        {
+            return *this;
+        }
+
+        FunctionDeleter& operator=(FunctionDeleter&&)
+        {
+            return *this;
+        }
+
+        void operator()(Handle) const
+        {
+        }
+    };
 
 }

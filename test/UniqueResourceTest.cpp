@@ -241,7 +241,14 @@ TEST_CASE("noexcept move", "[UniqueResource]")
 TEST_CASE("std::function deleter", "[UniqueResource]")
 {
     const auto deleter = std::function<void(Handle)>{[]([[maybe_unused]] Handle h) { }};
-    sr::unique_resource guard1{Handle{3}, deleter};
+    sr::unique_resource movedFrom{Handle{3}, deleter};
     sr::unique_resource guard2{Handle{4}, deleter};
-    guard2 = std::move(guard1);
+    guard2 = std::move(movedFrom);
+}
+
+TEST_CASE("not noexcept move and copy assignable deleter", "[UniqueResource]")
+{
+    sr::unique_resource movedFrom{0, FunctionDeleter{}};
+    sr::unique_resource guard{0, FunctionDeleter{}};
+    guard = std::move(movedFrom);
 }
