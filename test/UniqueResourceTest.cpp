@@ -237,3 +237,11 @@ TEST_CASE("noexcept move", "[UniqueResource]")
     auto temp = std::move(guard);
     guard = std::move(temp);
 }
+
+TEST_CASE("std::function deleter", "[UniqueResource]")
+{
+    const auto deleter = std::function<void(Handle)>{[]([[maybe_unused]] Handle h) { }};
+    sr::unique_resource guard1{Handle{3}, deleter};
+    sr::unique_resource guard2{Handle{4}, deleter};
+    guard2 = std::move(guard1);
+}
