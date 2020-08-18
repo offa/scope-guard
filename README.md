@@ -19,9 +19,14 @@ The namespace `sr` is used instead of `std`.
 The filenames contain a `.h` extension. To enable the compatible header as specified in the document the CMake option `ENABLE_COMPAT_HEADER` can be used. This will generate and install an additional header named `scope` (without file extension).
 
 
+## Standardisation progress
+
+[P0052][1] has been adopted (2019-03) and is in the [*Library Fundamentals v3*][2] now.
+
+
 ## Documentation
 
-- [*P0052R10 - Generic Scope Guard and RAII Wrapper for the Standard Library*][1] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
+- [*P0052R10 – Generic Scope Guard and RAII Wrapper for the Standard Library*][1] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
 - [*N4853 – C++ Extensions for Library Fundamentals, Version 3*][2] (T. Köppe)
 
 
