@@ -20,8 +20,6 @@ jobs:
     - env: COMPILER=clang-9
     - env: COMPILER=clang-8
     - env: COMPILER=clang-7
-    - env: COMPILER=clang-6
-    - env: COMPILER=clang-5
     - env: CONAN_GCC_VERSIONS=9
 
 
