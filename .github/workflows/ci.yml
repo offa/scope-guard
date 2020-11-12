@@ -1,0 +1,36 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        compiler:
+          - gcc-10
+          - gcc-9
+          - gcc-8
+          - gcc-7
+          - clang-11
+          - clang-10
+          - clang-9
+          - clang-8
+          - clang-7
+    container:
+      image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
+    name: "${{ matrix.compiler }}"
+    steps:
+      - uses: actions/checkout@master
+      - name: Build
+        run: script/ci_build.sh
+
+  build_conan:
+    runs-on: ubuntu-20.04
+    name: "Conan ${{ matrix.compiler }}"
+    steps:
+      - uses: actions/checkout@master
+      - name: Build
+        env:
+          CONAN_GCC_VERSIONS: 9
+        run: script/conan_build.sh

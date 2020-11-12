@@ -1,5 +1,6 @@
 # Scope Guard
 
+[![CI](https://github.com/offa/scope-guard/workflows/ci/badge.svg)](https://github.com/offa/scope-guard/actions)
 [![Build Status](https://travis-ci.org/offa/scope-guard.svg?branch=master)](https://travis-ci.org/offa/scope-guard)
 [![GitHub release](https://img.shields.io/github/release/offa/scope-guard.svg)](https://github.com/offa/scope-guard/releases)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
