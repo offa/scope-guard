@@ -31,6 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Build
-        env:
-          CONAN_GCC_VERSIONS: 9
-        run: script/conan_build.sh
+        run: |
+          export CONAN_GCC_VERSIONS=9
+          export CONAN_DOCKER_IMAGE=conanio/gcc${CONAN_GCC_VERSIONS}
+          script/conan_build.sh
