@@ -20,8 +20,8 @@ class ScopeguardConan(ConanFile):
         "revision": version
     }
     requires = (
-        "catch2/2.13.2",
-        "trompeloeil/v38@rollbear/stable"
+        "catch2/2.13.3",
+        "trompeloeil/39"
     )
     options = {
         "unittest": ["ON", "OFF"],
