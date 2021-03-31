@@ -179,6 +179,8 @@ namespace mock
     {
         CopyMock() { }
         CopyMock(const CopyMock&) { }
+
+        CopyMock& operator=(const CopyMock&) = default;
     };
 
     struct ConditionalThrowOnCopyDeleter
