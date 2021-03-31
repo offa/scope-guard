@@ -213,7 +213,7 @@ namespace sr
     {
         unique_resource<std::decay_t<R>, std::decay_t<D>> ur{std::forward<R>(r), std::forward<D>(d)};
 
-        if( bool(r == invalid) == true )
+        if( bool(r == invalid) )
         {
             ur.release();
         }
