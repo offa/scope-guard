@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 
-project(ScopeGuard VERSION 0.3.7)
+project(ScopeGuard VERSION 0.3.8)
 message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
