@@ -14,6 +14,8 @@ else
     conan profile update settings.compiler.libcxx=libstdc++11 default
 fi
 
+cp script/settings.yml ~/.conan/
+
 mkdir build && cd build
 
 conan install \
