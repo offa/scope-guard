@@ -175,7 +175,7 @@ TEST_CASE("get returns resource", "[UniqueResource]")
 TEST_CASE("pointer access returns resource" "[UniqueResource]")
 {
     const auto p = std::make_pair(3, 4);
-    auto guard = sr::unique_resource{&p, [](auto*) { }};
+    auto guard = sr::unique_resource{&p, [](auto*) {}};
     REQUIRE(guard->first == 3);
     REQUIRE(guard->second == 4);
 }
@@ -183,7 +183,7 @@ TEST_CASE("pointer access returns resource" "[UniqueResource]")
 TEST_CASE("pointer dereference returns resource" "[UniqueResource]")
 {
     Handle h{5};
-    auto guard = sr::unique_resource{PtrHandle{&h}, [](auto*) { }};
+    auto guard = sr::unique_resource{PtrHandle{&h}, [](auto*) {}};
     REQUIRE(*guard == 5);
 }
 
@@ -240,7 +240,7 @@ TEST_CASE("noexcept move", "[UniqueResource]")
 
 TEST_CASE("std::function deleter", "[UniqueResource]")
 {
-    const auto deleter = std::function<void(Handle)>{[]([[maybe_unused]] Handle h) { }};
+    const auto deleter = std::function<void(Handle)>{[]([[maybe_unused]] Handle h) {}};
     sr::unique_resource movedFrom{Handle{3}, deleter};
     sr::unique_resource guard2{Handle{4}, deleter};
     guard2 = std::move(movedFrom);

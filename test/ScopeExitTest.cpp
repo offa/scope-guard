@@ -63,9 +63,9 @@ TEST_CASE("exit function called and rethrow on copy exception", "[ScopeExit]")
 
 TEST_CASE("exit function is not called if released", "[ScopeExit]")
 {
-   REQUIRE_CALL(m, deleter()).TIMES(0);
-   auto guard = sr::scope_exit{deleter};
-   guard.release();
+    REQUIRE_CALL(m, deleter()).TIMES(0);
+    auto guard = sr::scope_exit{deleter};
+    guard.release();
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeExit]")

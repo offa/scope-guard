@@ -63,9 +63,9 @@ TEST_CASE("exit function called and rethrow on copy exception", "[ScopeFail]")
 
 TEST_CASE("exit function is not called if released", "[ScopeFail]")
 {
-   REQUIRE_CALL(m, deleter()).TIMES(0);
-   auto guard = sr::scope_fail{deleter};
-   guard.release();
+    REQUIRE_CALL(m, deleter()).TIMES(0);
+    auto guard = sr::scope_fail{deleter};
+    guard.release();
 }
 
 TEST_CASE("move releases moved-from object", "[ScopeFail]")
@@ -107,7 +107,7 @@ TEST_CASE("exit function called on exception", "[ScopeFail]")
         [[maybe_unused]] auto guard = sr::scope_fail{deleter};
         throw std::exception{};
     }
-    catch( ... )
+    catch (...)
     {
     }
 }
@@ -118,7 +118,7 @@ TEST_CASE("exit function not called on pending exception", "[ScopeFail]")
     {
         throw std::exception{};
     }
-    catch( ... )
+    catch (...)
     {
         [[maybe_unused]] auto guard = sr::scope_fail{deleter};
     }
