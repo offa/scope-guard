@@ -172,7 +172,7 @@ TEST_CASE("get returns resource", "[UniqueResource]")
     CHECK(guard.get() == 3);
 }
 
-TEST_CASE("pointer access returns resource" "[UniqueResource]")
+TEST_CASE("pointer access returns resource", "[UniqueResource]")
 {
     const auto p = std::make_pair(3, 4);
     auto guard = sr::unique_resource{&p, [](auto*) {}};
@@ -180,7 +180,7 @@ TEST_CASE("pointer access returns resource" "[UniqueResource]")
     REQUIRE(guard->second == 4);
 }
 
-TEST_CASE("pointer dereference returns resource" "[UniqueResource]")
+TEST_CASE("pointer dereference returns resource", "[UniqueResource]")
 {
     Handle h{5};
     auto guard = sr::unique_resource{PtrHandle{&h}, [](auto*) {}};
