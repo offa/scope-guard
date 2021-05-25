@@ -23,6 +23,7 @@
 #pragma once
 
 #include <trompeloeil.hpp>
+#include <exception>
 
 namespace mock
 {
