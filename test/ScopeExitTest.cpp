@@ -81,7 +81,7 @@ TEST_CASE("move with copy init releases moved-from object", "[ScopeExit]")
     const NotNothrowMoveMock notNothrow{&mock};
     REQUIRE_CALL(mock, deleter());
     sr::scope_exit movedFrom{notNothrow};
-    auto guard = std::move(movedFrom);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state", "[ScopeExit]")
@@ -98,4 +98,3 @@ TEST_CASE("move transfers state if released", "[ScopeExit]")
     movedFrom.release();
     [[maybe_unused]] auto guard = std::move(movedFrom);
 }
-

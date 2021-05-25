@@ -81,7 +81,7 @@ TEST_CASE("move with copy init releases moved-from object", "[ScopeFail]")
     const NotNothrowMoveMock notNothrow{&mock};
     REQUIRE_CALL(mock, deleter()).TIMES(0);
     sr::scope_fail movedFrom{notNothrow};
-    auto guard = std::move(movedFrom);
+    [[maybe_unused]] auto guard = std::move(movedFrom);
 }
 
 TEST_CASE("move transfers state", "[ScopeFail]")
@@ -123,4 +123,3 @@ TEST_CASE("exit function not called on pending exception", "[ScopeFail]")
         [[maybe_unused]] auto guard = sr::scope_fail{deleter};
     }
 }
-

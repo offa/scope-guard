@@ -249,6 +249,6 @@ TEST_CASE("std::function deleter", "[UniqueResource]")
 TEST_CASE("not noexcept move and copy assignable deleter", "[UniqueResource]")
 {
     sr::unique_resource movedFrom{0, FunctionDeleter{}};
-    sr::unique_resource guard{0, FunctionDeleter{}};
+    [[maybe_unused]] sr::unique_resource guard{0, FunctionDeleter{}};
     guard = std::move(movedFrom);
 }
