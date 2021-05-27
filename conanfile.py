@@ -12,6 +12,7 @@ class ScopeguardConan(ConanFile):
     topics = ("cpp", "cpp17", "p0052", "scope-guard",
               "scope-exit", "scope-fail", "scope-success", "unique-resource", "cmake")
     no_copy_source = True
+    exports = ["LICENSE"]
     _source_dir = "{}-{}".format(name, version)
     scm = {
         "type": "git",
@@ -40,5 +41,6 @@ class ScopeguardConan(ConanFile):
         return cmake
 
     def package(self):
+        self.copy("LICENSE", dst="license")
         cmake = self._configure_cmake()
         cmake.install()
