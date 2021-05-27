@@ -3,11 +3,10 @@ cmake_minimum_required(VERSION 3.11)
 project(ScopeGuard VERSION 0.3.8)
 message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 option(UNITTEST "Build Unit Tests" ON)
 option(ENABLE_COMPAT_HEADER "Enable compatible header 'scope'" OFF)
 message(STATUS "Compatible Header : ${ENABLE_COMPAT_HEADER}")
-
 
 if( CMAKE_BUILD_TYPE )
     message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
@@ -35,7 +34,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-include("${CMAKE_BINARY_DIR}/conan_paths.cmake" OPTIONAL)
+include("${CMAKE_CURRENT_BINARY_DIR}/conan_paths.cmake" OPTIONAL)
 
 
 add_library(ScopeGuard INTERFACE)
