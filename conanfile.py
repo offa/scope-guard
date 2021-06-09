@@ -27,6 +27,10 @@ class ScopeguardConan(ConanFile):
         "unittest=ON",
         "enable_compat_header=OFF"
     )
+    __requirements = [
+        "catch2/2.13.6",
+        "trompeloeil/40"
+    ]
 
 
     def set_version(self):
@@ -44,6 +48,11 @@ class ScopeguardConan(ConanFile):
 
         self.version = version_string
         self.output.info("Project version from CMakeLists.txt: '{}'".format(self.version))
+
+    def requirements(self):
+        if self.options.unittest:
+            for req in self.__requirements:
+                self.requires(req)
 
     def package(self):
         self.copy("LICENSE", dst="license")
