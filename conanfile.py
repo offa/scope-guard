@@ -3,7 +3,7 @@ from conans import ConanFile, CMake
 
 class ScopeguardConan(ConanFile):
     name = "scope-guard"
-    version = "v0.3.4"
+    version = "0.3.4"
     license = "MIT"
     author = "offa <offa@github>"
     url = "https://github.com.offa/scope-guard"
@@ -18,7 +18,7 @@ class ScopeguardConan(ConanFile):
         "type": "git",
         "subfolder": _source_dir,
         "url": "{}.git".format(homepage),
-        "revision": version
+        "revision": f"v{version}"
     }
     requires = (
         "catch2/2.13.6",
