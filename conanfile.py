@@ -1,9 +1,10 @@
-from conans import ConanFile, CMake
+import re
+import os
+from conans import ConanFile, CMake, tools
 
 
 class ScopeguardConan(ConanFile):
     name = "scope-guard"
-    version = "0.3.8"
     license = "MIT"
     author = "offa <offa@github>"
     url = "https://github.com.offa/scope-guard"
@@ -11,15 +12,9 @@ class ScopeguardConan(ConanFile):
     homepage = "https://github.com/offa/scope-guard"
     topics = ("cpp", "cpp17", "p0052", "scope-guard",
               "scope-exit", "scope-fail", "scope-success", "unique-resource", "cmake")
-    no_copy_source = True
+    generators = ("cmake_find_package", "cmake_paths")
     exports = ["LICENSE"]
-    _source_dir = "{}-{}".format(name, version)
-    scm = {
-        "type": "git",
-        "subfolder": _source_dir,
-        "url": "{}.git".format(homepage),
-        "revision": f"v{version}"
-    }
+    exports_sources = ("CMakeLists.txt", "include/*", "test/*", "cmake/*")
     requires = (
         "catch2/2.13.6",
         "trompeloeil/40"
@@ -33,14 +28,31 @@ class ScopeguardConan(ConanFile):
         "enable_compat_header=OFF"
     )
 
-    def _configure_cmake(self):
-        cmake = CMake(self)
-        cmake.definitions["UNITTEST"] = self.options.unittest
-        cmake.definitions["ENABLE_COMPAT_HEADER"] = self.options.enable_compat_header
-        cmake.configure(source_folder=self._source_dir, build_folder="build")
-        return cmake
+
+    def set_version(self):
+        cmake_lists_content = tools.load(os.path.join(self.recipe_folder, "CMakeLists.txt"))
+        project_match = re.search(r'project\s*\((.+?)\)', cmake_lists_content, re.DOTALL)
+
+        if not project_match:
+            raise ConanInvalidConfiguration("No valid project() statement found in CMakeLists.txt")
+
+        project_params = project_match.group(1).split()
+        version_string = project_params[project_params.index("VERSION") + 1]
+
+        if not re.search(r'\d+\.\d+\.\d+(?:\.\d)?', version_string):
+            raise ConanInvalidConfiguration("No valid version found in CMakeLists.txt")
+
+        self.version = version_string
+        self.output.info("Project version from CMakeLists.txt: '{}'".format(self.version))
 
     def package(self):
         self.copy("LICENSE", dst="license")
         cmake = self._configure_cmake()
         cmake.install()
+
+    def _configure_cmake(self):
+        cmake = CMake(self)
+        cmake.definitions["UNITTEST"] = self.options.unittest
+        cmake.definitions["ENABLE_COMPAT_HEADER"] = self.options.enable_compat_header
+        cmake.configure(build_folder="build")
+        return cmake
