@@ -3,7 +3,7 @@ from conans import ConanFile, CMake
 
 class ScopeguardConan(ConanFile):
     name = "scope-guard"
-    version = "0.3.4"
+    version = "0.3.8"
     license = "MIT"
     author = "offa <offa@github>"
     url = "https://github.com.offa/scope-guard"
