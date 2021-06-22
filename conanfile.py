@@ -15,10 +15,6 @@ class ScopeguardConan(ConanFile):
     generators = ("cmake_find_package", "cmake_paths")
     exports = ["LICENSE"]
     exports_sources = ("CMakeLists.txt", "include/*", "test/*", "cmake/*")
-    requires = (
-        "catch2/2.13.6",
-        "trompeloeil/40"
-    )
     options = {
         "unittest": ["ON", "OFF"],
         "enable_compat_header": ["ON", "OFF"]
@@ -29,7 +25,7 @@ class ScopeguardConan(ConanFile):
     )
     __requirements = [
         "catch2/2.13.6",
-        "trompeloeil/40"
+        "trompeloeil/41"
     ]
 
 
