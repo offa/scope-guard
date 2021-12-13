@@ -35,6 +35,6 @@ jobs:
       - uses: actions/checkout@main
       - name: Build
         run: |
-          export CONAN_GCC_VERSIONS=10
+          export CONAN_GCC_VERSIONS=11
           export CONAN_DOCKER_IMAGE=conanio/gcc${CONAN_GCC_VERSIONS}
           script/conan_build.sh
