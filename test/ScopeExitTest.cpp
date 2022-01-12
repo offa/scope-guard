@@ -24,12 +24,9 @@
 #include "CallMocks.h"
 #include <catch2/catch.hpp>
 
-using namespace mock;
-using namespace trompeloeil;
-
 namespace
 {
-    CallMock m;
+    mock::CallMock m;
 
     void deleter()
     {
@@ -46,7 +43,7 @@ TEST_CASE("exit function called on destruction", "[ScopeExit]")
 
 TEST_CASE("exit function lambda called on destruction", "[ScopeExit]")
 {
-    CallMock cm;
+    mock::CallMock cm;
     REQUIRE_CALL(cm, deleter());
     [[maybe_unused]] auto guard = sr::scope_exit{[&cm] { cm.deleter(); }};
 }
@@ -54,7 +51,7 @@ TEST_CASE("exit function lambda called on destruction", "[ScopeExit]")
 TEST_CASE("exit function called and rethrow on copy exception", "[ScopeExit]")
 {
     REQUIRE_THROWS([] {
-        const ThrowOnCopyMock noMove;
+        const mock::ThrowOnCopyMock noMove;
         REQUIRE_CALL(noMove, deleter());
 
         sr::scope_exit guard{noMove};
@@ -77,8 +74,8 @@ TEST_CASE("move releases moved-from object", "[ScopeExit]")
 
 TEST_CASE("move with copy init releases moved-from object", "[ScopeExit]")
 {
-    CallMock mock;
-    const NotNothrowMoveMock notNothrow{&mock};
+    mock::CallMock mock;
+    const mock::NotNothrowMoveMock notNothrow{&mock};
     REQUIRE_CALL(mock, deleter());
     sr::scope_exit movedFrom{notNothrow};
     [[maybe_unused]] auto guard = std::move(movedFrom);
