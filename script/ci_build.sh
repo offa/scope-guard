@@ -3,6 +3,7 @@
 set -ex
 
 # Conan
+apt-get update
 apt-get install -y python3-pip
 pip3 install -U conan
 conan profile new default --detect
