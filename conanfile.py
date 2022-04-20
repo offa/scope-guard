@@ -43,7 +43,7 @@ class ScopeguardConan(ConanFile):
             raise ConanInvalidConfiguration("No valid version found in CMakeLists.txt")
 
         self.version = version_string
-        self.output.info("Project version from CMakeLists.txt: '{}'".format(self.version))
+        self.output.info(f"Project version from CMakeLists.txt: '{self.version}'")
 
     def requirements(self):
         if self.options.unittest:
