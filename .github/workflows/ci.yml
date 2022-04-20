@@ -30,7 +30,7 @@ jobs:
         run: script/ci_build.sh
 
   build_conan:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     name: "Conan ${{ matrix.compiler }}"
     steps:
       - uses: actions/checkout@main
