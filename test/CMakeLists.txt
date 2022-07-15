@@ -4,7 +4,7 @@ find_package(trompeloeil REQUIRED)
 
 function(add_test_suite name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(${name} PRIVATE Catch2::Catch2WithMain trompeloeil::trompeloeil ScopeGuard)
+    target_link_libraries(${name} PRIVATE ScopeGuard Catch2::Catch2WithMain trompeloeil::trompeloeil)
     add_test(${name} ${name})
 endfunction()
 

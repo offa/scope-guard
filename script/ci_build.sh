@@ -11,6 +11,7 @@ conan profile new default --detect
 if [[ "${CXX}" == clang* ]]
 then
     export CXXFLAGS="-stdlib=libc++"
+    conan profile update settings.compiler.libcxx=libc++ default
 else
     conan profile update settings.compiler.libcxx=libstdc++11 default
 fi
@@ -21,6 +22,7 @@ conan install \
     --build=missing \
     -g cmake_find_package \
     -g cmake_paths \
+    -s compiler.cppstd=17 \
     ..
 
 cmake -DCMAKE_BUILD_TYPE=Release ..
