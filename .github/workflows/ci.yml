@@ -37,3 +37,14 @@ jobs:
           export CONAN_GCC_VERSIONS=11
           export CONAN_DOCKER_IMAGE=conanio/gcc${CONAN_GCC_VERSIONS}
           script/conan_build.sh
+
+  formatting-check:
+    name: "formatting"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - uses: DoozyX/clang-format-lint-action@master
+      name: "Verify formatting"
+      with:
+        clangFormatVersion: 14
+

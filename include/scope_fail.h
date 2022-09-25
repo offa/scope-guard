@@ -44,22 +44,18 @@ namespace sr
     }
 
 
-    template<class EF>
+    template <class EF>
     class scope_fail : public detail::scope_guard_base<EF, detail::scope_fail_strategy>
     {
         using ScopeGuardBase = std::enable_if_t<!std::is_same_v<detail::remove_cvref_t<EF>, scope_fail<EF>>,
-                                                detail::scope_guard_base<EF, detail::scope_fail_strategy>
-                                                >;
+                                                detail::scope_guard_base<EF, detail::scope_fail_strategy>>;
 
     public:
-
         using ScopeGuardBase::ScopeGuardBase;
-
     };
 
 
-    template<class EF>
+    template <class EF>
     scope_fail(EF) -> scope_fail<EF>;
 
 }
-

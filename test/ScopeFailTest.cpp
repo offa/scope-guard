@@ -45,17 +45,18 @@ TEST_CASE("exit function lambda called on destruction", "[ScopeFail]")
 {
     mock::CallMock cm;
     REQUIRE_CALL(cm, deleter()).TIMES(0);
-    [[maybe_unused]] auto guard = sr::scope_fail{[&cm] { cm.deleter(); }};
+    [[maybe_unused]] auto guard = sr::scope_fail{[&cm]
+                                                 { cm.deleter(); }};
 }
 
 TEST_CASE("exit function called and rethrow on copy exception", "[ScopeFail]")
 {
-    REQUIRE_THROWS([] {
+    REQUIRE_THROWS([]
+                   {
         const mock::ThrowOnCopyMock noMove;
         REQUIRE_CALL(noMove, deleter());
 
-        sr::scope_fail guard{noMove};
-    }());
+        sr::scope_fail guard{noMove}; }());
 }
 
 TEST_CASE("exit function is not called if released", "[ScopeFail]")

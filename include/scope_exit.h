@@ -35,28 +35,23 @@ namespace sr
             {
                 return true;
             }
-
         };
 
     }
 
 
-    template<class EF>
+    template <class EF>
     class scope_exit : public detail::scope_guard_base<EF, detail::scope_exit_strategy>
     {
         using ScopeGuardBase = std::enable_if_t<!std::is_same_v<detail::remove_cvref_t<EF>, scope_exit<EF>>,
-                                                detail::scope_guard_base<EF, detail::scope_exit_strategy>
-                                                >;
+                                                detail::scope_guard_base<EF, detail::scope_exit_strategy>>;
 
     public:
-
         using ScopeGuardBase::ScopeGuardBase;
-
     };
 
 
-    template<class EF>
+    template <class EF>
     scope_exit(EF) -> scope_exit<EF>;
 
 }
-

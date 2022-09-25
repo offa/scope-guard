@@ -28,26 +28,25 @@
 namespace sr::detail
 {
     // From P0550
-    template<class T>
+    template <class T>
     using remove_cvref = std::remove_cv<std::remove_reference<T>>;
 
-    template<class T>
+    template <class T>
     using remove_cvref_t = typename remove_cvref<T>::type;
 
 
-
-    template<class F, class S>
+    template <class F, class S>
     struct is_noexcept_dtor : public std::true_type
     {
     };
 
-    template<class F, class S>
+    template <class F, class S>
     inline constexpr bool is_noexcept_dtor_v = is_noexcept_dtor<F, S>::value;
 
-    template<class T>
+    template <class T>
     constexpr decltype(auto) forward_if_nothrow_move_constructible(T&& arg)
     {
-        if constexpr( std::is_nothrow_move_constructible_v<T> == true )
+        if constexpr (std::is_nothrow_move_constructible_v<T> == true)
         {
             return std::forward<T>(arg);
         }
@@ -55,46 +54,38 @@ namespace sr::detail
     }
 
 
-
-    template<class EF, class Strategy>
+    template <class EF, class Strategy>
     class scope_guard_base : private Strategy
     {
     public:
-
-        template<class EFP,
-            std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
-            std::enable_if_t<(!std::is_lvalue_reference_v<EFP>)
-                                && std::is_nothrow_constructible_v<EF, EFP>, int> = 0
-            >
-        explicit scope_guard_base(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP>
-                                                                || std::is_nothrow_constructible_v<EF, EFP&>)
-                                                    : exitfunction(std::forward<EFP>(exitFunction)),
-                                                    execute_on_destruction(true)
+        template <class EFP,
+                  std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
+                  std::enable_if_t<(!std::is_lvalue_reference_v<EFP>) &&std::is_nothrow_constructible_v<EF, EFP>, int> = 0>
+        explicit scope_guard_base(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP> || std::is_nothrow_constructible_v<EF, EFP&>)
+            : exitfunction(std::forward<EFP>(exitFunction)),
+              execute_on_destruction(true)
         {
         }
 
-        template<class EFP,
-            std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
-            std::enable_if_t<std::is_lvalue_reference_v<EFP>, int> = 0
-            >
-        explicit scope_guard_base(EFP&& exitFunction) try : exitfunction(exitFunction),
-                                                        execute_on_destruction(true)
+        template <class EFP,
+                  std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
+                  std::enable_if_t<std::is_lvalue_reference_v<EFP>, int> = 0>
+        explicit scope_guard_base(EFP&& exitFunction)
+        try : exitfunction(exitFunction),
+            execute_on_destruction(true)
         {
         }
-        catch( ... )
+        catch (...)
         {
             exitFunction();
             throw;
         }
 
-        template<class EFP = EF, std::enable_if_t<(std::is_nothrow_move_constructible_v<EF>
-                                                    || std::is_copy_constructible_v<EF>), int> = 0
-                >
-        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible_v<EF>
-                                                            || std::is_nothrow_copy_constructible_v<EF>)
-                                        : Strategy(other),
-                                        exitfunction(forward_if_nothrow_move_constructible(other.exitfunction)),
-                                        execute_on_destruction(other.execute_on_destruction)
+        template <class EFP = EF, std::enable_if_t<(std::is_nothrow_move_constructible_v<EF> || std::is_copy_constructible_v<EF>), int> = 0>
+        scope_guard_base(scope_guard_base&& other) noexcept(std::is_nothrow_move_constructible_v<EF> || std::is_nothrow_copy_constructible_v<EF>)
+            : Strategy(other),
+              exitfunction(forward_if_nothrow_move_constructible(other.exitfunction)),
+              execute_on_destruction(other.execute_on_destruction)
         {
             other.release();
         }
@@ -104,7 +95,7 @@ namespace sr::detail
 
         ~scope_guard_base() noexcept(is_noexcept_dtor_v<EF, Strategy>)
         {
-            if( (execute_on_destruction == true) && (this->should_execute() == true) )
+            if ((execute_on_destruction == true) && (this->should_execute() == true))
             {
                 exitfunction();
             }
@@ -122,7 +113,6 @@ namespace sr::detail
 
 
     private:
-
         EF exitfunction;
         bool execute_on_destruction;
     };

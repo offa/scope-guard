@@ -50,19 +50,20 @@ TEST_CASE("construction with copy", "[UniqueResource]")
 {
     REQUIRE_CALL(m, deleter(3));
     const mock::Handle h{3};
-    const auto d = [](auto v) { m.deleter(v); };
+    const auto d = [](auto v)
+    { m.deleter(v); };
     [[maybe_unused]] auto guard = sr::unique_resource{h, d};
 }
 
 TEST_CASE("construction with copy calls deleter and rethrows on failed copy", "[UniqueResource]")
 {
-    REQUIRE_THROWS([] {
+    REQUIRE_THROWS([]
+                   {
         const mock::ThrowOnCopyMock noMove;
         const auto d = [](const auto&) { m.deleter(3); };
         REQUIRE_CALL(m, deleter(3));
 
-        [[maybe_unused]] sr::unique_resource guard{noMove, d};
-    }());
+        [[maybe_unused]] sr::unique_resource guard{noMove, d}; }());
 }
 
 TEST_CASE("move-construction with move", "[UniqueResource]")
@@ -76,7 +77,8 @@ TEST_CASE("move-construction with move", "[UniqueResource]")
 TEST_CASE("move-construction with copy", "[UniqueResource]")
 {
     REQUIRE_CALL(m, deleter(7));
-    auto d = [](auto) { deleter(7); };
+    auto d = [](auto)
+    { deleter(7); };
 
     const mock::CopyMock copyMock;
     sr::unique_resource movedFrom{copyMock, d};
@@ -89,7 +91,8 @@ TEST_CASE("move-construction prevents double release", "[UniqueResource]")
     movedFrom.release();
     mock::ConditionalThrowOnCopyDeleter::throwOnNextCopy = true;
 
-    REQUIRE_THROWS([&movedFrom] { [[maybe_unused]] auto guard = std::move(movedFrom); }());
+    REQUIRE_THROWS([&movedFrom]
+                   { [[maybe_unused]] auto guard = std::move(movedFrom); }());
 }
 
 TEST_CASE("move assignment calls deleter", "[UniqueResource]")
@@ -140,7 +143,8 @@ TEST_CASE("reset sets new lvalue and calls deleter on previous", "[UniqueResourc
 {
     REQUIRE_CALL(m, deleter(3));
     REQUIRE_CALL(m, deleter(7));
-    auto d = [](const auto& v) { deleter(v.value); };
+    auto d = [](const auto& v)
+    { deleter(v.value); };
     auto guard = sr::unique_resource{mock::NotNothrowAssignable{3}, d};
     const mock::NotNothrowAssignable h{7};
     guard.reset(h);
@@ -150,7 +154,8 @@ TEST_CASE("reset handles exception on assignment", "[UniqueResource]")
 {
     REQUIRE_CALL(m, deleter(3));
     REQUIRE_CALL(m, deleter(7));
-    auto d = [](const auto& v) { deleter(v.handle); };
+    auto d = [](const auto& v)
+    { deleter(v.handle); };
     auto guard = sr::unique_resource{mock::ConditionalThrowOnCopyMock{3, false}, d};
     guard.reset(mock::ConditionalThrowOnCopyMock{7, true});
 }

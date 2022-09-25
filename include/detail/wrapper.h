@@ -35,13 +35,13 @@ namespace sr::detail
     };
 
 
-   template<class T>
-   class Wrapper
-   {
-   public:
-
-        template<class TT, class G = NoopGuard, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
-        Wrapper(TT&& v, G&& g = G{}) noexcept(std::is_nothrow_constructible_v<T, TT>) : value(std::forward<TT>(v))
+    template <class T>
+    class Wrapper
+    {
+    public:
+        template <class TT, class G = NoopGuard, std::enable_if_t<std::is_constructible_v<T, TT>, int> = 0>
+        Wrapper(TT&& v, G&& g = G{}) noexcept(std::is_nothrow_constructible_v<T, TT>)
+            : value(std::forward<TT>(v))
         {
             g.release();
         }
@@ -82,18 +82,17 @@ namespace sr::detail
 
 
     private:
-
         T value;
     };
 
 
-   template<class T>
-   class Wrapper<T&>
-   {
-   public:
-
-        template<class TT, class G = NoopGuard, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
-        Wrapper(TT&& v, G&& g = G{}) noexcept(std::is_nothrow_constructible_v<TT, T&>) : value(static_cast<T&>(v))
+    template <class T>
+    class Wrapper<T&>
+    {
+    public:
+        template <class TT, class G = NoopGuard, std::enable_if_t<std::is_convertible_v<TT, T&>, int> = 0>
+        Wrapper(TT&& v, G&& g = G{}) noexcept(std::is_nothrow_constructible_v<TT, T&>)
+            : value(static_cast<T&>(v))
         {
             g.release();
         }
@@ -124,8 +123,7 @@ namespace sr::detail
 
 
     private:
-
         type value;
-   };
+    };
 
 }

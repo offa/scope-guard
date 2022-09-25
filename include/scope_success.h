@@ -42,7 +42,7 @@ namespace sr
         };
 
 
-        template<class F>
+        template <class F>
         struct is_noexcept_dtor<F, scope_success_strategy>
             : public std::conditional_t<noexcept(std::declval<F>()()), std::true_type, std::false_type>
         {
@@ -51,22 +51,18 @@ namespace sr
     }
 
 
-    template<class EF>
+    template <class EF>
     class scope_success : public detail::scope_guard_base<EF, detail::scope_success_strategy>
     {
         using ScopeGuardBase = std::enable_if_t<!std::is_same_v<detail::remove_cvref_t<EF>, scope_success<EF>>,
-                                                detail::scope_guard_base<EF, detail::scope_success_strategy>
-                                                >;
+                                                detail::scope_guard_base<EF, detail::scope_success_strategy>>;
 
     public:
-
         using ScopeGuardBase::ScopeGuardBase;
-
     };
 
 
-    template<class EF>
+    template <class EF>
     scope_success(EF) -> scope_success<EF>;
 
 }
-
