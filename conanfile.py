@@ -24,7 +24,7 @@ class ScopeguardConan(ConanFile):
         "enable_compat_header=OFF"
     )
     __requirements = [
-        "catch2/3.2.1",
+        "catch2/3.3.0",
         "trompeloeil/43"
     ]
 
