@@ -1,6 +1,9 @@
 import re
 import os
-from conans import ConanFile, CMake, tools
+from conan import ConanFile
+from conan.errors import ConanInvalidConfiguration
+from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps, cmake_layout
+from conan.tools.files import load, copy
 
 
 class ScopeguardConan(ConanFile):
@@ -12,17 +15,17 @@ class ScopeguardConan(ConanFile):
     homepage = "https://github.com/offa/scope-guard"
     topics = ("cpp", "cpp17", "p0052", "scope-guard",
               "scope-exit", "scope-fail", "scope-success", "unique-resource", "cmake")
-    generators = ("cmake_find_package", "cmake_paths")
+    settings = "os", "arch", "compiler", "build_type"
     exports = ["LICENSE"]
     exports_sources = ("CMakeLists.txt", "include/*", "test/*", "cmake/*")
     options = {
-        "unittest": ["ON", "OFF"],
-        "enable_compat_header": ["ON", "OFF"]
+        "unittest": [True, False],
+        "enable_compat_header": [True, False]
     }
-    default_options = (
-        "unittest=ON",
-        "enable_compat_header=OFF"
-    )
+    default_options = {
+        "unittest": True,
+        "enable_compat_header": False
+    }
     __requirements = [
         "catch2/3.3.0",
         "trompeloeil/43"
@@ -30,7 +33,7 @@ class ScopeguardConan(ConanFile):
 
 
     def set_version(self):
-        cmake_lists_content = tools.load(os.path.join(self.recipe_folder, "CMakeLists.txt"))
+        cmake_lists_content = load(self, os.path.join(self.recipe_folder, "CMakeLists.txt"))
         project_match = re.search(r'project\s*\((.+?)\)', cmake_lists_content, re.DOTALL)
 
         if not project_match:
@@ -50,14 +53,32 @@ class ScopeguardConan(ConanFile):
             for req in self.__requirements:
                 self.requires(req)
 
+    def generate(self):
+        tc = CMakeToolchain(self)
+        tc.variables["UNITTEST"] = self.options.unittest
+        tc.variables["ENABLE_COMPAT_HEADER"] = self.options.enable_compat_header
+        tc.generate()
+
+        deps = CMakeDeps(self)
+        deps.generate()
+
+    def build(self):
+        cmake = self._configure_cmake()
+        cmake.build()
+
     def package(self):
-        self.copy("LICENSE", dst="license")
+        copy(self, pattern="LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self.source_folder)
         cmake = self._configure_cmake()
         cmake.install()
 
+    def package_info(self):
+        self.cpp_info.set_property("cmake_file_name", "ScopeGuard")
+        self.cpp_info.set_property("cmake_target_name", "ScopeGuard")
+        self.cpp_info.bindirs = []
+        self.cpp_info.libdirs = []
+        self.cpp_info.resdirs = []
+
     def _configure_cmake(self):
         cmake = CMake(self)
-        cmake.definitions["UNITTEST"] = self.options.unittest
-        cmake.definitions["ENABLE_COMPAT_HEADER"] = self.options.enable_compat_header
-        cmake.configure(build_folder="build")
+        cmake.configure()
         return cmake
