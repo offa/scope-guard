@@ -2,7 +2,7 @@ import re
 import os
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps, cmake_layout
+from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 from conan.tools.files import load, copy
 
 
@@ -30,7 +30,6 @@ class ScopeguardConan(ConanFile):
         "catch2/3.3.0",
         "trompeloeil/43"
     ]
-
 
     def set_version(self):
         cmake_lists_content = load(self, os.path.join(self.recipe_folder, "CMakeLists.txt"))
