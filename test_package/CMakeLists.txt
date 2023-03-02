@@ -8,5 +8,5 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(ScopeGuard REQUIRED)
 
 add_executable(test_package example.cpp)
-target_link_libraries(test_package PRIVATE ScopeGuard)
+target_link_libraries(test_package PRIVATE ScopeGuard::ScopeGuard)
 
