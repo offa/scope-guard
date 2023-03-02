@@ -6,14 +6,10 @@ message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 option(UNITTEST "Build Unit Tests" ON)
 option(ENABLE_COMPAT_HEADER "Enable compatible header 'scope'" OFF)
+
+message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
+message(STATUS "Unit Tests : ${UNITTEST}")
 message(STATUS "Compatible Header : ${ENABLE_COMPAT_HEADER}")
-
-if( CMAKE_BUILD_TYPE )
-    message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
-else()
-    message(STATUS "Build Type : None")
-endif()
-
 
 
 add_compile_options(-Wall
