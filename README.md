@@ -16,7 +16,7 @@ This implementation conforms to [P0052][1], except:
 The namespace `sr` is used instead of `std`.
 
 ###### Filenames
-The filenames contain a `.h` extension. To enable the compatible header as specified in the document the CMake option `ENABLE_COMPAT_HEADER` can be used. This will generate and install an additional header named `scope` (without file extension).
+The filenames contain a `.h` extension. To enable the compatible header as specified in the document the CMake option `SCOPEGUARD_ENABLE_COMPAT_HEADER` can be used. This will generate and install an additional header named `scope` (without file extension).
 
 
 ## Standardisation progress

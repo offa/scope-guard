@@ -54,8 +54,8 @@ class ScopeguardConan(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.variables["UNITTEST"] = self.options.unittest
-        tc.variables["ENABLE_COMPAT_HEADER"] = self.options.enable_compat_header
+        tc.variables["SCOPEGUARD_UNITTEST"] = self.options.unittest
+        tc.variables["SCOPEGUARD_ENABLE_COMPAT_HEADER"] = self.options.enable_compat_header
         tc.generate()
 
         deps = CMakeDeps(self)

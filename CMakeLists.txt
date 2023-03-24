@@ -4,12 +4,12 @@ project(ScopeGuard VERSION 0.3.11)
 message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-option(UNITTEST "Build Unit Tests" ON)
-option(ENABLE_COMPAT_HEADER "Enable compatible header 'scope'" OFF)
+option(SCOPEGUARD_UNITTEST "Build Unit Tests" ON)
+option(SCOPEGUARD_ENABLE_COMPAT_HEADER "Enable compatible header 'scope'" OFF)
 
 message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
-message(STATUS "Unit Tests : ${UNITTEST}")
-message(STATUS "Compatible Header : ${ENABLE_COMPAT_HEADER}")
+message(STATUS "Unit Tests : ${SCOPEGUARD_UNITTEST}")
+message(STATUS "Compatible Header : ${SCOPEGUARD_ENABLE_COMPAT_HEADER}")
 
 
 add_compile_options(-Wall
@@ -37,7 +37,7 @@ target_include_directories(ScopeGuard INTERFACE
                             $<INSTALL_INTERFACE:include>
                             )
 
-if( ENABLE_COMPAT_HEADER )
+if( SCOPEGUARD_ENABLE_COMPAT_HEADER )
     configure_file(cmake/scope.in generated/scope COPYONLY)
 
     target_include_directories(ScopeGuard INTERFACE
@@ -48,7 +48,7 @@ endif()
 
 
 
-if( UNITTEST )
+if( SCOPEGUARD_UNITTEST )
     enable_testing()
     add_subdirectory("test")
 endif()
