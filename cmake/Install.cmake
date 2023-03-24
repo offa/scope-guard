@@ -6,4 +6,7 @@ if( SCOPEGUARD_ENABLE_COMPAT_HEADER )
     install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 endif()
 
-install(EXPORT ScopeGuardConfig DESTINATION share/ScopeGuard/cmake)
+install(EXPORT ScopeGuardConfig
+    NAMESPACE ScopeGuard::
+    DESTINATION share/ScopeGuard/cmake
+    )
