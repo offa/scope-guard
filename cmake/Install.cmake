@@ -8,5 +8,5 @@ endif()
 
 install(EXPORT ScopeGuardConfig
     NAMESPACE ScopeGuard::
-    DESTINATION share/ScopeGuard/cmake
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/ScopeGuard/cmake
     )
