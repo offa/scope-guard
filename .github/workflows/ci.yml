@@ -16,9 +16,6 @@ jobs:
           - clang-14
           - clang-13
           - clang-12
-          - clang-11
-          - clang-10
-          - clang-9
     container:
       image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
     name: "${{ matrix.compiler }}"
