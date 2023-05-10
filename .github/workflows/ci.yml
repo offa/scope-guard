@@ -8,17 +8,17 @@ jobs:
     strategy:
       matrix:
         compiler:
-          - gcc-12
-          - gcc-11
-          - gcc-10
-          - gcc-9
-          - clang-16
-          - clang-15
-          - clang-14
-          - clang-13
-          - clang-12
+          - gcc:12
+          - gcc:11
+          - gcc:10
+          - gcc:9
+          - clang:16
+          - clang:15
+          - clang:14
+          - clang:13
+          - clang:12
     container:
-      image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
+      image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}"
     name: "${{ matrix.compiler }}"
     steps:
       - uses: actions/checkout@main
@@ -28,7 +28,7 @@ jobs:
   build_conan:
     runs-on: ubuntu-latest
     container:
-      image: "registry.gitlab.com/offa/docker-images/gcc-12:stable"
+      image: "registry.gitlab.com/offa/docker-images/gcc:12"
     name: "conan ${{ matrix.compiler }}"
     steps:
       - uses: actions/checkout@main
