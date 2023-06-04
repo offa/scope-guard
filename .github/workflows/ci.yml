@@ -14,7 +14,7 @@ jobs:
           - gcc:10
           - gcc:9
           - clang:16
-          # - clang:15 # Disabled due to broken image
+          - clang:15
           - clang:14
           - clang:13
           - clang:12
