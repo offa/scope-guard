@@ -28,7 +28,7 @@ class ScopeguardConan(ConanFile):
     }
     __requirements = [
         "catch2/3.4.0",
-        "trompeloeil/43"
+        "trompeloeil/45"
     ]
 
     def set_version(self):
