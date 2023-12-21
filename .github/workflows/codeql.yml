@@ -8,17 +8,17 @@ jobs:
   codeql:
     runs-on: ubuntu-latest
     container:
-      image: "registry.gitlab.com/offa/docker-images/gcc:12"
+      image: "registry.gitlab.com/offa/docker-images/gcc:13"
     name: "CodeQL"
     steps:
       - name: Checkout
         uses: actions/checkout@main
       - name: CodeQL Initialization
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: cpp
           queries: +security-and-quality
       - name: Build
         run: script/ci_build.sh
       - name: CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
