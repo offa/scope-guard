@@ -5,9 +5,11 @@ set -ex
 BUILD_TYPE="Release"
 
 # Conan
+export DEBIAN_FRONTEND=noninteractive
+export PATH=$HOME/.local/bin:$PATH
 apt-get update
-apt-get install -y python3-pip
-pip3 install -U conan
+apt-get install -y pipx
+pipx install conan
 conan profile detect
 
 if [[ "${CXX}" == clang* ]]
