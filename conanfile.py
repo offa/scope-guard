@@ -10,7 +10,7 @@ class ScopeguardConan(ConanFile):
     name = "scope-guard"
     license = "MIT"
     author = "offa <offa@github>"
-    url = "https://github.com.offa/scope-guard"
+    url = "https://github.com/offa/scope-guard"
     description = "Implementation of Scoped Guards and Unique Resource as proposed in P0052."
     homepage = "https://github.com/offa/scope-guard"
     topics = ("cpp", "cpp17", "p0052", "scope-guard",
