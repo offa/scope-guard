@@ -34,7 +34,7 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 
 **MIT License**
 
-    Copyright (c) 2017-2024 offa
+    Copyright (c) 2017-2025 offa
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
