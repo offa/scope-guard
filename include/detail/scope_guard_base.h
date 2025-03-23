@@ -60,7 +60,7 @@ namespace sr::detail
     public:
         template <class EFP,
                   std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
-                  std::enable_if_t<(!std::is_lvalue_reference_v<EFP>) &&std::is_nothrow_constructible_v<EF, EFP>, int> = 0>
+                  std::enable_if_t<(!std::is_lvalue_reference_v<EFP>) && std::is_nothrow_constructible_v<EF, EFP>, int> = 0>
         explicit scope_guard_base(EFP&& exitFunction) noexcept(std::is_nothrow_constructible_v<EF, EFP> || std::is_nothrow_constructible_v<EF, EFP&>)
             : exitfunction(std::forward<EFP>(exitFunction)),
               execute_on_destruction(true)
@@ -71,8 +71,9 @@ namespace sr::detail
                   std::enable_if_t<std::is_constructible_v<EF, EFP>, int> = 0,
                   std::enable_if_t<std::is_lvalue_reference_v<EFP>, int> = 0>
         explicit scope_guard_base(EFP&& exitFunction)
-        try : exitfunction(exitFunction),
-            execute_on_destruction(true)
+        try
+            : exitfunction(exitFunction),
+              execute_on_destruction(true)
         {
         }
         catch (...)
