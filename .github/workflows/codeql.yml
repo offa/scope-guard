@@ -3,6 +3,10 @@ name: codeql
 on:
   schedule:
     - cron: '0 5 * * 3'
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   codeql:
