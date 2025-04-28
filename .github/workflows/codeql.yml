@@ -8,6 +8,11 @@ on:
       - master
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: read
+  security-events: write
+
 jobs:
   codeql:
     runs-on: ubuntu-latest
