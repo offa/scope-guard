@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
-    - uses: jidicula/clang-format-action@main
+    - uses: jidicula/clang-format-action@cd22ed667fc160ec21ab482160adf16cc79274af
       name: "Verify formatting"
       with:
         clang-format-version: 19
