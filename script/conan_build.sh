@@ -2,9 +2,10 @@
 
 set -ex
 
+export PATH=$HOME/.local/bin:$PATH
 apt-get update
-apt-get install -y python3-pip
-pip3 install -U conan
+apt-get install -y pipx
+pipx install conan
 
 conan profile detect
 conan create --build=missing .

@@ -34,7 +34,7 @@ jobs:
   build_conan:
     runs-on: ubuntu-latest
     container:
-      image: "registry.gitlab.com/offa/docker-images/gcc:13"
+      image: "registry.gitlab.com/offa/docker-images/gcc:15"
     name: "conan ${{ matrix.compiler }}"
     steps:
       - uses: actions/checkout@main
