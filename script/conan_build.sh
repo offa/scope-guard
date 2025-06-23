@@ -2,6 +2,7 @@
 
 set -ex
 
+export PATH=$HOME/.local/bin:$PATH
 apt-get update
 apt-get install -y pipx
 pipx install conan
