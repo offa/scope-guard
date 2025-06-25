@@ -21,6 +21,7 @@ fi
 mkdir build && cd build
 
 conan install \
+    -o unittest=True \
     --build=missing \
     -of . \
     -s compiler.cppstd=17 \
