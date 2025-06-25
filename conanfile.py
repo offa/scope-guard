@@ -18,6 +18,7 @@ class ScopeguardConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     exports = ["LICENSE"]
     exports_sources = ("CMakeLists.txt", "include/*", "test/*", "cmake/*")
+    package_type = "header-library"
     options = {
         "unittest": [True, False],
         "enable_compat_header": [True, False]
@@ -75,7 +76,9 @@ class ScopeguardConan(ConanFile):
         self.cpp_info.set_property("cmake_target_name", "ScopeGuard::ScopeGuard")
         self.cpp_info.bindirs = []
         self.cpp_info.libdirs = []
-        self.cpp_info.resdirs = []
+
+    def package_id(self):
+        self.info.clear()
 
     def _configure_cmake(self):
         cmake = CMake(self)
