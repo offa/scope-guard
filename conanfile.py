@@ -24,7 +24,7 @@ class ScopeguardConan(ConanFile):
         "enable_compat_header": [True, False]
     }
     default_options = {
-        "unittest": True,
+        "unittest": False,
         "enable_compat_header": False
     }
     __requirements = [

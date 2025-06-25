@@ -8,4 +8,4 @@ apt-get install -y pipx
 pipx install conan
 
 conan profile detect
-conan create --build=missing .
+conan create -o unittest=True --build=missing .
