@@ -24,7 +24,6 @@ class ScopeguardConan(ConanFile):
         "scope-fail",
         "scope-success",
         "unique-resource",
-        "cmake",
     )
     settings = "os", "arch", "compiler", "build_type"
     exports = ["LICENSE"]
@@ -32,7 +31,6 @@ class ScopeguardConan(ConanFile):
     package_type = "header-library"
     options = {"unittest": [True, False], "enable_compat_header": [True, False]}
     default_options = {"unittest": False, "enable_compat_header": False}
-    __requirements = ["catch2/3.10.0", "trompeloeil/49"]
 
     def set_version(self):
         cmake_lists_content = load(
@@ -58,8 +56,8 @@ class ScopeguardConan(ConanFile):
 
     def requirements(self):
         if self.options.unittest:
-            for req in self.__requirements:
-                self.requires(req)
+            self.requires("catch2/3.10.0")
+            self.requires("trompeloeil/49")
 
     def generate(self):
         tc = CMakeToolchain(self)
