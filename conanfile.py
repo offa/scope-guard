@@ -56,7 +56,7 @@ class ScopeguardConan(ConanFile):
 
     def requirements(self):
         if self.options.unittest:
-            self.requires("catch2/3.10.0")
+            self.requires("catch2/3.11.0")
             self.requires("trompeloeil/49")
 
     def generate(self):
