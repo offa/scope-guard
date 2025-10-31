@@ -211,6 +211,8 @@ namespace mock
             throwOnNextCopy = false;
         }
 
+        ConditionalThrowOnCopyDeleter& operator=(const ConditionalThrowOnCopyDeleter&) = delete;
+
         MAKE_CONST_MOCK1(deleter, void(Handle));
 
         void operator()(Handle h) const
