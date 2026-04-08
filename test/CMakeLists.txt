@@ -6,11 +6,6 @@ function(add_test_suite name)
     add_executable(${name} ${name}.cpp)
     target_link_libraries(${name} PRIVATE ScopeGuard Catch2::Catch2WithMain trompeloeil::trompeloeil)
     add_test(${name} ${name})
-
-    # Workaround for catch2 #3076
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "22")
-        target_compile_options(${name} PRIVATE -Wno-c2y-extensions)
-    endif()
 endfunction()
 
 
