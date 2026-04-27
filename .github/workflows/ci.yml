@@ -12,6 +12,7 @@ jobs:
     strategy:
       matrix:
         compiler:
+          - gcc:16
           - gcc:15
           - gcc:14
           - gcc:13
