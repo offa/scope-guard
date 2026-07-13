@@ -1,9 +1,10 @@
-import re
 import os
+import re
+
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
-from conan.tools.files import load, copy
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain
+from conan.tools.files import copy, load
 
 
 class ScopeguardConan(ConanFile):
@@ -56,7 +57,7 @@ class ScopeguardConan(ConanFile):
 
     def requirements(self):
         if self.options.unittest:
-            self.requires("catch2/3.15.1")
+            self.requires("catch2/3.15.2")
             self.requires("trompeloeil/49")
 
     def generate(self):
