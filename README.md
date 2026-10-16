@@ -7,6 +7,12 @@
 
 Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R10**][1].
 
+- **`scope_exit`:** Executes a callable when the current scope is left
+- **`scope_success`:** Executes a callable only if the scope exits normally (no exception)
+- **`scope_fail`:** Executes a callable only if an exception is thrown during the scope
+- **`unique_resource`:** RAII wrapper that owns a resource and calls a deleter on destruction or reset
+- **`make_unique_resource_checked()`:** Helper that creates a `unique_resource` and releases it if the resource equals an invalid value
+
 
 ## Compatibility
 
