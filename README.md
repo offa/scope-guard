@@ -7,6 +7,12 @@
 
 Implementation of *Scope Guards* (`scope_exit`, `scope_success`, `scope_fail`) and `unique_resource` as proposed in [**P0052R10**][1].
 
+- **`scope_exit`:** Executes a callable when the current scope is left
+- **`scope_success`:** Executes a callable only if the scope exits normally (no exception)
+- **`scope_fail`:** Executes a callable only if an exception is thrown during the scope
+- **`unique_resource`:** RAII wrapper that owns a resource and calls a deleter on destruction or reset
+- **`make_unique_resource_checked()`:** Helper that creates a `unique_resource` and releases it if the resource equals an invalid value
+
 
 ## Compatibility
 
@@ -28,6 +34,96 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 
 - [*P0052R10 – Generic Scope Guard and RAII Wrapper for the Standard Library*][1] (P. Sommerlad, A. L. Sandoval, E. Niebler, D. Krügler)
 - [*N4853 – C++ Extensions for Library Fundamentals, Version 3*][2] (T. Köppe)
+
+
+## Usage Examples
+
+### scope_exit
+
+```cpp
+#include "scope_exit.h"
+
+void example() {
+    sr::scope_exit guard([] {
+        std::cout << "Cleanup executed when scope exits\n";
+    });
+
+    // Do work ...
+}
+```
+
+### scope_success
+
+```cpp
+#include "scope_success.h"
+
+void example() {
+    sr::scope_success guard{[] {
+        std::cout << "Success: no exception was thrown\n";
+    }};
+
+    // Do work that might throw ...
+}
+```
+
+### scope_fail
+
+```cpp
+#include "scope_fail.h"
+
+void example() {
+    sr::scope_fail guard{[] {
+        std::cout << "Failure: an exception was thrown\n";
+    }};
+
+    // do work that might throw ...
+}
+```
+
+### unique_resource
+
+```cpp
+#include "unique_resource.h"
+
+class Resource {
+    // ...
+};
+
+void example() {
+    sr::unique_resource resource{
+        Resource{"Example resource"},
+        [](Resource r) {
+            // Delete r
+            std::cout << "Resource deleted\n";
+    }};
+
+    auto& res = resource.get();
+    // Use resource ...
+}
+```
+
+### make_unique_resource_checked()
+
+```cpp
+#include "unique_resource.h"
+
+class Resource {
+    // ...
+};
+
+void example() {
+    auto resource = sr::make_unique_resource_checked(
+        Resource{"invalid"},  // invalid value
+        [](Resource r) {
+            // Delete r
+            std::cout << "Resource deleted\n";
+    });
+    // Resource is released if it equals the invalid value
+
+    auto& res = resource.get();
+    // Use resource ...
+}
+```
 
 
 ## License
