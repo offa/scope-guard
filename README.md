@@ -41,12 +41,14 @@ The filenames contain a `.h` extension. To enable the compatible header as speci
 ### scope_exit
 
 ```cpp
+#include <iostream>
 #include "scope_exit.h"
 
 void example() {
-    sr::scope_exit guard([] {
+    // The lambda is executed when the scope is left (normal or exceptional exit)
+    sr::scope_exit guard{[] {
         std::cout << "Cleanup executed when scope exits\n";
-    });
+    }};
 
     // Do work ...
 }
@@ -55,9 +57,11 @@ void example() {
 ### scope_success
 
 ```cpp
+#include <iostream>
 #include "scope_success.h"
 
 void example() {
+    // The lambda is executed only if the scope is left normally (no exception)
     sr::scope_success guard{[] {
         std::cout << "Success: no exception was thrown\n";
     }};
@@ -69,20 +73,23 @@ void example() {
 ### scope_fail
 
 ```cpp
+#include <iostream>
 #include "scope_fail.h"
 
 void example() {
+    // The lambda is executed only if an exception is thrown within the scope
     sr::scope_fail guard{[] {
         std::cout << "Failure: an exception was thrown\n";
     }};
 
-    // do work that might throw ...
+    // Do work that might throw ...
 }
 ```
 
 ### unique_resource
 
 ```cpp
+#include <iostream>
 #include "unique_resource.h"
 
 class Resource {
@@ -90,12 +97,14 @@ class Resource {
 };
 
 void example() {
+    // The deleter is called when the unique_resource is destroyed or reset
     sr::unique_resource resource{
         Resource{"Example resource"},
         [](Resource r) {
-            // Delete r
             std::cout << "Resource deleted\n";
-    }};
+            // Delete r
+        }
+    };
 
     auto& res = resource.get();
     // Use resource ...
@@ -105,6 +114,7 @@ void example() {
 ### make_unique_resource_checked()
 
 ```cpp
+#include <iostream>
 #include "unique_resource.h"
 
 class Resource {
@@ -112,13 +122,14 @@ class Resource {
 };
 
 void example() {
+    // If the resource equals the invalid value, the deleter is never called
     auto resource = sr::make_unique_resource_checked(
+        Resource{"Example resource"},
         Resource{"invalid"},  // invalid value
         [](Resource r) {
-            // Delete r
             std::cout << "Resource deleted\n";
-    });
-    // Resource is released if it equals the invalid value
+            // Delete r
+        });
 
     auto& res = resource.get();
     // Use resource ...
